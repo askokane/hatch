@@ -9,18 +9,19 @@ import http from "node:http";
 
 const PORT = 3100;
 const PID_FILE = join(process.cwd(), "e2e", ".server.pid");
-const E2E_DB_URL = "file:./e2e-test.db";
 const isWin = process.platform === "win32";
 
+// The e2e server inherits DATABASE_URL/DIRECT_URL from the environment — point
+// them at a throwaway Postgres test database (never your production DB) before
+// running `npm run test:e2e`.
 function envForServer() {
   return {
     ...process.env,
     NODE_ENV: "production" as const,
-    DATABASE_URL: E2E_DB_URL,
     DEV_EMAIL_ALLOWLIST: "@stateu.edu,@hatchdemo.edu,@e2e.edu",
     APP_URL: `http://localhost:${PORT}`,
     PORT: String(PORT),
-    // Enables the test-support routes on this server only (see api/_test/*).
+    // Enables the test-support routes on this server only (see api/test-support/*).
     E2E_TEST_SUPPORT: "1",
   };
 }

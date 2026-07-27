@@ -1,15 +1,17 @@
 // HATCH — Prisma schema.
-// Dev uses SQLite. To move to Postgres: change `provider` below to "postgresql"
-// and point DATABASE_URL at a Postgres instance. No model changes are required —
-// enums and Json fields used here map cleanly to Postgres native types.
+// Uses PostgreSQL (Supabase in the hosted deployment). DATABASE_URL is the pooled
+// (transaction) connection used at runtime; DIRECT_URL is the direct/session
+// connection used for migrations. The schema was originally authored for SQLite —
+// the swap was a provider + connection-string change only, no model changes.
 
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "sqlite"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 enum TagKind {

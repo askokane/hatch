@@ -152,9 +152,9 @@ export async function getPeople(
     where: {
       isDiscoverable: true,
       id: { notIn: [...blocked, viewer.profileId] },
-      ...(filters.school ? { school: { contains: filters.school } } : {}),
+      ...(filters.school ? { school: { contains: filters.school, mode: "insensitive" as const } } : {}),
       ...(filters.gradYear ? { gradYear: filters.gradYear } : {}),
-      ...(filters.q ? { bio: { contains: filters.q } } : {}),
+      ...(filters.q ? { bio: { contains: filters.q, mode: "insensitive" as const } } : {}),
       ...(filters.skillTagId
         ? { tags: { some: { tagId: filters.skillTagId, relation: "HAS" } } }
         : {}),

@@ -7,7 +7,7 @@ Built as a real full-stack app: real accounts, real login sessions, real persist
 ## Stack
 
 - **Next.js 15** (App Router, TypeScript) — all mutations are Server Actions
-- **Prisma ORM + SQLite** for local dev (swap to Postgres = change the datasource `provider` + `DATABASE_URL`; no model changes)
+- **Prisma ORM + PostgreSQL** (Supabase in the hosted deployment). The schema was authored to be provider-agnostic — the SQLite→Postgres swap was a datasource + connection-string change only.
 - **Tailwind CSS** (no component library)
 - **Hand-rolled session auth** — bcrypt (cost 12), SHA-256-hashed session tokens, httpOnly cookies. No Auth.js/Clerk/external auth.
 - **zod** for all input validation
@@ -16,12 +16,15 @@ Built as a real full-stack app: real accounts, real login sessions, real persist
 
 ## Setup (clean checkout)
 
-Requires Node 18+ (developed on Node 22/25).
+Requires Node 18+ (developed on Node 22/25) and a PostgreSQL database. Any
+Postgres works — a free [Supabase](https://supabase.com) or [Neon](https://neon.tech)
+project is easiest. From the provider's dashboard, copy the pooled (transaction,
+port 6543) and direct (session, port 5432) connection strings.
 
 ```bash
 npm install
-cp .env.example .env          # defaults work as-is for local dev
-npx prisma migrate dev        # creates prisma/dev.db and applies migrations
+cp .env.example .env          # then set DATABASE_URL + DIRECT_URL to your Postgres
+npx prisma migrate deploy     # applies migrations
 npm run seed                  # loads the demo dataset; prints demo credentials
 npm run dev                   # http://localhost:3000
 ```

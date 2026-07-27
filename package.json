@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
+    "postinstall": "prisma generate",
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
@@ -13,7 +14,7 @@
     "db:studio": "prisma studio",
     "test:e2e": "playwright test",
     "test:e2e:install": "playwright install chromium",
-    "pretest:e2e": "cross-env DATABASE_URL=file:./e2e-test.db prisma migrate deploy && cross-env DATABASE_URL=file:./e2e-test.db tsx prisma/seed.ts && cross-env DATABASE_URL=file:./e2e-test.db NODE_ENV=production next build"
+    "pretest:e2e": "prisma migrate deploy && tsx prisma/seed.ts && cross-env NODE_ENV=production next build"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"

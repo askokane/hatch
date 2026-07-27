@@ -21,7 +21,10 @@ export async function searchTagsAction(
   const candidates = await db.tag.findMany({
     where: {
       ...(kind ? { kind } : {}),
-      OR: [{ slug: { contains: q } }, { label: { contains: q } }],
+      OR: [
+        { slug: { contains: q, mode: "insensitive" } },
+        { label: { contains: q, mode: "insensitive" } },
+      ],
     },
     take: 20,
     orderBy: { label: "asc" },
