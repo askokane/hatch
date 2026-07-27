@@ -1,0 +1,52 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --paper: #fafaf7;
+  --ink: #14181b;
+  --pine: #2f6f4f;
+  --hairline: #d8d8d2;
+  --brick: #b23b2e;
+}
+
+@layer base {
+  html {
+    background-color: var(--paper);
+    color: var(--ink);
+  }
+  body {
+    font-family: var(--font-sans), system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* Monospace register for structural chrome: labels, tags, nav, buttons. */
+  .mono {
+    font-family: var(--font-mono), ui-monospace, monospace;
+  }
+
+  /* Visible focus everywhere — keyboard operability floor. */
+  :focus-visible {
+    outline: 2px solid var(--pine);
+    outline-offset: 2px;
+  }
+
+  a {
+    color: inherit;
+  }
+}
+
+@layer components {
+  /* A monospace bracket-label motif used as a structural device. */
+  .label-mono {
+    font-family: var(--font-mono), ui-monospace, monospace;
+    font-size: 0.75rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: #5b6469;
+  }
+
+  .hairline {
+    border-color: var(--hairline);
+  }
+}

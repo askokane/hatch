@@ -1,0 +1,384 @@
+// HATCH — Prisma schema.
+// Dev uses SQLite. To move to Postgres: change `provider` below to "postgresql"
+// and point DATABASE_URL at a Postgres instance. No model changes are required —
+// enums and Json fields used here map cleanly to Postgres native types.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+enum TagKind {
+  SKILL
+  INTEREST
+  DOMAIN
+}
+
+enum TagRelation {
+  HAS
+  LEARNING
+}
+
+enum IntentKind {
+  COFOUNDER
+  TEAMMATE
+  MENTOR
+  FEEDBACK
+  INTERNSHIP
+}
+
+enum ProjectStage {
+  IDEA
+  BUILDING
+  LAUNCHED
+}
+
+enum ProjectVisibility {
+  PUBLIC
+  UNLISTED
+}
+
+enum Commitment {
+  LIGHT
+  STEADY
+  HEAVY
+}
+
+enum RoleStatus {
+  OPEN
+  FILLED
+  CLOSED
+}
+
+enum ContextType {
+  ROLE
+  PROJECT
+  INTENT
+}
+
+enum RequestStatus {
+  PENDING
+  ACCEPTED
+  DECLINED
+}
+
+enum SubjectType {
+  PROFILE
+  PROJECT
+  MESSAGE
+  THREAD
+}
+
+model User {
+  id                 String                   @id @default(cuid())
+  email              String                   @unique
+  passwordHash       String
+  emailVerifiedAt    DateTime?
+  isAdmin            Boolean                  @default(false)
+  createdAt          DateTime                 @default(now())
+  sessions           Session[]
+  profile            Profile?
+  emailVerifications EmailVerificationToken[]
+  passwordResets     PasswordResetToken[]
+  loginAttempts      LoginAttempt[]
+
+  @@index([email])
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  userId    String
+  tokenHash String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([expiresAt])
+}
+
+model EmailVerificationToken {
+  id        String    @id @default(cuid())
+  userId    String
+  tokenHash String    @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model PasswordResetToken {
+  id        String    @id @default(cuid())
+  userId    String
+  tokenHash String    @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+// DB-backed rate limiter store. Chosen over an in-memory Map so the limit
+// survives dev-server restarts (see lib/rate-limit.ts).
+model LoginAttempt {
+  id        String   @id @default(cuid())
+  userId    String?
+  email     String
+  ip        String
+  succeeded Boolean
+  createdAt DateTime @default(now())
+  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([email, createdAt])
+  @@index([ip, createdAt])
+}
+
+model Profile {
+  id               String         @id @default(cuid())
+  userId           String         @unique
+  handle           String         @unique
+  name             String
+  school           String
+  gradYear         Int
+  bio              String         @default("")
+  links            Json           @default("[]")
+  avatarSeed       String
+  isDiscoverable   Boolean        @default(true)
+  handleChangedAt  DateTime       @default(now())
+  onboardedAt      DateTime?
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+  user             User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tags             ProfileTag[]
+  intents          Intent[]
+  memberships      Membership[]
+  updates          Update[]
+  createdProjects  Project[]      @relation("ProjectCreator")
+  sentRequests     IntroRequest[] @relation("RequestSender")
+  receivedRequests IntroRequest[] @relation("RequestRecipient")
+  threadMembers    ThreadMember[]
+  messages         Message[]
+  blocksMade       Block[]        @relation("Blocker")
+  blocksReceived   Block[]        @relation("Blocked")
+  reportsFiled     Report[]
+
+  @@index([school])
+  @@index([isDiscoverable])
+}
+
+model Tag {
+  id          String       @id @default(cuid())
+  slug        String       @unique
+  label       String
+  kind        TagKind
+  aliases     Json         @default("[]")
+  profileTags ProfileTag[]
+  projectTags ProjectTag[]
+  roleTags    RoleTag[]
+
+  @@index([kind])
+}
+
+// Free-text tag input that did not match the taxonomy. Logged for review;
+// never auto-promoted to a Tag row.
+model TagSuggestion {
+  id            String   @id @default(cuid())
+  rawText       String
+  suggestedBy   String?
+  kind          TagKind?
+  resolved      Boolean  @default(false)
+  resolvedTagId String?
+  createdAt     DateTime @default(now())
+
+  @@index([resolved])
+}
+
+model ProfileTag {
+  profileId String
+  tagId     String
+  relation  TagRelation
+  profile   Profile     @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  tag       Tag         @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@id([profileId, tagId, relation])
+  @@index([tagId])
+}
+
+model Intent {
+  id        String     @id @default(cuid())
+  profileId String
+  kind      IntentKind
+  note      String     @default("")
+  createdAt DateTime   @default(now())
+  profile   Profile    @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
+  @@unique([profileId, kind])
+  @@index([profileId])
+}
+
+model Project {
+  id          String            @id @default(cuid())
+  slug        String            @unique
+  name        String
+  description String
+  stage       ProjectStage
+  visibility  ProjectVisibility @default(PUBLIC)
+  links       Json              @default("[]")
+  createdById String
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+  closedAt    DateTime?
+  createdBy   Profile           @relation("ProjectCreator", fields: [createdById], references: [id])
+  tags        ProjectTag[]
+  memberships Membership[]
+  updates     Update[]
+  openRoles   OpenRole[]
+
+  @@index([stage])
+  @@index([visibility])
+}
+
+model ProjectTag {
+  projectId String
+  tagId     String
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  tag       Tag     @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@id([projectId, tagId])
+  @@index([tagId])
+}
+
+model Membership {
+  id        String   @id @default(cuid())
+  projectId String
+  profileId String
+  role      String
+  isOwner   Boolean  @default(false)
+  joinedAt  DateTime @default(now())
+  project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  profile   Profile  @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
+  @@unique([projectId, profileId])
+  @@index([profileId])
+}
+
+model Update {
+  id              String   @id @default(cuid())
+  projectId       String
+  authorProfileId String
+  body            String
+  createdAt       DateTime @default(now())
+  project         Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  author          Profile  @relation(fields: [authorProfileId], references: [id], onDelete: Cascade)
+
+  @@index([projectId, createdAt])
+}
+
+model OpenRole {
+  id          String     @id @default(cuid())
+  projectId   String
+  title       String
+  description String
+  commitment  Commitment
+  status      RoleStatus @default(OPEN)
+  createdAt   DateTime   @default(now())
+  project     Project    @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  tags        RoleTag[]
+
+  @@index([projectId])
+  @@index([status])
+}
+
+model RoleTag {
+  openRoleId String
+  tagId      String
+  openRole   OpenRole @relation(fields: [openRoleId], references: [id], onDelete: Cascade)
+  tag        Tag      @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@id([openRoleId, tagId])
+  @@index([tagId])
+}
+
+model IntroRequest {
+  id            String        @id @default(cuid())
+  fromProfileId String
+  toProfileId   String
+  contextType   ContextType
+  contextId     String
+  note          String
+  status        RequestStatus @default(PENDING)
+  createdAt     DateTime      @default(now())
+  respondedAt   DateTime?
+  fromProfile   Profile       @relation("RequestSender", fields: [fromProfileId], references: [id], onDelete: Cascade)
+  toProfile     Profile       @relation("RequestRecipient", fields: [toProfileId], references: [id], onDelete: Cascade)
+  thread        Thread?
+
+  @@index([toProfileId, status])
+  @@index([fromProfileId, status])
+}
+
+model Thread {
+  id             String         @id @default(cuid())
+  introRequestId String         @unique
+  contextType    ContextType
+  contextId      String
+  createdAt      DateTime       @default(now())
+  introRequest   IntroRequest   @relation(fields: [introRequestId], references: [id], onDelete: Cascade)
+  members        ThreadMember[]
+  messages       Message[]
+}
+
+model ThreadMember {
+  threadId   String
+  profileId  String
+  lastReadAt DateTime @default(now())
+  thread     Thread   @relation(fields: [threadId], references: [id], onDelete: Cascade)
+  profile    Profile  @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
+  @@id([threadId, profileId])
+  @@index([profileId])
+}
+
+model Message {
+  id              String   @id @default(cuid())
+  threadId        String
+  authorProfileId String
+  body            String
+  createdAt       DateTime @default(now())
+  thread          Thread   @relation(fields: [threadId], references: [id], onDelete: Cascade)
+  author          Profile  @relation(fields: [authorProfileId], references: [id], onDelete: Cascade)
+
+  @@index([threadId, createdAt])
+}
+
+model Block {
+  id               String   @id @default(cuid())
+  blockerProfileId String
+  blockedProfileId String
+  createdAt        DateTime @default(now())
+  blocker          Profile  @relation("Blocker", fields: [blockerProfileId], references: [id], onDelete: Cascade)
+  blocked          Profile  @relation("Blocked", fields: [blockedProfileId], references: [id], onDelete: Cascade)
+
+  @@unique([blockerProfileId, blockedProfileId])
+  @@index([blockedProfileId])
+}
+
+model Report {
+  id                String      @id @default(cuid())
+  reporterProfileId String
+  subjectType       SubjectType
+  subjectId         String
+  reason            String
+  detail            String      @default("")
+  createdAt         DateTime    @default(now())
+  reporter          Profile     @relation(fields: [reporterProfileId], references: [id], onDelete: Cascade)
+
+  @@index([subjectType, subjectId])
+}
