@@ -16,6 +16,14 @@ function appUrl(): string {
   return process.env.APP_URL ?? "http://localhost:3000";
 }
 
+// No mail provider is wired up. When false, verification/reset links are surfaced
+// directly (console + returned to the caller so the UI can show them) instead of
+// being emailed — otherwise the flow would be uncompletable without a mailbox.
+// Set MAIL_ENABLED=true once a real provider is integrated.
+export function isMailConfigured(): boolean {
+  return process.env.MAIL_ENABLED === "true";
+}
+
 // --- Email verification ---
 
 export async function createVerificationToken(userId: string): Promise<string> {
@@ -37,10 +45,12 @@ export async function consumeVerificationToken(
   return { userId: row.userId };
 }
 
-export function sendVerificationEmail(email: string, rawToken: string): void {
+// Returns the verification link when there is no mail provider, so the caller can
+// surface it in the UI. Returns null once real mail is configured.
+export function sendVerificationEmail(email: string, rawToken: string): string | null {
   const link = `${appUrl()}/verify/${rawToken}`;
-  // Dev "mail": console only. No external network call.
   console.log(`\n[HATCH:dev-mail] Verify ${email}:\n  ${link}\n`);
+  return isMailConfigured() ? null : link;
 }
 
 // --- Password reset ---

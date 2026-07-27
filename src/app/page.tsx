@@ -23,7 +23,7 @@ export default async function LandingPage() {
           href="/signup"
           className="mono border border-pine bg-pine px-5 py-2.5 text-xs text-paper hover:bg-[#255c41]"
         >
-          Sign up with your .edu email
+          Create your account
         </Link>
         <Link href="/login" className="mono border border-hairline px-5 py-2.5 text-xs hover:border-ink">
           Log in

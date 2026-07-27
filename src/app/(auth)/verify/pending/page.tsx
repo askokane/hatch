@@ -10,9 +10,8 @@ export default async function VerifyPendingPage() {
       <p className="label-mono">[ check your email ]</p>
       <h1 className="mt-2 text-xl font-600">Verify your email</h1>
       <p className="mt-2 text-xs text-ink-muted">
-        In development, verification links are printed to the server console (where you ran{" "}
-        <span className="mono">npm run dev</span>) instead of being emailed. Open that link to
-        verify.
+        Verifying unlocks sending intro requests and messages. This deployment has no mail
+        provider wired up, so generate your link below and click it — no inbox needed.
       </p>
       {session && !session.emailVerifiedAt && (
         <div className="mt-6">

@@ -17,12 +17,12 @@ export function SignupForm() {
         </p>
       )}
       <Input
-        label="Email (.edu)"
+        label="Email"
         name="email"
         type="email"
         autoComplete="email"
         required
-        hint="Use your school email. Dev accounts may use an allowlisted domain."
+        hint="Any email works. Use your school address if you want classmates to find you."
       />
       <Input
         label="Password"

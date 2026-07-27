@@ -45,20 +45,29 @@ The seed prints these at the end. Every seeded user shares the same password.
 
 To see two-way messaging live, log in as `demo@stateu.edu` in one browser and any other seeded user in a second browser (or an incognito window).
 
-### Email verification in dev
+### Who can sign up
 
-There is no mail server. On signup (and password reset), the verification/reset link is **printed to the server console** where you ran `npm run dev`:
+**Any valid email address.** To run HATCH as a school-only network instead, set
+`REQUIRE_EDU_EMAIL=true` — signups are then restricted to `.edu` domains, with
+`DEV_EMAIL_ALLOWLIST` (comma-separated emails and/or `@domain`) as a non-production
+escape hatch for test accounts.
+
+### Email verification
+
+Unverified accounts can log in and browse, but **cannot send intro requests or
+messages**. A banner prompts them to verify.
+
+There is no mail provider wired up, so the verification link is both printed to the
+server console *and* shown in the UI at `/verify/pending` — click **Get my
+verification link**, then click the link. No inbox required.
 
 ```
-[HATCH:dev-mail] Verify you@school.edu:
+[HATCH:dev-mail] Verify you@example.com:
   http://localhost:3000/verify/<token>
 ```
 
-Open that link to verify. Unverified accounts can log in and browse but cannot send intro requests or messages.
-
-### `.edu` requirement
-
-Registration requires a `.edu` email. For local/dev/test accounts you can allowlist non-`.edu` domains via `DEV_EMAIL_ALLOWLIST` in `.env` (comma-separated full emails and/or `@domain` entries). The allowlist is only honored when `NODE_ENV !== "production"`.
+Once you integrate a real email provider, set `MAIL_ENABLED=true` and the link stops
+being surfaced in the UI (it will only be emailed).
 
 ## npm scripts
 

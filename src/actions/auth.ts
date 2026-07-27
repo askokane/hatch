@@ -9,7 +9,7 @@ import {
   destroyAllSessionsForUser,
   requireSession,
 } from "@/lib/session";
-import { isAllowedRegistrationEmail } from "@/lib/edu-allowlist";
+import { isAllowedRegistrationEmail, isEduOnlyMode } from "@/lib/edu-allowlist";
 import { checkLoginRateLimit, recordLoginAttempt } from "@/lib/rate-limit";
 import { getClientIp } from "@/lib/request-meta";
 import {
@@ -50,7 +50,11 @@ export async function signupAction(
   const { email, password } = parsed.data;
 
   if (!isAllowedRegistrationEmail(email)) {
-    return fail("Registration requires a .edu email address.");
+    return fail(
+      isEduOnlyMode()
+        ? "Registration requires a .edu email address."
+        : "Enter a valid email address."
+    );
   }
 
   const existing = await db.user.findUnique({ where: { email } });
@@ -71,12 +75,14 @@ export async function signupAction(
 }
 
 // --- Resend verification link (for the logged-in, still-unverified user) ---
-export async function resendVerificationAction(): Promise<ActionResult> {
+// When no mail provider is configured, the link is returned so the UI can show it
+// (there is no inbox to check). With MAIL_ENABLED=true this returns null instead.
+export async function resendVerificationAction(): Promise<ActionResult<{ link: string | null }>> {
   const session = await requireSession();
-  if (session.emailVerifiedAt) return ok(undefined);
+  if (session.emailVerifiedAt) return ok({ link: null });
   const token = await createVerificationToken(session.userId);
-  sendVerificationEmail(session.email, token);
-  return ok(undefined);
+  const link = sendVerificationEmail(session.email, token);
+  return ok({ link });
 }
 
 // --- Verify email ---
