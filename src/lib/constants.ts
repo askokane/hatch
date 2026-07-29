@@ -34,6 +34,16 @@ export const TAG_KINDS = ["SKILL", "INTEREST", "DOMAIN"] as const;
 // Polling / messaging
 export const POLL_INTERVAL_MS = 3000;
 
+// Nav badges show the exact count up to this value, then "9+".
+export const COUNT_BADGE_MAX = 9;
+
+// Typing presence. A keystroke claims the next TYPING_TTL_MS as "typing"; the
+// client re-claims no more often than TYPING_PING_THROTTLE_MS. The TTL must
+// comfortably exceed both the throttle and the poll interval, or the indicator
+// flickers between ticks.
+export const TYPING_TTL_MS = 6000;
+export const TYPING_PING_THROTTLE_MS = 2000;
+
 // Intro request constraints (enforced server-side)
 export const NOTE_MIN = 40;
 export const NOTE_MAX = 500;

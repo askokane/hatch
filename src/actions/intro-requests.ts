@@ -51,12 +51,7 @@ export async function createIntroRequestAction(input: {
   // (0) cannot request yourself
   if (toProfileId === fromProfileId) return fail("You cannot request an intro to yourself.");
 
-  // (1) sender must have a verified email
-  if (!session.emailVerifiedAt) {
-    return fail("Verify your email before sending intro requests.");
-  }
-
-  // (2) sender must have a complete profile
+  // (1) sender must have a complete profile
   const completeness = await getProfileCompleteness(fromProfileId);
   if (!completeness.isComplete) {
     return fail("Complete your profile before sending intro requests.");
@@ -66,20 +61,20 @@ export async function createIntroRequestAction(input: {
   const recipient = await db.profile.findUnique({ where: { id: toProfileId }, select: { id: true } });
   if (!recipient) return fail("That profile does not exist.");
 
-  // (3) note length is enforced by the schema (40–500)
+  // (2) note length is enforced by the schema (40–500)
 
-  // (4) context must belong to the recipient
+  // (3) context must belong to the recipient
   const contextOk = await contextBelongsToRecipient(contextType, contextId, toProfileId);
   if (!contextOk) {
     return fail("That context doesn't belong to this person.");
   }
 
-  // (5) neither party may have blocked the other
+  // (4) neither party may have blocked the other
   if (await isBlockedEitherWay(fromProfileId, toProfileId)) {
     return fail("You can't send a request to this person.");
   }
 
-  // (6) at most one PENDING request between the pair in either direction
+  // (5) at most one PENDING request between the pair in either direction
   const existingPending = await db.introRequest.findFirst({
     where: {
       status: "PENDING",
@@ -94,7 +89,7 @@ export async function createIntroRequestAction(input: {
     return fail("There's already a pending request between you two.");
   }
 
-  // (7) at most 5 pending outbound requests
+  // (6) at most 5 pending outbound requests
   const outboundPending = await db.introRequest.count({
     where: { fromProfileId, status: "PENDING" },
   });

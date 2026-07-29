@@ -932,7 +932,6 @@ async function wipe() {
   await prisma.tag.deleteMany();
   await prisma.profile.deleteMany();
   await prisma.passwordResetToken.deleteMany();
-  await prisma.emailVerificationToken.deleteMany();
   await prisma.loginAttempt.deleteMany();
   await prisma.session.deleteMany();
   await prisma.user.deleteMany();

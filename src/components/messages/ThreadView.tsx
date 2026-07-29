@@ -1,38 +1,82 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { sendMessageAction, markThreadReadAction, type MessageDTO } from "@/actions/messages";
+import { sendMessageAction, markThreadReadAction } from "@/actions/messages";
+import type { MessageDTO, ThreadPresence } from "@/actions/messages";
 import { useThreadPolling } from "./useThreadPolling";
+import { TypingIndicator } from "./TypingIndicator";
 import { Button } from "@/components/ui/Button";
 import { useToast } from "@/components/ui/ToastProvider";
 import { MESSAGE_MAX } from "@/lib/constants";
 
+// Why the composer is closed, if it is. "BLOCKED_BY_ME" is the only state that
+// names a block: it describes the viewer's own action. When the *other* party
+// did the blocking the state is "CLOSED", which says nothing about why — the
+// blocked person is prevented from writing, never told they were blocked.
+export type ComposerState =
+  | { kind: "OPEN" }
+  | { kind: "BLOCKED_BY_ME"; name: string }
+  | { kind: "CLOSED" };
+
+function timeOf(iso: string): string {
+  return new Date(iso).toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" });
+}
+
 export function ThreadView({
   threadId,
   myProfileId,
+  counterpartName,
   initialMessages,
-  readOnly,
+  initialPresence,
+  composer,
 }: {
   threadId: string;
   myProfileId: string;
+  counterpartName: string;
   initialMessages: MessageDTO[];
-  readOnly: boolean;
+  initialPresence: ThreadPresence;
+  composer: ComposerState;
 }) {
   const { notify } = useToast();
-  const { messages, append } = useThreadPolling(threadId, initialMessages);
+  const { messages, presence, append, reportTyping } = useThreadPolling(
+    threadId,
+    initialMessages,
+    initialPresence
+  );
   const [body, setBody] = useState("");
   const [busy, setBusy] = useState(false);
   const endRef = useRef<HTMLDivElement>(null);
-  const lastCountRef = useRef(messages.length);
 
-  // Auto-scroll to newest and mark read when new messages arrive.
+  // Mark read on open and on every arrival. Doing it only on *change* used to
+  // mean opening a thread full of unread messages never cleared the nav badge —
+  // and never turned the sender's "delivered" into "seen".
+  useEffect(() => {
+    markThreadReadAction(threadId).catch(() => {});
+  }, [threadId, messages.length]);
+
   useEffect(() => {
     endRef.current?.scrollIntoView({ behavior: "smooth" });
-    if (messages.length !== lastCountRef.current) {
-      lastCountRef.current = messages.length;
-      markThreadReadAction(threadId).catch(() => {});
+  }, [messages.length, presence.otherTyping]);
+
+  // Receipts belong on the newest own message only — a column of "seen" beside
+  // every bubble is noise, and the newest one implies all the ones above it.
+  const lastOwnIndex = (() => {
+    for (let i = messages.length - 1; i >= 0; i--) {
+      if (messages[i].authorProfileId === myProfileId) return i;
     }
-  }, [messages.length, threadId]);
+    return -1;
+  })();
+
+  const lastOwn = lastOwnIndex >= 0 ? messages[lastOwnIndex] : null;
+  const seen =
+    !!lastOwn &&
+    !!presence.otherLastReadAt &&
+    new Date(presence.otherLastReadAt).getTime() >= new Date(lastOwn.createdAt).getTime();
+
+  function onBodyChange(value: string) {
+    setBody(value);
+    if (composer.kind === "OPEN") reportTyping(value.trim().length > 0);
+  }
 
   async function send(e: React.FormEvent) {
     e.preventDefault();
@@ -44,6 +88,7 @@ export function ThreadView({
     if (res.ok) {
       append(res.data);
       setBody("");
+      reportTyping(false);
     } else {
       notify(res.error, "error");
     }
@@ -53,13 +98,13 @@ export function ThreadView({
     <div className="flex h-[60vh] flex-col border border-hairline bg-white">
       {/* Message list with aria-live so new arrivals are announced. */}
       <div className="flex-1 overflow-y-auto p-4" aria-live="polite" aria-relevant="additions">
-        {messages.length === 0 ? (
+        {messages.length === 0 && !presence.otherTyping ? (
           <p className="mono py-8 text-center text-xs text-ink-muted">
             No messages yet. Say hello — reference why you connected.
           </p>
         ) : (
           <ul className="flex flex-col gap-3">
-            {messages.map((m) => {
+            {messages.map((m, i) => {
               const mine = m.authorProfileId === myProfileId;
               return (
                 <li key={m.id} className={`flex flex-col ${mine ? "items-end" : "items-start"}`}>
@@ -72,15 +117,20 @@ export function ThreadView({
                     <p className="whitespace-pre-wrap break-words">{m.body}</p>
                   </div>
                   <span className="mono mt-0.5 text-2xs text-ink-muted">
-                    {mine ? "you" : m.authorName} ·{" "}
-                    {new Date(m.createdAt).toLocaleTimeString("en-US", {
-                      hour: "numeric",
-                      minute: "2-digit",
-                    })}
+                    {mine ? "you" : m.authorName} · {timeOf(m.createdAt)}
+                    {i === lastOwnIndex && (
+                      <>
+                        {" · "}
+                        <span className={seen ? "text-pine" : undefined}>
+                          {seen ? "✓✓ seen" : "✓ delivered"}
+                        </span>
+                      </>
+                    )}
                   </span>
                 </li>
               );
             })}
+            {presence.otherTyping && <TypingIndicator name={counterpartName} />}
           </ul>
         )}
         <div ref={endRef} />
@@ -88,9 +138,17 @@ export function ThreadView({
 
       {/* Composer */}
       <div className="border-t border-hairline p-3">
-        {readOnly ? (
+        {composer.kind === "BLOCKED_BY_ME" ? (
           <p className="mono text-center text-xs text-ink-muted">
-            This conversation is read-only.
+            You blocked {composer.name}. Unblock them in{" "}
+            <a href="/settings" className="text-pine underline underline-offset-2">
+              settings
+            </a>{" "}
+            to message again.
+          </p>
+        ) : composer.kind === "CLOSED" ? (
+          <p className="mono text-center text-xs text-ink-muted">
+            You can&apos;t send messages in this conversation.
           </p>
         ) : (
           <form onSubmit={send} className="flex items-end gap-2">
@@ -100,7 +158,8 @@ export function ThreadView({
             <textarea
               id="composer"
               value={body}
-              onChange={(e) => setBody(e.target.value)}
+              onChange={(e) => onBodyChange(e.target.value)}
+              onBlur={() => reportTyping(false)}
               onKeyDown={(e) => {
                 if (e.key === "Enter" && !e.shiftKey) {
                   e.preventDefault();

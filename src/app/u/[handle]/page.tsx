@@ -1,6 +1,7 @@
 import { notFound, redirect } from "next/navigation";
 import { requireSession } from "@/lib/session";
 import { loadProfileByHandle } from "@/lib/profile-queries";
+import { getRelationship } from "@/lib/relationship";
 import { db } from "@/lib/db";
 import { ProfileView } from "@/components/profile/ProfileView";
 import { ProfileActions } from "@/components/profile/ProfileActions";
@@ -26,6 +27,8 @@ export default async function PublicProfilePage({
   const isOwn = target.id === session.profileId;
   if (isOwn) redirect("/profile");
 
+  const relationship = await getRelationship(session.profileId, target.id);
+
   // Intro contexts owned by this profile that the viewer can reference:
   // open roles on their projects, their public projects, and their intents.
   const [roles, projects, intents] = await Promise.all([
@@ -50,6 +53,7 @@ export default async function PublicProfilePage({
             targetProfileId={target.id}
             targetName={data.name}
             targetHandle={data.handle}
+            relationship={relationship}
             contexts={{
               roles: roles.map((r) => ({ id: r.id, label: `Role: ${r.title} (${r.project.name})` })),
               projects: projects.map((p) => ({ id: p.id, label: `Project: ${p.name}` })),

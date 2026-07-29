@@ -75,18 +75,20 @@ enum SubjectType {
   THREAD
 }
 
+// Accounts are usable the moment they are created. `emailVerifiedAt` is stamped
+// at signup and kept as an audit field / hook for a future real mail provider —
+// nothing gates on it, so there is no on-platform verification step.
 model User {
-  id                 String                   @id @default(cuid())
-  email              String                   @unique
-  passwordHash       String
-  emailVerifiedAt    DateTime?
-  isAdmin            Boolean                  @default(false)
-  createdAt          DateTime                 @default(now())
-  sessions           Session[]
-  profile            Profile?
-  emailVerifications EmailVerificationToken[]
-  passwordResets     PasswordResetToken[]
-  loginAttempts      LoginAttempt[]
+  id              String               @id @default(cuid())
+  email           String               @unique
+  passwordHash    String
+  emailVerifiedAt DateTime?
+  isAdmin         Boolean              @default(false)
+  createdAt       DateTime             @default(now())
+  sessions        Session[]
+  profile         Profile?
+  passwordResets  PasswordResetToken[]
+  loginAttempts   LoginAttempt[]
 
   @@index([email])
 }
@@ -101,18 +103,6 @@ model Session {
 
   @@index([userId])
   @@index([expiresAt])
-}
-
-model EmailVerificationToken {
-  id        String    @id @default(cuid())
-  userId    String
-  tokenHash String    @unique
-  expiresAt DateTime
-  usedAt    DateTime?
-  createdAt DateTime  @default(now())
-  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@index([userId])
 }
 
 model PasswordResetToken {
@@ -338,11 +328,18 @@ model Thread {
 }
 
 model ThreadMember {
-  threadId   String
-  profileId  String
-  lastReadAt DateTime @default(now())
-  thread     Thread   @relation(fields: [threadId], references: [id], onDelete: Cascade)
-  profile    Profile  @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  threadId    String
+  profileId   String
+  // Read receipts: every message in the thread authored by the OTHER member and
+  // created at or before this instant has been seen by this member.
+  lastReadAt  DateTime  @default(now())
+  // Typing presence. Set a few seconds into the future while this member types;
+  // any reader treats `typingUntil > now()` as "currently typing". Storing an
+  // expiry rather than a boolean means a disconnected client self-heals — there
+  // is no stuck "typing…" to clean up.
+  typingUntil DateTime?
+  thread      Thread    @relation(fields: [threadId], references: [id], onDelete: Cascade)
+  profile     Profile   @relation(fields: [profileId], references: [id], onDelete: Cascade)
 
   @@id([threadId, profileId])
   @@index([profileId])

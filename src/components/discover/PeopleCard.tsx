@@ -1,10 +1,13 @@
 import Link from "next/link";
 import { Avatar } from "@/components/ui/Avatar";
 import { TagBadge } from "@/components/ui/TagBadge";
+import { ConnectionStatus } from "@/components/ui/ConnectionStatus";
 import { INTENT_LABELS } from "@/lib/constants";
+import type { Relationship } from "@/lib/relationship";
 
 export function PeopleCard({
   person,
+  relationship,
 }: {
   person: {
     handle: string;
@@ -16,6 +19,7 @@ export function PeopleCard({
     tags: { relation: string; tag: { id: string; label: string } }[];
     intents: { kind: string }[];
   };
+  relationship: Relationship;
 }) {
   const skills = person.tags.filter((t) => t.relation === "HAS").slice(0, 6);
   return (
@@ -35,11 +39,16 @@ export function PeopleCard({
           <TagBadge key={t.tag.id} label={t.tag.label} />
         ))}
       </div>
-      {person.intents.length > 0 && (
-        <p className="mono mt-3 text-2xs text-ink-muted">
-          looking for: {person.intents.map((i) => INTENT_LABELS[i.kind]).join(", ")}
-        </p>
-      )}
+      <div className="mt-3 flex items-center justify-between gap-2">
+        {person.intents.length > 0 ? (
+          <p className="mono text-2xs text-ink-muted">
+            looking for: {person.intents.map((i) => INTENT_LABELS[i.kind]).join(", ")}
+          </p>
+        ) : (
+          <span />
+        )}
+        <ConnectionStatus relationship={relationship} />
+      </div>
     </article>
   );
 }

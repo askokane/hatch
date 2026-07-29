@@ -39,15 +39,35 @@ export async function assertThreadMember(threadId: string, profileId: string) {
   return member;
 }
 
-// True if either profile has blocked the other (bidirectional in effect).
-export async function isBlockedEitherWay(a: string, b: string): Promise<boolean> {
-  const block = await db.block.findFirst({
+export type BlockState = {
+  /** `viewer` blocked `other`. Safe to show the viewer — it was their action. */
+  viewerBlockedThem: boolean;
+  /** `other` blocked `viewer`. Never disclose; use only to withhold actions. */
+  theyBlockedViewer: boolean;
+  /** Either direction — the symmetric check used for access decisions. */
+  either: boolean;
+};
+
+// Resolves the block relationship in ONE query, keeping the two directions
+// distinct. They have to stay distinct because they are not equally disclosable:
+// a user may be told whom they blocked, but must never be told they were
+// blocked. Callers that only need an access decision use `either`.
+export async function getBlockState(viewer: string, other: string): Promise<BlockState> {
+  const blocks = await db.block.findMany({
     where: {
       OR: [
-        { blockerProfileId: a, blockedProfileId: b },
-        { blockerProfileId: b, blockedProfileId: a },
+        { blockerProfileId: viewer, blockedProfileId: other },
+        { blockerProfileId: other, blockedProfileId: viewer },
       ],
     },
+    select: { blockerProfileId: true },
   });
-  return !!block;
+  const viewerBlockedThem = blocks.some((b) => b.blockerProfileId === viewer);
+  const theyBlockedViewer = blocks.some((b) => b.blockerProfileId === other);
+  return { viewerBlockedThem, theyBlockedViewer, either: blocks.length > 0 };
+}
+
+// True if either profile has blocked the other (bidirectional in effect).
+export async function isBlockedEitherWay(a: string, b: string): Promise<boolean> {
+  return (await getBlockState(a, b)).either;
 }

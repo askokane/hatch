@@ -54,20 +54,15 @@ escape hatch for test accounts.
 
 ### Email verification
 
-Unverified accounts can log in and browse, but **cannot send intro requests or
-messages**. A banner prompts them to verify.
+**There is none.** Accounts are usable the moment they are created — sign up and
+you are straight into onboarding.
 
-There is no mail provider wired up, so the verification link is both printed to the
-server console *and* shown in the UI at `/verify/pending` — click **Get my
-verification link**, then click the link. No inbox required.
-
-```
-[HATCH:dev-mail] Verify you@example.com:
-  http://localhost:3000/verify/<token>
-```
-
-Once you integrate a real email provider, set `MAIL_ENABLED=true` and the link stops
-being surfaced in the UI (it will only be emailed).
+This was deliberate. With no mail provider in the loop, the verification link had
+to be handed to the user by the app itself, so clicking it proved only that you
+could read a page the app had just rendered for you — not that you owned the
+inbox. It gated intro requests and messaging behind a step that established
+nothing. `User.emailVerifiedAt` is still stamped at signup and kept as the hook a
+real provider would gate on later.
 
 ## npm scripts
 
@@ -90,21 +85,39 @@ npm run test:e2e:install   # once, downloads Chromium
 npm run test:e2e
 ```
 
-The suite runs against its own database (`prisma/e2e-test.db`) and its own server on port **3100**, so it never touches your dev data. It covers:
+> **The suite seeds — i.e. wipes — the database it points at.** `npm run test:e2e`
+> therefore routes every step through `scripts/with-e2e-db.mjs`, which rewrites
+> `DATABASE_URL`/`DIRECT_URL` to an isolated Postgres schema (`hatch_e2e` by
+> default, override with `E2E_SCHEMA`). Your application data lives in `public`
+> and is never touched. `e2e/server-control.ts` refuses to start the test server
+> if the URL has no explicit schema, so running Playwright bare cannot reach
+> production either.
 
-1. **Signup → verify → onboarding → discoverable** — a brand-new account through the real UI.
+The suite runs on its own server on port **3100**. It covers:
+
+1. **Signup → onboarding → discoverable** — a brand-new account through the real UI.
 2. **Session persistence** — login survives reload; logout clears it and re-guards protected routes.
-3. **Intro request → accept → two-way messaging → survives restart** — two browser contexts hold a conversation, then the test **kills and restarts the server process** and confirms every message persisted (proving file-based persistence, not in-memory state).
-4. **Constraint enforcement** — a 39-char note, a duplicate pending request, and a 6th outbound request are all rejected server-side.
+3. **Intro request → accept → two-way messaging → survives restart** — two browser contexts hold a conversation, then the test **kills and restarts the server process** and confirms every message persisted (proving durable storage, not in-memory state).
+4. **Constraint enforcement** — a 39-char note and a 6th outbound request are rejected server-side; a duplicate request to the same person is prevented by the UI before it can be attempted.
 5. **Authorization** — forced IDs (another user's thread via API and by URL, a non-member project, another user's profile, the admin route) all return 403 or redirect, never data.
+6. **No verification gate** — a fresh account sends an intro request immediately; the old `/verify/*` routes are gone, not merely unlinked.
+7. **Nav request badge** — shows the exact count, switches to `9+` past the cap, keeps the true figure in the accessible name, and updates on the poll without a reload.
+8. **Typing + receipts** — one context types and the *other* sees the indicator; a sent message reads `✓ delivered` until the recipient opens the thread, then flips to `✓✓ seen` with no action from the sender.
+9. **Relationship sync** — a connected pair is offered "Message", never "Request intro", on the project page, the profile and the discovery feed; a pending request reads as pending on all of them.
+10. **Block asymmetry** — the blocker sees the block and can lift it from settings; the blocked user gets a closed composer, a refusal with no block wording, and none of the disclosing phrasings anywhere on the page.
 
 ## Architecture notes
 
 - **`src/lib/session.ts`** — `createSession` / `getSession` / `requireSession` / `destroySession`. Tokens are 32 random bytes, stored as a SHA-256 hash, delivered as an httpOnly + sameSite=lax cookie with 30-day sliding expiry. Logout deletes the DB row.
 - **`src/lib/authz.ts`** — `assertProjectOwner`, `assertProjectMember`, `assertThreadMember`, `isBlockedEitherWay`. Every server action and route handler re-derives ownership/membership from the DB using the caller's own `profileId`; a client-supplied ID is never trusted as proof of access.
 - **`src/lib/ranking.ts`** — a single documented pure function scores the discovery open-roles feed (tag overlap 55, same school 20, recency 15, profile completeness 10). Non-discoverable owners and blocked users are excluded in the query (`src/lib/discover-queries.ts`), not in the UI. A comment marks the Postgres GIN-index upgrade path.
+- **`src/lib/relationship.ts`** — one answer to "where do I stand with this person?", shared by the profile page, project pages and both discovery feeds. Each surface used to decide locally and partially (the project page only asked "am I a member?"), so a pair who were already messaging still saw a bare "Request intro". `getRelationships` resolves a whole feed in a fixed number of queries. The intro-request *lifecycle* and the *block* state are separate axes because they are not equally disclosable — see below.
+- **Blocking is one-directional in what it discloses and bidirectional in what it prevents.** `getBlockState` (`src/lib/authz.ts`) keeps the two directions apart. The blocker is told plainly on the profile, in the thread and in settings, and can lift it there. The blocked user is only ever stopped: the composer closes with "You can't send messages in this conversation", the server's refusal carries no block wording, and nothing on their view names a block. Settings carries the block list because blocking removes the profile from discovery — without it a block would be effectively irreversible.
+- **`src/lib/messages-core.ts`** — messaging logic shared by the server action and the route handler. It lives outside `actions/` on purpose: every exported async function in a `"use server"` module is a callable endpoint, so a helper there that takes `profileId` as a parameter lets the client choose whose identity to write under.
+- **Typing presence** is an *expiry* (`ThreadMember.typingUntil`), not a boolean: a client that disappears mid-keystroke stops advertising "typing…" on its own, with no reaper job. A keystroke re-claims the window at most once per 2s, and sending or blurring releases it.
+- **Read receipts** reuse `ThreadMember.lastReadAt`. The newest own message shows `✓ delivered` until the other member's watermark passes it, then `✓✓ seen` — only the newest, since it implies every message above it.
 - **Tags are a table.** Profiles, projects, and roles reference tag IDs only. The picker autocompletes against the taxonomy; unrecognized input creates a `TagSuggestion` row (for review) and never a `Tag`.
-- **Messaging** polls `GET /api/threads/[threadId]/messages?after=<cursor>` every 3s while the tab is visible (paused when hidden); the nav unread badge polls `GET /api/unread-count`. No websockets — a comment marks where an SSE upgrade would slot in. User text renders as plain text (React-escaped; no `dangerouslySetInnerHTML` in the message path).
+- **Messaging** polls `GET /api/threads/[threadId]/messages?after=<cursor>` every 3s while the tab is visible (paused when hidden), and typing/read presence rides along on that same response rather than adding a second poll. Every nav badge is fed by one `GET /api/nav-counts`. No websockets — a comment marks where an SSE upgrade would slot in. User text renders as plain text (React-escaped; no `dangerouslySetInnerHTML` in the message path).
 - **Avatars** are deterministic inline SVG identicons generated from a seed (`src/lib/avatar.ts`) — no uploads, no external images, no faces.
 
 ## Switching to Postgres

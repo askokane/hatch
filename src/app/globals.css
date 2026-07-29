@@ -50,3 +50,31 @@
     border-color: var(--hairline);
   }
 }
+
+@layer components {
+  /* Typing indicator. Respects prefers-reduced-motion: the dots stop moving but
+     stay visible, so the signal survives without the animation. */
+  .typing-dot {
+    animation: typing-bounce 1.2s ease-in-out infinite;
+  }
+
+  @keyframes typing-bounce {
+    0%,
+    60%,
+    100% {
+      opacity: 0.3;
+      transform: translateY(0);
+    }
+    30% {
+      opacity: 1;
+      transform: translateY(-3px);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .typing-dot {
+      animation: none;
+      opacity: 0.7;
+    }
+  }
+}

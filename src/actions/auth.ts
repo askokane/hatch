@@ -13,9 +13,6 @@ import { isAllowedRegistrationEmail, isEduOnlyMode } from "@/lib/edu-allowlist";
 import { checkLoginRateLimit, recordLoginAttempt } from "@/lib/rate-limit";
 import { getClientIp } from "@/lib/request-meta";
 import {
-  createVerificationToken,
-  sendVerificationEmail,
-  consumeVerificationToken,
   createPasswordResetToken,
   sendPasswordResetEmail,
   consumePasswordResetToken,
@@ -63,37 +60,19 @@ export async function signupAction(
     return fail("An account with this email already exists.");
   }
 
+  // Accounts are live immediately — there is no verification step to complete.
+  // `emailVerifiedAt` is stamped now so the column stays meaningful as an audit
+  // trail and as the hook a real mail provider would later gate on.
   const user = await db.user.create({
-    data: { email, passwordHash: await hashPassword(password) },
+    data: {
+      email,
+      passwordHash: await hashPassword(password),
+      emailVerifiedAt: new Date(),
+    },
   });
-
-  const token = await createVerificationToken(user.id);
-  sendVerificationEmail(email, token);
 
   await createSession(user.id);
   redirect("/onboarding");
-}
-
-// --- Resend verification link (for the logged-in, still-unverified user) ---
-// When no mail provider is configured, the link is returned so the UI can show it
-// (there is no inbox to check). With MAIL_ENABLED=true this returns null instead.
-export async function resendVerificationAction(): Promise<ActionResult<{ link: string | null }>> {
-  const session = await requireSession();
-  if (session.emailVerifiedAt) return ok({ link: null });
-  const token = await createVerificationToken(session.userId);
-  const link = sendVerificationEmail(session.email, token);
-  return ok({ link });
-}
-
-// --- Verify email ---
-export async function verifyEmailAction(token: string): Promise<ActionResult> {
-  const result = await consumeVerificationToken(token);
-  if (!result) return fail("This verification link is invalid or has expired.");
-  await db.user.update({
-    where: { id: result.userId },
-    data: { emailVerifiedAt: new Date() },
-  });
-  return ok(undefined);
 }
 
 // --- Login ---

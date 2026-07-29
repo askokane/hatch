@@ -49,7 +49,6 @@ export async function createProjectAction(input: {
 }): Promise<ActionResult<{ slug: string }>> {
   const session = await requireSession();
   const profileId = await requireProfile(session);
-  if (!session.emailVerifiedAt) return fail("Verify your email before creating a project.");
 
   const parsed = createProjectSchema.safeParse(input);
   if (!parsed.success) return fail(parsed.error.issues[0]?.message ?? "Please complete the form.");

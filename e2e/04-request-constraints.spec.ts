@@ -1,5 +1,5 @@
 import { test, expect, type Page } from "@playwright/test";
-import { signup, verifyEmail, completeOnboarding, DEMO_EMAIL } from "./fixtures";
+import { signup, completeOnboarding, DEMO_EMAIL } from "./fixtures";
 import { testDb } from "./db";
 
 // Gathers up to `n` OPEN roles, each owned by a DISTINCT profile that isn't the
@@ -44,7 +44,6 @@ test("intro-request constraints are enforced", async ({ page }) => {
   const email = `constraints${unique}@e2e.edu`;
 
   await signup(page, email);
-  await verifyEmail(page, email);
   await page.goto("/onboarding");
   await completeOnboarding(page, {
     name: `Constraint Tester ${unique}`,
@@ -73,12 +72,22 @@ test("intro-request constraints are enforced", async ({ page }) => {
     await expect(page.getByText(/intro request sent/i)).toBeVisible();
   }
 
-  // (a) a 2nd pending request to the SAME person is rejected.
-  await requestIntroOnProject(page, roles[0]!.slug, `${goodNote} (dup)`);
-  await expect(page.getByText(/already a pending request/i)).toBeVisible();
-  await page.getByRole("button", { name: /cancel/i }).click();
+  // (a) a 2nd pending request to the SAME person is now unreachable: the page
+  //     remembers the outstanding request instead of offering another one. The
+  //     server constraint still exists — it simply can no longer be tripped from
+  //     here, so this asserts the prevention and the resulting state.
+  await page.goto(`/p/${roles[0]!.slug}`);
+  await expect(page.getByRole("button", { name: /request intro/i })).toHaveCount(0);
+  await expect(page.getByRole("link", { name: /request sent/i }).first()).toBeVisible();
 
-  // (b) the 6th distinct outbound request is rejected (cap of 5 pending).
+  const me = await testDb.user.findUnique({ where: { email }, include: { profile: true } });
+  const pendingToSameOwner = await testDb.introRequest.count({
+    where: { fromProfileId: me!.profile!.id, toProfileId: roles[0]!.ownerId, status: "PENDING" },
+  });
+  expect(pendingToSameOwner).toBe(1);
+
+  // (b) the 6th distinct outbound request is rejected (cap of 5 pending). This
+  //     one IS still reachable, because the 6th owner is someone new.
   await requestIntroOnProject(page, roles[5]!.slug, `${goodNote} (#6)`);
   await expect(page.getByText(/at most 5 pending outbound/i)).toBeVisible();
 });

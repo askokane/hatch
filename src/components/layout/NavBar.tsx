@@ -3,10 +3,11 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { logoutAction } from "@/actions/auth";
-import { UnreadBadge } from "./UnreadBadge";
+import { CountBadge } from "@/components/ui/CountBadge";
+import { useNavCounts } from "./useNavCounts";
 
-// Top nav. Client component so it can host the unread-count poller and highlight
-// the active route. Auth state is passed from the server layout.
+// Top nav. Client component so it can host the badge poller and highlight the
+// active route. Auth state is passed from the server layout.
 export function NavBar({
   isAuthed,
   hasProfile,
@@ -17,6 +18,7 @@ export function NavBar({
   isAdmin: boolean;
 }) {
   const pathname = usePathname();
+  const { unreadMessages, pendingRequests } = useNavCounts(isAuthed && hasProfile);
 
   const link = (href: string, label: string, extra?: React.ReactNode) => {
     const active = pathname === href || pathname.startsWith(href + "/");
@@ -49,11 +51,15 @@ export function NavBar({
           {isAuthed && hasProfile && (
             <>
               {link("/discover", "discover")}
-              {link("/requests", "requests")}
+              {link(
+                "/requests",
+                "requests",
+                <CountBadge count={pendingRequests} label="pending intro request" />
+              )}
               {link(
                 "/messages",
                 "messages",
-                <UnreadBadge />
+                <CountBadge count={unreadMessages} label="unread message" />
               )}
               {link("/profile", "profile")}
               {isAdmin && link("/admin/reports", "admin")}

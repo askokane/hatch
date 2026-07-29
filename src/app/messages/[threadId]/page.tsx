@@ -2,11 +2,13 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { requireSession } from "@/lib/session";
 import { db } from "@/lib/db";
-import { assertThreadMember, isBlockedEitherWay, ForbiddenError } from "@/lib/authz";
+import { assertThreadMember, getBlockState, ForbiddenError } from "@/lib/authz";
+import { getThreadPresence } from "@/lib/messages-core";
 import { resolveContextLabel } from "@/lib/context-label";
 import { Avatar } from "@/components/ui/Avatar";
-import { ThreadView } from "@/components/messages/ThreadView";
+import { ThreadView, type ComposerState } from "@/components/messages/ThreadView";
 import { ReportDialog } from "@/components/safety/ReportDialog";
+import { UnblockButton } from "@/components/safety/UnblockButton";
 import type { MessageDTO } from "@/actions/messages";
 
 export default async function ThreadPage({ params }: { params: Promise<{ threadId: string }> }) {
@@ -42,7 +44,21 @@ export default async function ThreadPage({ params }: { params: Promise<{ threadI
 
   const counterpart = thread.members[0]?.profile;
   const contextLabel = await resolveContextLabel(thread.contextType, thread.contextId);
-  const readOnly = counterpart ? await isBlockedEitherWay(profileId, counterpart.id) : true;
+  const presence = await getThreadPresence(threadId, profileId);
+
+  const block = counterpart
+    ? await getBlockState(profileId, counterpart.id)
+    : { viewerBlockedThem: false, theyBlockedViewer: false, either: true };
+
+  // The two block directions produce different UI on purpose. The blocker sees
+  // exactly what they did and how to undo it. The blocked party sees a closed
+  // composer with no explanation — the thread simply stops accepting messages,
+  // which is indistinguishable from any other reason it might be closed.
+  const composer: ComposerState = block.viewerBlockedThem
+    ? { kind: "BLOCKED_BY_ME", name: counterpart?.name ?? "this person" }
+    : block.theyBlockedViewer || !counterpart
+      ? { kind: "CLOSED" }
+      : { kind: "OPEN" };
 
   const initialMessages: MessageDTO[] = thread.messages.map((m) => ({
     id: m.id,
@@ -78,18 +94,22 @@ export default async function ThreadPage({ params }: { params: Promise<{ threadI
         </div>
       </div>
 
-      {readOnly && (
-        <p className="mono mt-2 border border-hairline bg-brick-soft px-3 py-1 text-2xs text-brick">
-          A block is in place — this conversation is read-only.
-        </p>
+      {/* Only the blocker is told a block exists. */}
+      {block.viewerBlockedThem && counterpart && (
+        <div className="mono mt-2 flex flex-wrap items-center justify-between gap-2 border border-brick bg-brick-soft px-3 py-2 text-2xs text-brick">
+          <span>You blocked {counterpart.name}. They can no longer message you.</span>
+          <UnblockButton blockedProfileId={counterpart.id} blockedName={counterpart.name} />
+        </div>
       )}
 
       <div className="mt-3">
         <ThreadView
           threadId={threadId}
           myProfileId={profileId}
+          counterpartName={counterpart?.name ?? "They"}
           initialMessages={initialMessages}
-          readOnly={readOnly}
+          initialPresence={presence}
+          composer={composer}
         />
       </div>
     </div>

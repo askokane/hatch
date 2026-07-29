@@ -1,13 +1,22 @@
 import Link from "next/link";
 import { Avatar } from "@/components/ui/Avatar";
 import { TagBadge } from "@/components/ui/TagBadge";
+import { ConnectionStatus } from "@/components/ui/ConnectionStatus";
 import { COMMITMENT_LABELS, STAGE_LABELS } from "@/lib/constants";
 import type { RoleFeedItem } from "@/lib/discover-queries";
+import type { Relationship } from "@/lib/relationship";
 
 // The signature element: a role card whose tag-match visualization makes the
 // ranking transparent. Matched tags render in the accent; a match meter shows the
 // overlap fraction; the "why" is spelled out.
-export function RoleFeedCard({ item }: { item: RoleFeedItem }) {
+export function RoleFeedCard({
+  item,
+  relationship,
+}: {
+  item: RoleFeedItem;
+  /** Standing with the role's owner, so the feed agrees with the profile page. */
+  relationship: Relationship;
+}) {
   const { role, project, owner, score } = item;
   const matched = new Set(score.matchedTagIds);
   const total = role.tags.length;
@@ -69,6 +78,7 @@ export function RoleFeedCard({ item }: { item: RoleFeedItem }) {
           </span>
         </Link>
         <div className="flex items-center gap-3">
+          <ConnectionStatus relationship={relationship} />
           <span className="mono text-2xs text-ink-muted">{COMMITMENT_LABELS[role.commitment]}</span>
           <Link
             href={`/p/${project.slug}`}

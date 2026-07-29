@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { requireSession } from "@/lib/session";
 import { db } from "@/lib/db";
+import { getRelationship, noRelationship } from "@/lib/relationship";
 import { STAGE_LABELS } from "@/lib/constants";
 import { Avatar } from "@/components/ui/Avatar";
 import { TagBadge } from "@/components/ui/TagBadge";
@@ -54,6 +55,13 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
     select: { tagId: true },
   });
   const viewerSkillSet = new Set(viewerSkills.map((s) => s.tagId));
+
+  // Where the viewer stands with the project owner. Resolved once here and
+  // handed to every role card, so the page cannot contradict the owner's
+  // profile page or the discovery feed.
+  const ownerRelationship = owner
+    ? await getRelationship(viewerProfileId, owner.id)
+    : null;
 
   return (
     <div>
@@ -162,7 +170,9 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
                       ownerProfileId={owner?.id ?? ""}
                       ownerName={owner?.name ?? "the owner"}
                       viewerMatchedTagIds={r.tags.filter((t) => viewerSkillSet.has(t.tag.id)).map((t) => t.tag.id)}
-                      canRequest={!isMember && !project.closedAt}
+                      relationship={ownerRelationship ?? noRelationship()}
+                      projectOpen={!project.closedAt}
+                      isMember={isMember}
                       canManage={isOwner}
                     />
                   ))

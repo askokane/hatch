@@ -31,7 +31,9 @@ export type RoleFeedItem = {
     tags: { id: string; label: string }[];
   };
   project: { slug: string; name: string; stage: string };
-  owner: { handle: string; name: string; school: string; avatarSeed: string };
+  // `id` is carried so callers can resolve the viewer's relationship with the
+  // owner (see lib/relationship.ts) without a second lookup per card.
+  owner: { id: string; handle: string; name: string; school: string; avatarSeed: string };
   score: RoleScoreBreakdown;
 };
 
@@ -124,6 +126,7 @@ export async function getRankedRoleFeed(viewer: {
       },
       project: { slug: r.project.slug, name: r.project.name, stage: r.project.stage },
       owner: {
+        id: owner.id,
         handle: owner.handle,
         name: owner.name,
         school: owner.school,

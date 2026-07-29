@@ -10,9 +10,14 @@ export async function login(page: Page, email: string, password = DEMO_PASSWORD)
   await page.getByLabel("Password").fill(password);
   await page.getByRole("button", { name: /log in/i }).click();
   await page.waitForURL(/\/(discover|onboarding)/);
+  // Let the post-login navigation finish. Issuing the next goto while the
+  // router is still resolving the redirect aborts it.
+  await page.waitForLoadState("load");
 }
 
 // Sign up a brand-new account through the real UI. Returns the email used.
+// There is no verification step — the account is usable immediately, and the
+// signup redirect lands straight on onboarding.
 export async function signup(page: Page, email: string, password = DEMO_PASSWORD) {
   await page.goto("/signup");
   await page.getByLabel(/email/i).fill(email);
@@ -22,16 +27,21 @@ export async function signup(page: Page, email: string, password = DEMO_PASSWORD
   return email;
 }
 
-// Verify a freshly-signed-up email by fetching a real token from the test-support
-// route and visiting the genuine /verify/[token] page.
-export async function verifyEmail(page: Page, email: string) {
-  const res = await page.request.get(
-    `/api/test-support/last-verification-link?email=${encodeURIComponent(email)}`
-  );
-  expect(res.ok()).toBeTruthy();
-  const { path } = await res.json();
-  await page.goto(path);
-  await expect(page.getByText(/verified/i).first()).toBeVisible();
+// Sign up and complete onboarding in one step — the usual precondition for the
+// scenarios below, which care about what happens *after* a user exists.
+export async function signupAndOnboard(
+  page: Page,
+  opts: { email: string; name: string; handle: string; school?: string }
+) {
+  await signup(page, opts.email);
+  await page.goto("/onboarding");
+  await completeOnboarding(page, {
+    name: opts.name,
+    handle: opts.handle,
+    school: opts.school ?? "State University",
+    skills: ["React", "TypeScript", "Node"],
+    learning: ["Rust"],
+  });
 }
 
 // Complete onboarding through the wizard. Assumes we're on /onboarding.
@@ -70,6 +80,13 @@ export async function addTag(page: Page, labelStartsWith: string, query: string)
   const option = page.getByRole("option").filter({ hasText: new RegExp(query, "i") }).first();
   await option.waitFor({ state: "visible" });
   await option.click();
+}
+
+// The thread composer. Targeted by role rather than by label: the nav unread
+// badge is labelled "N unread messages", which a substring label match would
+// also hit.
+export function composer(page: Page) {
+  return page.getByRole("textbox", { name: "Message" });
 }
 
 export async function logout(page: Page) {

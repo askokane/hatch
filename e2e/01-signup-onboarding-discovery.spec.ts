@@ -1,15 +1,15 @@
 import { test, expect } from "@playwright/test";
-import { signup, verifyEmail, completeOnboarding, login, DEMO_EMAIL } from "./fixtures";
+import { signup, completeOnboarding, login, DEMO_EMAIL } from "./fixtures";
 
-// Scenario 1: signup -> verification -> onboarding -> profile visible in discovery.
-test("signup, verify, onboard, and appear in discovery", async ({ page, browser }) => {
+// Scenario 1: signup -> onboarding -> profile visible in discovery. There is no
+// verification step; a new account is usable the moment it exists.
+test("signup, onboard, and appear in discovery", async ({ page, browser }) => {
   const unique = Date.now().toString(36);
   const email = `newbuilder${unique}@e2e.edu`;
   const handle = `newbuilder-${unique}`;
   const name = `New Builder ${unique}`;
 
   await signup(page, email);
-  await verifyEmail(page, email);
 
   await page.goto("/onboarding");
   await completeOnboarding(page, {

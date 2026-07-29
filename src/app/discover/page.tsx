@@ -7,6 +7,7 @@ import {
   getPeople,
   getProjects,
 } from "@/lib/discover-queries";
+import { getRelationships, noRelationship } from "@/lib/relationship";
 import { Tabs } from "@/components/ui/Tabs";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { RoleFeedCard } from "@/components/discover/RoleFeedCard";
@@ -103,10 +104,19 @@ async function RolesTab({
       />
     );
   }
+  // One batched lookup for the whole feed rather than one per card.
+  const relationships = await getRelationships(
+    viewer.profileId,
+    feed.map((item) => item.owner.id)
+  );
   return (
     <div className="flex flex-col gap-3">
       {feed.map((item) => (
-        <RoleFeedCard key={item.role.id} item={item} />
+        <RoleFeedCard
+          key={item.role.id}
+          item={item}
+          relationship={relationships.get(item.owner.id) ?? noRelationship(item.owner.id)}
+        />
       ))}
     </div>
   );
@@ -130,6 +140,10 @@ async function PeopleTab({
       intent: filters.intent,
     }
   );
+  const relationships = await getRelationships(
+    viewerId,
+    people.map((p) => p.id)
+  );
   return (
     <div className="flex flex-col gap-4">
       <PeopleFilterBar schools={schools} />
@@ -143,6 +157,7 @@ async function PeopleTab({
           {people.map((p) => (
             <PeopleCard
               key={p.id}
+              relationship={relationships.get(p.id) ?? noRelationship(p.id)}
               person={{
                 handle: p.handle,
                 name: p.name,

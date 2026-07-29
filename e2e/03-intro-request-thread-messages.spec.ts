@@ -1,5 +1,5 @@
 import { test, expect } from "@playwright/test";
-import { signup, verifyEmail, completeOnboarding, login, DEMO_EMAIL } from "./fixtures";
+import { signup, completeOnboarding, login, composer, DEMO_EMAIL } from "./fixtures";
 import { testDb } from "./db";
 import { restartServer } from "./server-control";
 
@@ -37,11 +37,10 @@ test("intro request, accept, two-way messaging, survives restart", async ({ brow
   const senderEmail = `restarttester${unique}@e2e.edu`;
   const senderHandle = `restart-tester-${unique}`;
 
-  // --- Sender context: fresh account, verified + onboarded ---
+  // --- Sender context: fresh account, onboarded ---
   const senderCtx = await browser.newContext();
   const sender = await senderCtx.newPage();
   await signup(sender, senderEmail);
-  await verifyEmail(sender, senderEmail);
   await sender.goto("/onboarding");
   await completeOnboarding(sender, {
     name: `Restart Tester ${unique}`,
@@ -75,7 +74,7 @@ test("intro request, accept, two-way messaging, survives restart", async ({ brow
   const threadUrl = recipient.url();
 
   // Recipient sends the first message.
-  await recipient.getByLabel("Message").fill("Hey — thanks for reaching out, happy to chat.");
+  await composer(recipient).fill("Hey — thanks for reaching out, happy to chat.");
   await recipient.getByRole("button", { name: /^send$/i }).click();
   await expect(recipient.getByText("Hey — thanks for reaching out, happy to chat.")).toBeVisible();
 
@@ -84,16 +83,19 @@ test("intro request, accept, two-way messaging, survives restart", async ({ brow
   await sender.getByRole("link", { name: /open thread/i }).first().click();
   await sender.waitForURL(/\/messages\/.+/);
   // Sender should see the recipient's message via initial load / polling.
+  // Delivery takes up to one poll interval plus a round-trip to a hosted
+  // database, so the window has to cover several polls — 10s was tight enough
+  // to flake once the suite had other work in flight.
   await expect(sender.getByText("Hey — thanks for reaching out, happy to chat.")).toBeVisible({
-    timeout: 10_000,
+    timeout: 30_000,
   });
-  await sender.getByLabel("Message").fill("Awesome — here is what I have so far.");
+  await composer(sender).fill("Awesome — here is what I have so far.");
   await sender.getByRole("button", { name: /^send$/i }).click();
   await expect(sender.getByText("Awesome — here is what I have so far.")).toBeVisible();
 
   // Recipient sees the reply via polling (no manual reload).
   await expect(recipient.getByText("Awesome — here is what I have so far.")).toBeVisible({
-    timeout: 10_000,
+    timeout: 30_000,
   });
 
   // --- Restart the server, then confirm both messages persisted ---

@@ -3,7 +3,6 @@ import { Inter, IBM_Plex_Mono } from "next/font/google";
 import "./globals.css";
 import { getSession } from "@/lib/session";
 import { NavBar } from "@/components/layout/NavBar";
-import { VerifyBanner } from "@/components/layout/VerifyBanner";
 import { ToastProvider } from "@/components/ui/ToastProvider";
 
 const sans = Inter({ subsets: ["latin"], variable: "--font-sans", display: "swap" });
@@ -30,7 +29,6 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             hasProfile={!!session?.profileId}
             isAdmin={!!session?.isAdmin}
           />
-          {session && !session.emailVerifiedAt && <VerifyBanner />}
           <main id="main" className="mx-auto w-full max-w-5xl px-4 py-8 sm:px-6">
             {children}
           </main>

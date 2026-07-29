@@ -11,18 +11,23 @@ const PORT = 3100;
 const PID_FILE = join(process.cwd(), "e2e", ".server.pid");
 const isWin = process.platform === "win32";
 
-// The e2e server inherits DATABASE_URL/DIRECT_URL from the environment — point
-// them at a throwaway Postgres test database (never your production DB) before
-// running `npm run test:e2e`.
+// The e2e server inherits DATABASE_URL/DIRECT_URL from this process, which
+// `npm run test:e2e` has already pointed at the isolated test schema (see
+// scripts/with-e2e-db.mjs). Next does not override variables already present in
+// process.env, so .env cannot leak the production URL back in here.
 function envForServer() {
+  if (!process.env.DATABASE_URL?.includes("schema=")) {
+    throw new Error(
+      "Refusing to start the e2e server: DATABASE_URL has no explicit schema, so it " +
+        "may be pointing at production. Run the suite via `npm run test:e2e`."
+    );
+  }
   return {
     ...process.env,
     NODE_ENV: "production" as const,
     DEV_EMAIL_ALLOWLIST: "@stateu.edu,@hatchdemo.edu,@e2e.edu",
     APP_URL: `http://localhost:${PORT}`,
     PORT: String(PORT),
-    // Enables the test-support routes on this server only (see api/test-support/*).
-    E2E_TEST_SUPPORT: "1",
   };
 }
 
