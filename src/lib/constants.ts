@@ -31,8 +31,34 @@ export const ROLE_STATUS_LABELS: Record<string, string> = {
 
 export const TAG_KINDS = ["SKILL", "INTEREST", "DOMAIN"] as const;
 
-// Polling / messaging
+// Polling / messaging.
+//
+// POLL_INTERVAL_MS drives an OPEN thread, where the reader is watching for a
+// reply and latency is the whole experience — it stays tight.
+//
+// NAV_POLL_INTERVAL_MS drives the nav badges, which every logged-in client polls
+// from every page. That makes it the app's baseline load per concurrent user, and
+// a badge is not worth the same urgency as a live conversation. Both pollers pause
+// on a hidden tab and tick immediately on refocus, so a slower interval is
+// invisible to someone returning to the tab.
+//
+// The ceiling here is a product promise, not a guess: the badge is specified to go
+// live without a navigation, and e2e/07-nav-request-badge.spec.ts holds that to a
+// 15s budget. 10s keeps a comfortable margin inside it while costing a third of
+// the request volume the old 3s interval did.
 export const POLL_INTERVAL_MS = 3000;
+export const NAV_POLL_INTERVAL_MS = 10000;
+
+// Floor on the gap between the END of one poll and the START of the next.
+//
+// Both pollers schedule themselves rather than running on a fixed interval, so
+// a request can never overlap its predecessor. That alone is not quite enough:
+// when a response takes longer than its interval, "wait out the remainder"
+// computes to zero and the client would poll back-to-back forever. This floor
+// is the concession to a slow link — under load each poller settles into a
+// steady rhythm instead of consuming every connection it can get, which is what
+// let background polling starve the user's own page loads.
+export const MIN_POLL_GAP_MS = 1000;
 
 // Nav badges show the exact count up to this value, then "9+".
 export const COUNT_BADGE_MAX = 9;
@@ -60,3 +86,65 @@ export const MIN_INTENTS = 1;
 
 // Pagination
 export const PAGE_SIZE = 20;
+
+// --- Feed & posts ---
+
+// A post may be text-only, media-only, or both — but never empty. The action
+// enforces "body non-empty OR at least one media item", so POST_BODY_MIN is not
+// a constant: emptiness is only a failure in the absence of media.
+export const POST_BODY_MAX = 1000;
+export const POST_MEDIA_MAX = 4;
+
+// The feed merges three sources (posts, project updates, open roles) on
+// createdAt. Each source is read with its own bounded query and the merged
+// result is sliced to FEED_PAGE_SIZE, so one prolific source cannot starve the
+// others and no single request is unbounded.
+export const FEED_PAGE_SIZE = 20;
+// Per-source candidate ceiling. Must be >= FEED_PAGE_SIZE: each source has to be
+// able to supply a whole page on its own, or a page whose items all come from
+// one source would come back short and end paging early.
+export const FEED_SOURCE_CANDIDATES = 40;
+
+// Media limits, enforced server-side in the upload route (a client-side check is
+// a courtesy, never the guard).
+//
+// Both caps are 4 MB, and video is not the larger of the two, which looks wrong
+// until you follow where the request actually dies. The binding constraint is
+// the deployment target, not this app: a Vercel serverless function rejects a
+// request body over ~4.5 MB before the handler ever runs, so a 20 MB video would
+// upload fine on `npm run dev` and fail in production with an error we never got
+// to write. A limit that only holds on a developer's laptop is worse than a
+// smaller one that holds everywhere, so the cap is set where it is real.
+//
+// This is also the reason a video posted here is a short clip rather than a
+// full recording. Lifting it is not a matter of raising these numbers: the
+// upload has to stop going through our own origin at all. The route would hand
+// the client a presigned URL, the browser would PUT the bytes straight to object
+// storage, and MediaAsset would hold a key instead of `data` — at which point
+// the per-file ceiling becomes the storage provider's, not the function's.
+export const IMAGE_BYTES_MAX = 4 * 1024 * 1024; // 4 MB
+export const VIDEO_BYTES_MAX = 4 * 1024 * 1024; // 4 MB
+
+// MIME allowlist. An allowlist rather than a blocklist, and the served
+// Content-Type is echoed from this list rather than from the upload, so a file
+// cannot be stored as one type and served as another (e.g. text/html).
+export const ALLOWED_IMAGE_MIME = ["image/jpeg", "image/png", "image/gif", "image/webp"] as const;
+export const ALLOWED_VIDEO_MIME = ["video/mp4", "video/webm", "video/quicktime"] as const;
+
+// Uploads sit unattached between "file chosen" and "post created". This caps how
+// many a single profile may hold in that state, so an abandoned composer cannot
+// accumulate blobs without bound.
+export const PENDING_UPLOAD_MAX = 12;
+
+// Thread transcripts load the newest MESSAGE_PAGE_SIZE messages and walk backwards
+// from there on demand. Opening a thread used to select its entire history, so a
+// long-running conversation grew its own page weight without bound — the whole
+// transcript was serialized into the server-rendered payload every visit. Nothing
+// is unreachable: ThreadView pages older messages in with the same cursor the
+// live tail already uses.
+export const MESSAGE_PAGE_SIZE = 50;
+
+// Ceiling on a single live-tail catch-up response. The tail is normally a handful
+// of messages, but a client that slept through a long burst must not be handed an
+// unbounded array; it re-polls immediately when a page comes back full.
+export const MESSAGE_TAIL_MAX = 200;

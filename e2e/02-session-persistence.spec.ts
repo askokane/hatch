@@ -6,9 +6,18 @@ test("session persists across reload and logout clears it", async ({ page }) => 
   await login(page, DEMO_EMAIL);
   await expect(page).toHaveURL(/\/discover/);
 
-  // Reload — still authenticated (nav shows profile link, not log in).
+  // Reload — still authenticated. The signed-in tell is the nav's account menu
+  // (your avatar), which replaced the standalone profile / log out links; the
+  // profile link itself now lives inside it.
   await page.reload();
-  await expect(page.getByRole("link", { name: "profile" })).toBeVisible();
+  const accountMenu = page.getByRole("button", { name: /^account menu/i });
+  await expect(accountMenu).toBeVisible();
+  await expect(page.getByRole("link", { name: /^log in$/i })).toHaveCount(0);
+
+  await accountMenu.click();
+  // Exact: "view public profile" sits right below it and would match a substring.
+  await expect(page.getByRole("menuitem", { name: "profile", exact: true })).toBeVisible();
+  await page.keyboard.press("Escape");
 
   // A protected page is reachable while logged in.
   await page.goto("/messages");

@@ -73,6 +73,12 @@ enum SubjectType {
   PROJECT
   MESSAGE
   THREAD
+  POST
+}
+
+enum MediaKind {
+  IMAGE
+  VIDEO
 }
 
 // Accounts are usable the moment they are created. `emailVerifiedAt` is stamped
@@ -160,9 +166,14 @@ model Profile {
   blocksMade       Block[]        @relation("Blocker")
   blocksReceived   Block[]        @relation("Blocked")
   reportsFiled     Report[]
+  posts            Post[]
+  mediaAssets      MediaAsset[]
 
   @@index([school])
   @@index([isDiscoverable])
+  // getPeople() sorts the discoverable set by updatedAt. Without this the planner
+  // had to sort every matching profile on each people search.
+  @@index([isDiscoverable, updatedAt])
 }
 
 model Tag {
@@ -235,6 +246,8 @@ model Project {
 
   @@index([stage])
   @@index([visibility])
+  // getProjects() lists public, non-closed projects newest-first.
+  @@index([visibility, createdAt])
 }
 
 model ProjectTag {
@@ -286,6 +299,9 @@ model OpenRole {
 
   @@index([projectId])
   @@index([status])
+  // The discover feed pages OPEN roles newest-first; this serves both the filter
+  // and the ordering from one index.
+  @@index([status, createdAt])
 }
 
 model RoleTag {
@@ -354,7 +370,67 @@ model Message {
   thread          Thread   @relation(fields: [threadId], references: [id], onDelete: Cascade)
   author          Profile  @relation(fields: [authorProfileId], references: [id], onDelete: Cascade)
 
-  @@index([threadId, createdAt])
+  // Supersedes a plain [threadId, createdAt]: that prefix still serves transcript
+  // paging identically, and carrying authorProfileId makes the unread-count query
+  // behind /api/nav-counts — the app's hottest read — satisfiable from the index
+  // alone, with no heap lookup per counted row. Kept as one index rather than two
+  // so sending a message still only maintains one.
+  @@index([threadId, createdAt, authorProfileId])
+}
+
+// A profile post — the feed's first-party content type, alongside the project
+// updates and open roles the feed also carries. Body may be empty ONLY when the
+// post carries media, so a post is never entirely blank (enforced in the action).
+model Post {
+  id              String       @id @default(cuid())
+  authorProfileId String
+  body            String
+  createdAt       DateTime     @default(now())
+  author          Profile      @relation(fields: [authorProfileId], references: [id], onDelete: Cascade)
+  media           MediaAsset[]
+
+  // The profile tab pages one author's posts newest-first.
+  @@index([authorProfileId, createdAt])
+  // The global feed pages every post newest-first; it is one of three sources
+  // merged on createdAt, so each source must be independently ordered cheaply.
+  @@index([createdAt])
+}
+
+// Uploaded photo/video bytes, stored in Postgres as `bytea` and served by
+// GET /api/media/[id].
+//
+// Storing blobs in the database is a deliberate scope choice, not an oversight:
+// the app's standing constraint is no paid services and no API keys, and the
+// hosted target (Vercel) has no writable persistent filesystem, so the local
+// disk is not actually an option. The DB is the only durable store present.
+// The caps in lib/constants.ts (IMAGE_BYTES_MAX / VIDEO_BYTES_MAX) are what keep
+// that honest. The upgrade path is a swap of two functions — the upload route
+// would PUT to object storage and this row would hold a key instead of `data`;
+// nothing else reads `data` directly.
+//
+// `postId` is null between upload and attachment: the composer uploads first to
+// get an id, then creates the post referencing it. Assets left unattached are
+// bounded per profile (PENDING_UPLOAD_MAX) and swept when the composer's own
+// post is created, so an abandoned upload cannot accumulate without limit.
+model MediaAsset {
+  id             String    @id @default(cuid())
+  ownerProfileId String
+  postId         String?
+  kind           MediaKind
+  mimeType       String
+  data           Bytes
+  byteSize       Int
+  // Original filename is kept for the download/alt affordance only; it is never
+  // used to build a path.
+  fileName       String    @default("")
+  position       Int       @default(0)
+  createdAt      DateTime  @default(now())
+  owner          Profile   @relation(fields: [ownerProfileId], references: [id], onDelete: Cascade)
+  post           Post?     @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  @@index([postId])
+  // Serves the pending-upload quota check (postId null for one owner).
+  @@index([ownerProfileId, postId])
 }
 
 model Block {

@@ -2,7 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { requireSession } from "@/lib/session";
 import { db } from "@/lib/db";
-import { resolveContextLabel } from "@/lib/context-label";
+import { resolveContextLabels, contextLabelKey } from "@/lib/context-label";
 import { Avatar } from "@/components/ui/Avatar";
 import { EmptyState } from "@/components/ui/EmptyState";
 
@@ -35,14 +35,15 @@ export default async function MessagesPage() {
       return bt - at;
     });
 
-  const items = await Promise.all(
-    threads.map(async (t) => ({
-      id: t.id,
-      counterpart: t.members[0]?.profile ?? { handle: "unknown", name: "Unknown", avatarSeed: "x" },
-      contextLabel: await resolveContextLabel(t.contextType, t.contextId),
-      lastMessage: t.messages[0]?.body ?? null,
-    }))
-  );
+  // One batched lookup for every row's context label, rather than a query per row.
+  const labels = await resolveContextLabels(threads);
+
+  const items = threads.map((t) => ({
+    id: t.id,
+    counterpart: t.members[0]?.profile ?? { handle: "unknown", name: "Unknown", avatarSeed: "x" },
+    contextLabel: labels.get(contextLabelKey(t)) ?? "Context",
+    lastMessage: t.messages[0]?.body ?? null,
+  }));
 
   return (
     <div>

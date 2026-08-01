@@ -27,6 +27,7 @@ export function ThreadView({
   myProfileId,
   counterpartName,
   initialMessages,
+  initialHasOlder,
   initialPresence,
   composer,
 }: {
@@ -34,29 +35,33 @@ export function ThreadView({
   myProfileId: string;
   counterpartName: string;
   initialMessages: MessageDTO[];
+  initialHasOlder: boolean;
   initialPresence: ThreadPresence;
   composer: ComposerState;
 }) {
   const { notify } = useToast();
-  const { messages, presence, append, reportTyping } = useThreadPolling(
-    threadId,
-    initialMessages,
-    initialPresence
-  );
+  const { messages, presence, append, reportTyping, loadOlder, hasOlder, loadingOlder } =
+    useThreadPolling(threadId, initialMessages, initialPresence, initialHasOlder);
   const [body, setBody] = useState("");
   const [busy, setBusy] = useState(false);
   const endRef = useRef<HTMLDivElement>(null);
+
+  // Both effects below key off the NEWEST message id rather than the array length,
+  // because "load earlier" grows the array at the front. Keyed on length, loading
+  // history would yank the reader back down to the newest message and fire a
+  // redundant read-receipt write every time they paged up.
+  const newestId = messages.at(-1)?.id ?? null;
 
   // Mark read on open and on every arrival. Doing it only on *change* used to
   // mean opening a thread full of unread messages never cleared the nav badge —
   // and never turned the sender's "delivered" into "seen".
   useEffect(() => {
     markThreadReadAction(threadId).catch(() => {});
-  }, [threadId, messages.length]);
+  }, [threadId, newestId]);
 
   useEffect(() => {
     endRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages.length, presence.otherTyping]);
+  }, [newestId, presence.otherTyping]);
 
   // Receipts belong on the newest own message only — a column of "seen" beside
   // every bubble is noise, and the newest one implies all the ones above it.
@@ -98,6 +103,20 @@ export function ThreadView({
     <div className="flex h-[60vh] flex-col border border-hairline bg-white">
       {/* Message list with aria-live so new arrivals are announced. */}
       <div className="flex-1 overflow-y-auto p-4" aria-live="polite" aria-relevant="additions">
+        {/* Only the newest page is server-rendered; the rest of the history is a
+            click away rather than absent. */}
+        {hasOlder && (
+          <div className="mb-3 flex justify-center">
+            <button
+              type="button"
+              onClick={loadOlder}
+              disabled={loadingOlder}
+              className="mono border border-hairline px-3 py-1 text-2xs text-ink-muted hover:border-ink hover:text-ink disabled:opacity-50"
+            >
+              {loadingOlder ? "loading…" : "load earlier messages"}
+            </button>
+          </div>
+        )}
         {messages.length === 0 && !presence.otherTyping ? (
           <p className="mono py-8 text-center text-xs text-ink-muted">
             No messages yet. Say hello — reference why you connected.

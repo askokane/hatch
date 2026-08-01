@@ -1,4 +1,5 @@
 import crypto from "node:crypto";
+import { cache } from "react";
 import { redirect } from "next/navigation";
 import { db } from "./db";
 import { getSessionCookie, setSessionCookie, clearSessionCookie } from "./cookies";
@@ -12,6 +13,11 @@ export type SessionUser = {
   isAdmin: boolean;
   profileId: string | null;
   emailVerifiedAt: Date | null;
+  /** Identity for the nav's account menu and the feed composer's avatar. Null
+   *  until onboarding creates the profile — every consumer gates on profileId. */
+  name: string | null;
+  handle: string | null;
+  avatarSeed: string | null;
 };
 
 function hashToken(token: string): string {
@@ -30,13 +36,29 @@ export async function createSession(userId: string): Promise<void> {
 
 // Read-only lookup. Safe from Server Components, layouts, actions, route handlers.
 // Returns null for missing/expired/invalid sessions. Never redirects.
-export async function getSession(): Promise<SessionUser | null> {
+//
+// Wrapped in React's `cache()` below, so this body runs at most once per request
+// no matter how many callers ask. That matters because the root layout resolves
+// the session to render the nav AND the page itself calls requireSession — which
+// was two identical Session lookups (plus a possible duplicate renewal write) on
+// every single render. Memoizing is safe here because no request both mutates the
+// session and re-reads it: every create/destroy is immediately followed by a
+// redirect, so nothing can observe a stale memo.
+async function loadSession(): Promise<SessionUser | null> {
   const token = await getSessionCookie();
   if (!token) return null;
 
   const session = await db.session.findUnique({
     where: { tokenHash: hashToken(token) },
-    include: { user: { include: { profile: { select: { id: true } } } } },
+    // Widened from `{ id }` to carry the display identity as well. The nav
+    // renders an avatar and an account menu on every authenticated page, so the
+    // alternative was a second profile lookup per render for three columns the
+    // session query was already joining.
+    include: {
+      user: {
+        include: { profile: { select: { id: true, name: true, handle: true, avatarSeed: true } } },
+      },
+    },
   });
 
   if (!session || session.expiresAt < new Date()) return null;
@@ -61,8 +83,13 @@ export async function getSession(): Promise<SessionUser | null> {
     isAdmin: session.user.isAdmin,
     profileId: session.user.profile?.id ?? null,
     emailVerifiedAt: session.user.emailVerifiedAt,
+    name: session.user.profile?.name ?? null,
+    handle: session.user.profile?.handle ?? null,
+    avatarSeed: session.user.profile?.avatarSeed ?? null,
   };
 }
+
+export const getSession = cache(loadSession);
 
 // Redirects unauthenticated callers to /login with a validated relative return
 // path. Use at the top of every protected page and every protected server action.

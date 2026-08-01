@@ -2,21 +2,32 @@ import { redirect } from "next/navigation";
 import { requireSession } from "@/lib/session";
 import { db } from "@/lib/db";
 import { HANDLE_IMMUTABLE_DAYS } from "@/lib/constants";
+import { getFeedPage } from "@/lib/feed-queries";
 import { OwnProfile } from "@/components/profile/OwnProfile";
 import type { ProfileViewData } from "@/components/profile/ProfileView";
 import type { ProfileEditInitial } from "@/components/profile/ProfileEditForm";
+import { FeedList } from "@/components/feed/FeedList";
+import { PostComposer } from "@/components/feed/PostComposer";
 
 export default async function OwnProfilePage() {
   const session = await requireSession("/profile");
   if (!session.profileId) redirect("/onboarding");
 
-  const profile = await db.profile.findUnique({
-    where: { id: session.profileId },
-    include: {
-      tags: { include: { tag: { select: { id: true, label: true, kind: true, slug: true } } } },
-      intents: true,
-    },
-  });
+  // Both reads key off the session's profileId, so neither waits on the other.
+  const [profile, postsPage] = await Promise.all([
+    db.profile.findUnique({
+      where: { id: session.profileId },
+      include: {
+        tags: { include: { tag: { select: { id: true, label: true, kind: true, slug: true } } } },
+        intents: true,
+      },
+    }),
+    getFeedPage({
+      viewerProfileId: session.profileId,
+      filter: "posts",
+      authorProfileId: session.profileId,
+    }),
+  ]);
   if (!profile) redirect("/onboarding");
 
   const skills = profile.tags
@@ -63,7 +74,24 @@ export default async function OwnProfilePage() {
 
   return (
     <div className="py-2">
-      <OwnProfile data={data} editInitial={editInitial} />
+      <OwnProfile
+        data={data}
+        editInitial={editInitial}
+        postsSlot={
+          <>
+            <PostComposer avatarSeed={profile.avatarSeed} />
+            <div className="mt-6">
+              <FeedList
+                initialPage={postsPage}
+                filter="posts"
+                authorHandle={profile.handle}
+                emptyTitle="You haven't posted yet"
+                emptyBody="Posts are the running record of what you're building — what shipped, what broke, what you're stuck on. Write one above and it shows up here and in everyone's feed."
+              />
+            </div>
+          </>
+        }
+      />
     </div>
   );
 }

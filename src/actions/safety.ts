@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { db } from "@/lib/db";
 import { requireSession, requireProfile } from "@/lib/session";
-import { reportSchema } from "@/lib/validation/message.schema";
+import { reportSchema, type ReportSubjectType } from "@/lib/validation/message.schema";
 import { ok, fail, type ActionResult } from "@/lib/action-result";
 
 // Every surface that can change with a block. Blocking alters discovery, the
@@ -68,7 +68,7 @@ export async function unblockUserAction(blockedProfileId: string): Promise<Actio
 
 // File a report. Reporter is always the caller.
 export async function reportAction(input: {
-  subjectType: "PROFILE" | "PROJECT" | "MESSAGE" | "THREAD";
+  subjectType: ReportSubjectType;
   subjectId: string;
   reason: string;
   detail?: string;

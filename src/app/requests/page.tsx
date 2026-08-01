@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import { requireSession } from "@/lib/session";
 import { db } from "@/lib/db";
-import { resolveContextLabel, formatDate } from "@/lib/context-label";
+import { resolveContextLabels, contextLabelKey, formatDate } from "@/lib/context-label";
 import { Tabs } from "@/components/ui/Tabs";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { RequestCard, type RequestCardData } from "@/components/requests/RequestCard";
@@ -39,23 +39,24 @@ export default async function RequestsPage({
   ]);
 
   const list = tab === "received" ? received : sent;
-  const cards: RequestCardData[] = await Promise.all(
-    list.map(async (r) => {
-      const counterpart =
-        tab === "received"
-          ? (r as (typeof received)[number]).fromProfile
-          : (r as (typeof sent)[number]).toProfile;
-      return {
-        id: r.id,
-        note: r.note,
-        status: r.status,
-        contextLabel: await resolveContextLabel(r.contextType, r.contextId),
-        createdAt: formatDate(r.createdAt),
-        counterpart,
-        threadId: r.thread?.id ?? null,
-      };
-    })
-  );
+  // One batched lookup for every card's context label, rather than a query per card.
+  const labels = await resolveContextLabels(list);
+
+  const cards: RequestCardData[] = list.map((r) => {
+    const counterpart =
+      tab === "received"
+        ? (r as (typeof received)[number]).fromProfile
+        : (r as (typeof sent)[number]).toProfile;
+    return {
+      id: r.id,
+      note: r.note,
+      status: r.status,
+      contextLabel: labels.get(contextLabelKey(r)) ?? "Context",
+      createdAt: formatDate(r.createdAt),
+      counterpart,
+      threadId: r.thread?.id ?? null,
+    };
+  });
 
   const tabs = [
     { value: "received", label: "received", count: pendingReceivedCount },

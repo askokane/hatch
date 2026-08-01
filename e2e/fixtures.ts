@@ -89,7 +89,19 @@ export function composer(page: Page) {
   return page.getByRole("textbox", { name: "Message" });
 }
 
+// Log out lives in the nav's account menu, behind your avatar. The exception is
+// a half-onboarded account, which has no profile to hang a menu off and so still
+// shows the button directly — hence the conditional open rather than an
+// unconditional click.
 export async function logout(page: Page) {
-  await page.getByRole("button", { name: /log out/i }).click();
+  const accountMenu = page.getByRole("button", { name: /^account menu/i });
+  if ((await accountMenu.count()) > 0) {
+    await accountMenu.click();
+    // Inside the menu the control is a menuitem, not a button — the explicit
+    // role replaces the implicit one.
+    await page.getByRole("menuitem", { name: /log out/i }).click();
+  } else {
+    await page.getByRole("button", { name: /log out/i }).click();
+  }
   await page.waitForURL(/\/login/);
 }

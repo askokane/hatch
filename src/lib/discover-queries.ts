@@ -1,5 +1,14 @@
+import { cache } from "react";
+import { unstable_cache } from "next/cache";
+import { Prisma } from "@prisma/client";
 import { db } from "./db";
 import { rankOpenRoles, type RankableRole, type RoleScoreBreakdown } from "./ranking";
+
+// How many rows each candidate pass may pull, and how many ranked cards the feed
+// returns. Both are bounded so one busy campus cannot turn the default landing
+// surface into an unbounded query.
+const ROLE_CANDIDATE_LIMIT = 300;
+const ROLE_FEED_MAX = 100;
 
 // Discovery queries. Discoverability + block exclusions are applied in the WHERE
 // clause here (not in the UI): non-discoverable owners and anyone who blocked the
@@ -8,7 +17,22 @@ import { rankOpenRoles, type RankableRole, type RoleScoreBreakdown } from "./ran
 // Postgres note: the tag filtering below uses joins over the tag tables, which is
 // fine at SQLite/college scale. See lib/ranking.ts for the GIN-index upgrade path.
 
-async function blockedProfileIds(viewerProfileId: string): Promise<Set<string>> {
+// Exported because the feed applies the identical exclusion (lib/feed-queries.ts).
+// Blocking has to mean the same thing on every surface, so both read it from one
+// implementation rather than each writing its own OR-pair.
+//
+// Memoized per request with React's `cache()`, for the same reason `getSession`
+// is (see lib/session.ts): a single /discover render asks for the identical
+// block set two or three times — once for the ranked role feed, once for people
+// or projects — and the feed asks again on its own page. Every one of those was
+// a separate round trip returning the same rows. `cache()` collapses them to one
+// per request without any caller having to thread the value through.
+//
+// Deliberately request-scoped rather than time-cached: a block must take effect
+// on the very next page load, so nothing here may outlive the request.
+export const blockedProfileIds = cache(async function blockedProfileIds(
+  viewerProfileId: string
+): Promise<Set<string>> {
   const blocks = await db.block.findMany({
     where: {
       OR: [{ blockerProfileId: viewerProfileId }, { blockedProfileId: viewerProfileId }],
@@ -20,7 +44,7 @@ async function blockedProfileIds(viewerProfileId: string): Promise<Set<string>> 
     ids.add(b.blockerProfileId === viewerProfileId ? b.blockedProfileId : b.blockerProfileId);
   }
   return ids;
-}
+});
 
 export type RoleFeedItem = {
   role: {
@@ -38,6 +62,21 @@ export type RoleFeedItem = {
 };
 
 // The default discovery surface: OPEN ROLES ranked against the viewer's skills.
+//
+// Candidate selection runs as two bounded, deterministic passes rather than one
+// arbitrary slice. Previously this took 200 rows with no ORDER BY and ranked
+// whatever Postgres happened to return: correct while every open role fit inside
+// the limit, but past that the feed silently ranked an arbitrary subset, so the
+// best-matching role on the platform could simply never appear.
+//
+//   Pass A — roles sharing at least one tag with the viewer's skills. Tag overlap
+//            is the dominant scoring term, so these are the rows whose omission
+//            would actually change the ranking. Served by RoleTag.tagId.
+//   Pass B — the newest open roles regardless of tags, so a viewer with unusual
+//            or missing skill tags still gets a populated feed.
+//
+// Both are ordered newest-first and capped, then merged, scored, and truncated.
+// The scoring math in lib/ranking.ts is untouched — only which rows reach it.
 export async function getRankedRoleFeed(viewer: {
   profileId: string;
   school: string;
@@ -45,58 +84,86 @@ export async function getRankedRoleFeed(viewer: {
 }): Promise<RoleFeedItem[]> {
   const blocked = await blockedProfileIds(viewer.profileId);
 
-  const roles = await db.openRole.findMany({
-    where: {
-      status: "OPEN",
-      project: {
-        visibility: "PUBLIC",
-        // owner must be discoverable and not blocked
-        memberships: {
-          some: {
-            isOwner: true,
-            profile: {
-              isDiscoverable: true,
-              id: { notIn: [...blocked, viewer.profileId] },
-            },
+  const visibleToViewer: Prisma.OpenRoleWhereInput = {
+    status: "OPEN",
+    project: {
+      visibility: "PUBLIC",
+      // owner must be discoverable and not blocked
+      memberships: {
+        some: {
+          isOwner: true,
+          profile: {
+            isDiscoverable: true,
+            id: { notIn: [...blocked, viewer.profileId] },
           },
         },
       },
     },
-    include: {
-      tags: { include: { tag: { select: { id: true, label: true } } } },
-      project: {
-        select: {
-          slug: true,
-          name: true,
-          stage: true,
-          memberships: {
-            where: { isOwner: true },
-            include: {
-              profile: {
-                select: {
-                  id: true,
-                  handle: true,
-                  name: true,
-                  school: true,
-                  avatarSeed: true,
-                  bio: true,
-                  onboardedAt: true,
-                },
+  };
+
+  const include = {
+    tags: { include: { tag: { select: { id: true, label: true } } } },
+    project: {
+      select: {
+        slug: true,
+        name: true,
+        stage: true,
+        memberships: {
+          where: { isOwner: true },
+          include: {
+            profile: {
+              select: {
+                id: true,
+                handle: true,
+                name: true,
+                school: true,
+                avatarSeed: true,
+                bio: true,
+                onboardedAt: true,
               },
             },
           },
         },
       },
     },
-    take: 200,
-  });
+  } satisfies Prisma.OpenRoleInclude;
+
+  const [tagMatched, recent] = await Promise.all([
+    viewer.skillTagIds.length > 0
+      ? db.openRole.findMany({
+          where: {
+            ...visibleToViewer,
+            tags: { some: { tagId: { in: viewer.skillTagIds } } },
+          },
+          include,
+          orderBy: { createdAt: "desc" },
+          take: ROLE_CANDIDATE_LIMIT,
+        })
+      : Promise.resolve([]),
+    db.openRole.findMany({
+      where: visibleToViewer,
+      include,
+      orderBy: { createdAt: "desc" },
+      take: ROLE_CANDIDATE_LIMIT,
+    }),
+  ]);
+
+  // Merge the passes; a role matched by both must only be scored once.
+  const candidates = [...tagMatched];
+  const seen = new Set(tagMatched.map((r) => r.id));
+  for (const r of recent) {
+    if (!seen.has(r.id)) {
+      seen.add(r.id);
+      candidates.push(r);
+    }
+  }
 
   const viewerSkills = new Set(viewer.skillTagIds);
 
   // Build rankable inputs.
   const rankable: RankableRole[] = [];
-  const byId = new Map<string, (typeof roles)[number]>();
-  for (const r of roles) {
+  const byId = new Map<string, (typeof candidates)[number]>();
+  for (const r of candidates) {
     const owner = r.project.memberships[0]?.profile;
     if (!owner) continue;
     byId.set(r.id, r);
@@ -111,7 +178,10 @@ export async function getRankedRoleFeed(viewer: {
     });
   }
 
-  const scored = rankOpenRoles(rankable, { skillTagIds: viewerSkills, school: viewer.school });
+  const scored = rankOpenRoles(rankable, {
+    skillTagIds: viewerSkills,
+    school: viewer.school,
+  }).slice(0, ROLE_FEED_MAX);
 
   return scored.map((s) => {
     const r = byId.get(s.roleId)!;
@@ -136,6 +206,28 @@ export async function getRankedRoleFeed(viewer: {
     };
   });
 }
+
+// The school list populates one filter dropdown. It is a DISTINCT over every
+// discoverable profile, so its cost grows with the platform while its value
+// changes about as often as a new school joins — and it used to run on every
+// /discover render, including the two tabs that never display it.
+//
+// Cached for an hour and called only from the People tab. A school that appears
+// mid-window is still fully reachable: `school` is a free-text `contains` filter,
+// so the dropdown is a convenience over the query param, not the only way in.
+export const getDiscoverableSchools = unstable_cache(
+  async (): Promise<string[]> => {
+    const rows = await db.profile.findMany({
+      where: { isDiscoverable: true },
+      distinct: ["school"],
+      select: { school: true },
+      orderBy: { school: "asc" },
+    });
+    return rows.map((r) => r.school);
+  },
+  ["discoverable-schools"],
+  { revalidate: 3600 }
+);
 
 export type PeopleFilters = {
   q?: string;

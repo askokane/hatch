@@ -34,17 +34,46 @@ function parseEnvFile(path) {
 function withSchema(url) {
   const u = new URL(url);
   u.searchParams.set("schema", SCHEMA);
-  // Prisma otherwise opens a pool of (cores * 2 + 1) connections PER client, and
-  // the suite runs several at once: the Next server, the Playwright process, and
-  // — around scenario 03's restart — briefly a second server. That comfortably
-  // exceeds a hosted pool and surfaces as "max clients reached", failing every
+
+  // FORCE THE SESSION POOLER. This is a data-safety requirement, not a tuning
+  // choice, and it must not be "simplified" back to inheriting whatever
+  // DATABASE_URL happens to be.
+  //
+  // The suite isolates itself by schema, and the seed WIPES the schema it lands
+  // in. That isolation is carried by the connection's search_path — and a
+  // transaction pooler (port 6543, pgbouncer=true) does not preserve it. Under
+  // concurrency it hands transactions to server connections whose search_path
+  // has been reset, which was measured directly:
+  //
+  //   12 concurrent `SELECT current_schema()` through :6543
+  //     -> schemas seen = ["hatch_e2e", "public"]
+  //
+  // "public" there is the real database. Pointed at the transaction pooler, this
+  // suite would delete live user data on a run. The application itself is free
+  // to use :6543 — it only ever uses the default schema, so it has nothing to
+  // leak — but anything that relies on `schema=` must stay on the session port.
+  u.port = "5432";
+  u.searchParams.delete("pgbouncer");
+
+  // Session mode caps the whole project at 15 client connections, and the suite
+  // runs several at once: the Next server, the Playwright process, and — around
+  // scenario 03's restart — briefly a second server. Prisma would otherwise open
+  // (cores * 2 + 1) per client and trip "max clients reached", failing every
   // spec after it.
   //
   // 4 is a deliberate middle: 1 serialises every query behind a single
   // connection and made page loads slow enough to blow the test timeouts, while
-  // the worst case here (three clients alive at once) still stays under a
-  // 15-connection pool.
+  // the worst case here (three clients alive at once) still stays under 15.
   u.searchParams.set("connection_limit", "4");
+
+  // Wait for a connection rather than failing for one. With the database a few
+  // hundred milliseconds away, a handful of queries can hold all four
+  // connections for longer than Prisma's 10s default, which surfaced as
+  // "Timed out fetching a new connection from the connection pool" and failed
+  // spec 10 — a queueing problem wearing the costume of a product bug. Raising
+  // the wait is the safe half of the fix: opening more connections instead would
+  // push the suite's three concurrent clients past the 15-connection ceiling.
+  u.searchParams.set("pool_timeout", "30");
   return u.toString();
 }
 

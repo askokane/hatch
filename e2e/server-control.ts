@@ -55,6 +55,22 @@ async function waitUntilReady(timeoutMs = 60_000): Promise<void> {
 }
 
 export async function startServer(): Promise<void> {
+  // Refuse to start on top of a server this run did not spawn.
+  //
+  // Without this the suite can report a completely false result: an orphan from a
+  // previous run (one killed before global teardown, so its PID file was never
+  // consumed) keeps holding the port, the freshly spawned `next start` silently
+  // fails to bind, and waitUntilReady() is satisfied by the ORPHAN's reply. Every
+  // spec then runs green or red against a stale build while appearing to test the
+  // working tree. Failing loudly here is far better than testing the wrong code.
+  if (await ping()) {
+    throw new Error(
+      `Refusing to start the e2e server: something is already listening on port ${PORT}. ` +
+        `It is most likely an orphaned server from an interrupted run, which would make this ` +
+        `run test a stale build. Kill the process holding the port and try again.`
+    );
+  }
+
   const nextBin = join(process.cwd(), "node_modules", ".bin", isWin ? "next.cmd" : "next");
   const child = spawn(nextBin, ["start", "-p", String(PORT)], {
     env: envForServer(),

@@ -2,6 +2,8 @@
 
 A builder-serious professional network for college students. Post projects and open roles, get discovered by your skills, and reach people through **context** — every intro references a real open role, project, or intent, so there are no cold DMs.
 
+The **feed** is where the work shows up as it happens: profile posts (with photos and video), project updates from the rooms you can see, and the roles those projects are hiring for — one stream, merged newest-first. Your own posts also live on your profile.
+
 Built as a real full-stack app: real accounts, real login sessions, real persisted messaging. A second person on another browser can sign up, be discovered, receive an intro request, accept it, and hold a conversation that survives a server restart.
 
 ## Stack
@@ -105,6 +107,7 @@ The suite runs on its own server on port **3100**. It covers:
 8. **Typing + receipts** — one context types and the *other* sees the indicator; a sent message reads `✓ delivered` until the recipient opens the thread, then flips to `✓✓ seen` with no action from the sender.
 9. **Relationship sync** — a connected pair is offered "Message", never "Request intro", on the project page, the profile and the discovery feed; a pending request reads as pending on all of them.
 10. **Block asymmetry** — the blocker sees the block and can lift it from settings; the blocked user gets a closed composer, a refusal with no block wording, and none of the disclosing phrasings anywhere on the page.
+11. **Feed + posts** — a post with no media, then one with a real PNG whose bytes are fetched back from `/api/media/[id]` and compared byte-for-byte; the post appears both in the feed and on the author's profile, and on their public profile as seen by a second account; all three item types render under their filters; the author deletes their own post; and the upload route refuses a disallowed MIME type and an oversized file, while unauthenticated calls to `/api/media` and `/api/feed` get 401.
 
 ## Architecture notes
 
@@ -117,8 +120,47 @@ The suite runs on its own server on port **3100**. It covers:
 - **Typing presence** is an *expiry* (`ThreadMember.typingUntil`), not a boolean: a client that disappears mid-keystroke stops advertising "typing…" on its own, with no reaper job. A keystroke re-claims the window at most once per 2s, and sending or blurring releases it.
 - **Read receipts** reuse `ThreadMember.lastReadAt`. The newest own message shows `✓ delivered` until the other member's watermark passes it, then `✓✓ seen` — only the newest, since it implies every message above it.
 - **Tags are a table.** Profiles, projects, and roles reference tag IDs only. The picker autocompletes against the taxonomy; unrecognized input creates a `TagSuggestion` row (for review) and never a `Tag`.
-- **Messaging** polls `GET /api/threads/[threadId]/messages?after=<cursor>` every 3s while the tab is visible (paused when hidden), and typing/read presence rides along on that same response rather than adding a second poll. Every nav badge is fed by one `GET /api/nav-counts`. No websockets — a comment marks where an SSE upgrade would slot in. User text renders as plain text (React-escaped; no `dangerouslySetInnerHTML` in the message path).
+- **Messaging** polls `GET /api/threads/[threadId]/messages?after=<cursor>` every 3s while the tab is visible (paused when hidden, with an immediate catch-up tick on refocus), and typing/read presence rides along on that same response rather than adding a second poll. Every nav badge is fed by one `GET /api/nav-counts`, polled every 10s under the same visibility rules. No websockets — a comment marks where an SSE upgrade would slot in. User text renders as plain text (React-escaped; no `dangerouslySetInnerHTML` in the message path).
+- **Transcripts are paged.** Opening a thread renders the newest `MESSAGE_PAGE_SIZE` messages; `?before=<cursor>` walks backwards behind a "load earlier messages" control. The whole history is reachable, it is just not re-serialized into the page payload on every visit.
 - **Avatars** are deterministic inline SVG identicons generated from a seed (`src/lib/avatar.ts`) — no uploads, no external images, no faces.
+- **The feed merges three sources rather than materializing a fourth.** `/feed` shows profile posts, project updates, and open roles interleaved newest-first. Updates and roles are *read* from the tables that already own them (`Update`, `OpenRole`) instead of being copied into a feed table on write, so a project update cannot go stale or diverge from what the project room shows — there is one row, read from two places. `getFeedPage` (`src/lib/feed-queries.ts`) queries the selected sources in one `Promise.all`, each bounded and ordered on `createdAt`, then merges and slices to a page. A single timestamp works as a cursor across all three precisely because all three are ordered on that same field.
+- **Feed visibility is a query concern, not a UI one**, exactly as in discovery. Updates and roles belonging to `UNLISTED` projects never enter the result set, and blocked profiles are excluded in both directions via the same `blockedProfileIds` helper discovery uses — one implementation, so a block cannot mean one thing on `/discover` and another on `/feed`.
+- **Posts carry optional media, and the bytes live in Postgres** (`MediaAsset.data`, a `bytea`). This is a deliberate consequence of the app's standing constraints rather than a default: no paid services and no API keys rules out object storage, and the hosted target has no writable persistent filesystem, so the database is the only durable store available. `MediaAsset` is written so the upgrade is local — nothing but the serving route reads `data`, so swapping in a storage key changes two functions and no callers.
+- **The upload is a route handler, not a Server Action.** Server Actions carry a default 1 MB request body cap, and raising it is a global setting that would apply to every action in the app. `POST /api/media` takes the file, validates it, and returns an id; the post is then created with ids only. The per-file cap is 4 MB because that is where the limit is *real* — a serverless function rejects a larger body before our handler runs, so a bigger limit would work on a laptop and fail in production.
+- **Media is validated by allowlist and served back from that same allowlist.** The stored MIME is re-checked against `ALLOWED_IMAGE_MIME`/`ALLOWED_VIDEO_MIME` on the way out and sent with `X-Content-Type-Options: nosniff`, so a row can never cause an arbitrary content type to be served. `GET /api/media/[id]` requires a session (media is not public), supports HTTP `Range` so `<video>` seeking works, and is cached `private, immutable` since an asset id never changes content.
+- **An upload is attached, not trusted.** The composer uploads first and posts ids second, so between those two steps an asset exists with no post. `createPostAction` attaches only assets that the caller owns *and* that are still unattached, re-derived from the DB — a borrowed or already-used id is refused rather than silently dropped. Assets stranded by an abandoned composer are capped per profile and swept when that profile's next post lands.
+
+## Load characteristics
+
+Concurrency here is set by the polled endpoints, not by page renders — a logged-in
+client generates traffic whether or not anyone is clicking. The two rules that keep
+that affordable:
+
+- **A poll's query count must not depend on the caller's data.** `/api/nav-counts`
+  issues exactly two queries regardless of how many threads the viewer is in. It
+  previously ran one `COUNT` per thread, so the platform's total load grew with
+  users × threads — engagement made it superlinearly more expensive. The unread
+  counts are now a single grouped join against the viewer's own `ThreadMember` row,
+  covered by `Message(threadId, createdAt, authorProfileId)`.
+- **Hidden tabs cost nothing.** Both pollers stop on `visibilitychange` and fire a
+  catch-up tick on refocus, so idle background tabs no longer multiply a single
+  user's baseline.
+
+Supporting rules applied to the read paths: `getSession` is wrapped in React's
+`cache()` so the root layout and the page share one lookup per request; list
+surfaces (`/messages`, `/requests`, both discovery feeds) resolve labels and
+relationships in a fixed number of batched queries rather than one per row;
+transcripts and the role feed are bounded and ordered rather than unbounded or
+arbitrary; and the school dropdown's `DISTINCT` over all profiles is cached for an
+hour instead of running on every `/discover` render.
+
+Known remaining cost, deliberately unchanged: `hashPassword` uses `bcryptjs`
+(pure JS) at cost 12, which is several hundred ms of blocking CPU per login. That
+is a deliberate security/latency trade, it only affects auth bursts rather than
+steady-state load, and lowering the cost factor is a security decision rather than
+a tuning one. Free-text bio search is still an unindexed `ILIKE`; the next lever
+there is a `pg_trgm` GIN index, which is worth adding well before six-figure
+profile counts but not at this scale.
 
 ## Switching to Postgres
 

@@ -6,6 +6,7 @@ import {
   getRankedRoleFeed,
   getPeople,
   getProjects,
+  getDiscoverableSchools,
 } from "@/lib/discover-queries";
 import { getRelationships, noRelationship } from "@/lib/relationship";
 import { Tabs } from "@/components/ui/Tabs";
@@ -24,27 +25,26 @@ export default async function DiscoverPage({
   const session = await requireSession("/discover");
   if (!session.profileId) redirect("/onboarding");
 
-  // Cannot reach discovery with an empty profile.
-  const completeness = await getProfileCompleteness(session.profileId);
-  if (!completeness.isComplete) redirect("/onboarding");
-
+  // The completeness gate and the viewer's own profile are independent reads, so
+  // they go out together rather than one after the other. They used to be two
+  // sequential awaits, which on a remote database means paying the round trip
+  // twice for data that could have arrived at once. The gate below still runs
+  // before anything is rendered; the only cost is fetching a profile we discard
+  // on the redirect path, which is the rare case.
   const sp = await searchParams;
   const tab = sp.tab ?? "roles";
 
-  const profile = await db.profile.findUnique({
-    where: { id: session.profileId },
-    include: { tags: { where: { relation: "HAS" }, select: { tagId: true } } },
-  });
-  if (!profile) redirect("/onboarding");
+  const [completeness, profile] = await Promise.all([
+    getProfileCompleteness(session.profileId),
+    db.profile.findUnique({
+      where: { id: session.profileId },
+      include: { tags: { where: { relation: "HAS" }, select: { tagId: true } } },
+    }),
+  ]);
 
-  const schools = (
-    await db.profile.findMany({
-      where: { isDiscoverable: true },
-      distinct: ["school"],
-      select: { school: true },
-      orderBy: { school: "asc" },
-    })
-  ).map((s) => s.school);
+  // Cannot reach discovery with an empty profile.
+  if (!completeness.isComplete) redirect("/onboarding");
+  if (!profile) redirect("/onboarding");
 
   const tabs = [
     { value: "roles", label: "open roles" },
@@ -83,7 +83,7 @@ export default async function DiscoverPage({
             }}
           />
         )}
-        {tab === "people" && <PeopleTab viewerId={session.profileId} filters={sp} schools={schools} />}
+        {tab === "people" && <PeopleTab viewerId={session.profileId} filters={sp} />}
         {tab === "projects" && <ProjectsTab viewerId={session.profileId} filters={sp} />}
       </div>
     </div>
@@ -125,21 +125,24 @@ async function RolesTab({
 async function PeopleTab({
   viewerId,
   filters,
-  schools,
 }: {
   viewerId: string;
   filters: Record<string, string | undefined>;
-  schools: string[];
 }) {
-  const people = await getPeople(
-    { profileId: viewerId },
-    {
-      q: filters.q,
-      school: filters.school,
-      gradYear: filters.gradYear ? Number(filters.gradYear) : undefined,
-      intent: filters.intent,
-    }
-  );
+  // Resolved here rather than in the page: only this tab renders the dropdown, so
+  // the roles and projects tabs no longer pay for the DISTINCT.
+  const [people, schools] = await Promise.all([
+    getPeople(
+      { profileId: viewerId },
+      {
+        q: filters.q,
+        school: filters.school,
+        gradYear: filters.gradYear ? Number(filters.gradYear) : undefined,
+        intent: filters.intent,
+      }
+    ),
+    getDiscoverableSchools(),
+  ]);
   const relationships = await getRelationships(
     viewerId,
     people.map((p) => p.id)

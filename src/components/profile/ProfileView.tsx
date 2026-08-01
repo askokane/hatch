@@ -19,14 +19,21 @@ export type ProfileViewData = {
 
 // Renders a profile with the two field classes visually and structurally split:
 // IDENTITY (human-read) on the left, INTENT (machine-read/structured) on the right.
+//
+// `postsSlot` is filled by the page with the same FeedList the main feed uses,
+// scoped to this profile's author. It is passed in rather than queried here so
+// this component stays a pure renderer — and so the own-profile page can put a
+// composer above the list without this file knowing anything about posting.
 export function ProfileView({
   data,
   isOwn,
   actionSlot,
+  postsSlot,
 }: {
   data: ProfileViewData;
   isOwn: boolean;
   actionSlot?: React.ReactNode;
+  postsSlot?: React.ReactNode;
 }) {
   return (
     <div>
@@ -118,6 +125,17 @@ export function ProfileView({
           </div>
         </section>
       </div>
+
+      {/* POSTS — full width below the two columns: a running record rather than
+          a profile field, so it reads as a timeline, not a third attribute. */}
+      {postsSlot && (
+        <section aria-labelledby="posts-h" className="mt-12">
+          <p id="posts-h" className="label-mono">
+            [ posts ]
+          </p>
+          <div className="mt-3 border-t border-hairline pt-4">{postsSlot}</div>
+        </section>
+      )}
 
       {isOwn && (
         <p className="mt-8 text-2xs text-ink-muted">

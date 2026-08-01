@@ -9,6 +9,7 @@ import { Avatar } from "@/components/ui/Avatar";
 import { ThreadView, type ComposerState } from "@/components/messages/ThreadView";
 import { ReportDialog } from "@/components/safety/ReportDialog";
 import { UnblockButton } from "@/components/safety/UnblockButton";
+import { MESSAGE_PAGE_SIZE } from "@/lib/constants";
 import type { MessageDTO } from "@/actions/messages";
 
 export default async function ThreadPage({ params }: { params: Promise<{ threadId: string }> }) {
@@ -27,20 +28,32 @@ export default async function ThreadPage({ params }: { params: Promise<{ threadI
     throw e;
   }
 
-  const thread = await db.thread.findUnique({
-    where: { id: threadId },
-    include: {
-      members: {
-        where: { profileId: { not: profileId } },
-        include: { profile: { select: { id: true, handle: true, name: true, avatarSeed: true } } },
+  // The transcript is deliberately NOT loaded through the thread's `messages`
+  // relation: that had no bound, so opening a long conversation serialized every
+  // message it had ever held into the RSC payload. Select the newest page instead
+  // and let ThreadView walk backwards on demand — one extra row tells us whether
+  // there is anything behind it to offer.
+  const [thread, newestFirst] = await Promise.all([
+    db.thread.findUnique({
+      where: { id: threadId },
+      include: {
+        members: {
+          where: { profileId: { not: profileId } },
+          include: { profile: { select: { id: true, handle: true, name: true, avatarSeed: true } } },
+        },
       },
-      messages: {
-        orderBy: { createdAt: "asc" },
-        include: { author: { select: { handle: true, name: true } } },
-      },
-    },
-  });
+    }),
+    db.message.findMany({
+      where: { threadId },
+      orderBy: { createdAt: "desc" },
+      take: MESSAGE_PAGE_SIZE + 1,
+      include: { author: { select: { handle: true, name: true } } },
+    }),
+  ]);
   if (!thread) notFound();
+
+  const hasOlder = newestFirst.length > MESSAGE_PAGE_SIZE;
+  const page = (hasOlder ? newestFirst.slice(0, MESSAGE_PAGE_SIZE) : newestFirst).reverse();
 
   const counterpart = thread.members[0]?.profile;
   const contextLabel = await resolveContextLabel(thread.contextType, thread.contextId);
@@ -60,7 +73,7 @@ export default async function ThreadPage({ params }: { params: Promise<{ threadI
       ? { kind: "CLOSED" }
       : { kind: "OPEN" };
 
-  const initialMessages: MessageDTO[] = thread.messages.map((m) => ({
+  const initialMessages: MessageDTO[] = page.map((m) => ({
     id: m.id,
     body: m.body,
     createdAt: m.createdAt.toISOString(),
@@ -108,6 +121,7 @@ export default async function ThreadPage({ params }: { params: Promise<{ threadI
           myProfileId={profileId}
           counterpartName={counterpart?.name ?? "They"}
           initialMessages={initialMessages}
+          initialHasOlder={hasOlder}
           initialPresence={presence}
           composer={composer}
         />

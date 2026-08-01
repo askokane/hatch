@@ -113,6 +113,8 @@ export async function acceptIntroRequestAction(requestId: string): Promise<Actio
   const request = await db.introRequest.findUnique({ where: { id: requestId } });
   if (!request) return fail("Request not found.");
   if (request.toProfileId !== profileId) return fail("You can't respond to this request.");
+  // Fast path only. This read cannot be the guard against a concurrent accept —
+  // see the atomic claim below — but it spares the common case a transaction.
   if (request.status !== "PENDING") return fail("This request has already been answered.");
 
   // Blocking makes acceptance impossible.
@@ -120,12 +122,33 @@ export async function acceptIntroRequestAction(requestId: string): Promise<Actio
     return fail("You can't accept a request from someone you've blocked.");
   }
 
-  const thread = await db.$transaction(async (tx) => {
-    await tx.introRequest.update({
-      where: { id: requestId },
+  const threadId = await db.$transaction(async (tx) => {
+    // Claim the request atomically: `status: "PENDING"` in the WHERE clause is
+    // the lock. Checking the status in a separate read first (as this used to)
+    // is check-then-act — two concurrent accepts both saw PENDING, both entered
+    // here, and the second one's thread.create tripped the unique constraint on
+    // Thread.introRequestId with a raw PrismaClientKnownRequestError. Exactly
+    // one caller now matches a row and gets count 1.
+    const claimed = await tx.introRequest.updateMany({
+      where: { id: requestId, status: "PENDING" },
       data: { status: "ACCEPTED", respondedAt: new Date() },
     });
-    const t = await tx.thread.create({
+
+    if (claimed.count === 0) {
+      // Lost the race, or the request was answered between the read above and
+      // here. If a thread exists, the winner was another accept of this same
+      // request — hand back the very same thread rather than an error, because
+      // both callers wanted the identical outcome and usually ARE the same
+      // person double-clicking. A decline leaves no thread, so that returns
+      // null and the caller gets the "already answered" message.
+      const existing = await tx.thread.findUnique({
+        where: { introRequestId: requestId },
+        select: { id: true },
+      });
+      return existing?.id ?? null;
+    }
+
+    const created = await tx.thread.create({
       data: {
         introRequestId: request.id,
         contextType: request.contextType,
@@ -137,13 +160,16 @@ export async function acceptIntroRequestAction(requestId: string): Promise<Actio
           ],
         },
       },
+      select: { id: true },
     });
-    return t;
+    return created.id;
   });
+
+  if (!threadId) return fail("This request has already been answered.");
 
   revalidatePath("/requests");
   revalidatePath("/messages");
-  return ok({ threadId: thread.id });
+  return ok({ threadId });
 }
 
 // Decline a request. Only the recipient may decline. Terminal for this request,
@@ -155,12 +181,19 @@ export async function declineIntroRequestAction(requestId: string): Promise<Acti
   const request = await db.introRequest.findUnique({ where: { id: requestId } });
   if (!request) return fail("Request not found.");
   if (request.toProfileId !== profileId) return fail("You can't respond to this request.");
+  // Fast path; the atomic claim below is the real guard.
   if (request.status !== "PENDING") return fail("This request has already been answered.");
 
-  await db.introRequest.update({
-    where: { id: requestId },
+  // Same atomic claim as accept. Without the status predicate, a decline racing
+  // an accept would overwrite ACCEPTED and leave a live thread hanging off a
+  // request marked DECLINED — no constraint would catch that one, so it would
+  // just be quietly wrong.
+  const claimed = await db.introRequest.updateMany({
+    where: { id: requestId, status: "PENDING" },
     data: { status: "DECLINED", respondedAt: new Date() },
   });
+  if (claimed.count === 0) return fail("This request has already been answered.");
+
   revalidatePath("/requests");
   return ok(undefined);
 }

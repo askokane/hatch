@@ -2,8 +2,9 @@
  * HATCH — database seed.
  *
  * Produces a demo-ready dataset: a full tag taxonomy, 24 verified users with
- * complete profiles, 10 projects across all three stages, open roles, and a set
- * of accepted + pending intro requests with real threaded conversations.
+ * complete profiles, 10 projects across all three stages, open roles, a set of
+ * accepted + pending intro requests with real threaded conversations, and
+ * profile posts timed to interleave with the project updates in the feed.
  *
  * Run with:  npm run seed   (wraps `tsx prisma/seed.ts`)
  * Idempotent: wipes every table first, so it can be re-run safely.
@@ -909,6 +910,96 @@ const PENDING_TO_DEMO: { fromHandle: string; context: ContextRef; note: string; 
 ];
 
 // ---------------------------------------------------------------------------
+// 5. PROFILE POSTS
+// ---------------------------------------------------------------------------
+
+// Posts are seeded WITHOUT media, on purpose. A photo or video only exists here
+// by way of a real upload — POST /api/media validates the file and stores the
+// bytes — so fabricating MediaAsset rows would have the demo dataset assert a
+// capability nothing had actually exercised, and a broken byte would surface as
+// a broken player rather than as a failed seed. Attach a file in the composer to
+// see that path end to end.
+//
+// The timestamps below are chosen to interleave with the project updates (2-21
+// days ago) and the open roles, since the point of the merged feed is that all
+// three item types show up mixed together on first load.
+type PostSeed = { handle: string; body: string; daysAgo: number; hoursAgo?: number };
+
+const POSTS: PostSeed[] = [
+  {
+    handle: "alex-demo",
+    body: "Watched someone open NoteMesh for the first time with no explanation from me. They tried to search before uploading anything, then sat there for a full minute. The empty state never tells you what to do first. Fixing that tonight.",
+    daysAgo: 1,
+    hoursAgo: 3,
+  },
+  {
+    handle: "maya-chen",
+    body: "Note to past me: a PDF is not a document, it's a crime scene. Spent today writing a reference parser for a format with no rules. It works on 84% of the test set and I am choosing to call that a win.",
+    daysAgo: 2,
+  },
+  {
+    handle: "priya-shah",
+    body: "Ran my first real migration against a live database today. Backed everything up three times, ran it, then stared at the logs for twenty minutes waiting for something to break. Nothing broke. I still don't trust it.",
+    daysAgo: 3,
+    hoursAgo: 4,
+  },
+  {
+    handle: "alex-demo",
+    body: "The hardest part of building for students isn't the code, it's getting fifteen people to open a link. I wrote a few thousand lines this month and the thing that actually moved the numbers was one well-timed Discord message.",
+    daysAgo: 5,
+  },
+  {
+    handle: "grace-liu",
+    body: "Drew 40 empty-state illustrations this weekend for a component library nobody asked for. Do I regret it? No. Will I use more than six of them? Also no.",
+    daysAgo: 6,
+    hoursAgo: 3,
+  },
+  {
+    handle: "deepak-nair",
+    body: "Load-tested the Curbside map endpoint at 10x our real traffic just to find where it falls over. It didn't. Mildly annoyed — I had cleared the whole evening to fix something.",
+    daysAgo: 7,
+  },
+  {
+    handle: "tyler-nguyen",
+    body: "Ran the club game jam this weekend. 14 teams, 48 hours, and one team that spent 40 of those hours on a menu screen. Their menu is genuinely the best thing anyone made.",
+    daysAgo: 9,
+    hoursAgo: 5,
+  },
+  {
+    handle: "sofia-marino",
+    body: "Every design portfolio I see is polished final screens. Nobody posts the eleven versions before it. My honest ratio is about one good screen per eleven bad ones, and the bad ones are where all the thinking happened.",
+    daysAgo: 10,
+  },
+  {
+    handle: "marcus-webb",
+    body: "Someone found a bug where splitting $0.01 three ways in Ledgerly quietly loses a penny. It has been live for four months. Four months of pennies evaporating. Fixed now, and I am afraid of floating point in an entirely new way.",
+    daysAgo: 13,
+  },
+  {
+    handle: "hana-kim",
+    body: "Bribed six people with coffee to use a prototype for ten minutes each. Cost me $27 and it stopped us building a feature nobody wanted. Best money this project has spent.",
+    daysAgo: 15,
+    hoursAgo: 2,
+  },
+  {
+    handle: "noah-berg",
+    body: "Spent the week convincing a model to stop complimenting people's fonts and start questioning their revenue model. Being useful and being nice turn out to be in direct tension, and I have to pick one.",
+    daysAgo: 17,
+  },
+  {
+    handle: "yuki-tanaka",
+    body: "The sensor board finally talked to the cloud backend. Three weeks. The bug was a byte-order mismatch I had 'already checked' four separate times.",
+    daysAgo: 19,
+    hoursAgo: 6,
+  },
+  {
+    handle: "chloe-adams",
+    body: "Rewrote a component in React to prove I could, and it took four hours to do what takes me twenty minutes in Vue. Losing framework arguments is much easier when you're simply bad at the other one.",
+    daysAgo: 22,
+  },
+];
+
+// ---------------------------------------------------------------------------
 // SEED RUNNER
 // ---------------------------------------------------------------------------
 
@@ -920,6 +1011,9 @@ async function wipe() {
   await prisma.introRequest.deleteMany();
   await prisma.report.deleteMany();
   await prisma.block.deleteMany();
+  // MediaAsset before Post: an asset points at the post it was attached to.
+  await prisma.mediaAsset.deleteMany();
+  await prisma.post.deleteMany();
   await prisma.update.deleteMany();
   await prisma.roleTag.deleteMany();
   await prisma.openRole.deleteMany();
@@ -937,7 +1031,46 @@ async function wipe() {
   await prisma.user.deleteMany();
 }
 
+// Refuse to wipe unless we are demonstrably in a schema meant to be wiped.
+//
+// wipe() deletes every row in the database it is pointed at, and the only thing
+// standing between it and real user data is the `schema=` parameter in the URL.
+// That is carried by the connection's search_path, and a transaction pooler does
+// not preserve it under concurrency — a measured run of 12 concurrent
+// `SELECT current_schema()` through port 6543 came back as a mix of
+// ["hatch_e2e", "public"]. Asking the database where it actually landed, rather
+// than trusting the URL we think we passed, is the difference between a failed
+// seed and a deleted production table.
+//
+// SEED_ALLOW_PUBLIC=1 is the deliberate escape hatch for seeding a genuinely
+// disposable database whose default schema is public.
+async function assertSafeToWipe() {
+  const rows = await prisma.$queryRaw<{ schema: string }[]>`SELECT current_schema() AS schema`;
+  const schema = rows[0]?.schema ?? "unknown";
+
+  if (schema !== "public") {
+    console.log(`[HATCH seed] target schema: ${schema}`);
+    return;
+  }
+  if (process.env.SEED_ALLOW_PUBLIC === "1") {
+    console.log("[HATCH seed] target schema: public (allowed via SEED_ALLOW_PUBLIC=1)");
+    return;
+  }
+
+  console.error(
+    "\n[HATCH seed] REFUSING TO WIPE.\n" +
+      "  Connected schema is 'public', which is where real data lives.\n" +
+      "  The e2e suite must run via `npm run test:e2e`, which points DATABASE_URL\n" +
+      "  at an isolated schema on the SESSION pooler (port 5432).\n" +
+      "  If DATABASE_URL uses port 6543 (pgbouncer/transaction mode), the schema\n" +
+      "  isolation is not reliable — see scripts/with-e2e-db.mjs.\n" +
+      "  To seed a genuinely disposable public-schema database, set SEED_ALLOW_PUBLIC=1.\n"
+  );
+  process.exit(1);
+}
+
 async function main() {
+  await assertSafeToWipe();
   console.log("[HATCH seed] wiping database...");
   await wipe();
 
@@ -1068,6 +1201,18 @@ async function main() {
     }
   }
   console.log(`[HATCH seed] created ${PROJECTS.length} projects, ${roleCount} open roles, ${updateCount} updates`);
+
+  // --- Profile posts (text only — see the note on POSTS) ---
+  for (const p of POSTS) {
+    await prisma.post.create({
+      data: {
+        authorProfileId: profileId.get(p.handle)!,
+        body: p.body,
+        createdAt: ago(p.daysAgo, p.hoursAgo ?? 0),
+      },
+    });
+  }
+  console.log(`[HATCH seed] created ${POSTS.length} profile posts`);
 
   // Resolve a ContextRef to (contextType, contextId, recipient handle).
   function resolveContext(ctx: ContextRef): { type: ContextType; id: string; toHandle: string } {

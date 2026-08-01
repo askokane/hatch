@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { reportAction } from "@/actions/safety";
+import type { ReportSubjectType } from "@/lib/validation/message.schema";
 import { Button } from "@/components/ui/Button";
 import { TextArea } from "@/components/ui/TextArea";
 import { Select } from "@/components/ui/Select";
@@ -14,10 +15,18 @@ export function ReportDialog({
   subjectType,
   subjectId,
   subjectLabel,
+  compact = false,
 }: {
-  subjectType: "PROFILE" | "PROJECT" | "MESSAGE" | "THREAD";
+  subjectType: ReportSubjectType;
   subjectId: string;
   subjectLabel: string;
+  /**
+   * Renders the trigger as a bare text link sized to a feed card's metadata row
+   * instead of a full ghost button. The feed puts this control beside a 2xs
+   * timestamp, where a standard button is louder than the action deserves —
+   * reporting should be available, not advertised.
+   */
+  compact?: boolean;
 }) {
   const { notify } = useToast();
   const [open, setOpen] = useState(false);
@@ -27,9 +36,19 @@ export function ReportDialog({
 
   return (
     <>
-      <Button variant="ghost" onClick={() => setOpen(true)}>
-        Report
-      </Button>
+      {compact ? (
+        <button
+          type="button"
+          onClick={() => setOpen(true)}
+          className="mono text-2xs text-ink-muted hover:text-brick"
+        >
+          report
+        </button>
+      ) : (
+        <Button variant="ghost" onClick={() => setOpen(true)}>
+          Report
+        </Button>
+      )}
       {open && (
         <Modal title={`Report ${subjectLabel}`} onClose={() => setOpen(false)}>
           <div className="flex flex-col gap-4">
