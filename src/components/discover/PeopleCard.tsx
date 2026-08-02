@@ -14,6 +14,7 @@ export function PeopleCard({
     name: string;
     school: string;
     gradYear: number;
+    basedIn: string;
     bio: string;
     avatarSeed: string;
     tags: { relation: string; tag: { id: string; label: string } }[];
@@ -31,6 +32,9 @@ export function PeopleCard({
           <p className="mono text-2xs text-ink-muted">
             @{person.handle} · {person.school} · &apos;{String(person.gradYear).slice(2)}
           </p>
+          {person.basedIn && (
+            <p className="mono text-2xs text-ink-muted">based in {person.basedIn}</p>
+          )}
         </div>
       </Link>
       {person.bio && <p className="mt-2 line-clamp-2 text-sm text-ink-muted">{person.bio}</p>}

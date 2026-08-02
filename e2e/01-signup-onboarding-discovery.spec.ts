@@ -6,7 +6,7 @@ import { signup, completeOnboarding, login, DEMO_EMAIL } from "./fixtures";
 test("signup, onboard, and appear in discovery", async ({ page, browser }) => {
   const unique = Date.now().toString(36);
   const email = `newbuilder${unique}@e2e.edu`;
-  const handle = `newbuilder-${unique}`;
+  const handle = `newbuilder_${unique}`;
   const name = `New Builder ${unique}`;
 
   await signup(page, email);

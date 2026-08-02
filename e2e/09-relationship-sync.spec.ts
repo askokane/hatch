@@ -59,7 +59,7 @@ test("a pending outbound request is reflected on the project and profile", async
   await signupAndOnboard(page, {
     email,
     name: `Pending Tester ${unique}`,
-    handle: `pending-${unique}`,
+    handle: `pending_${unique}`,
   });
 
   // Find a project this owner owns that has an open role.
@@ -99,7 +99,7 @@ test("a pending outbound request is reflected on the project and profile", async
   const ownerCtx = await browser.newContext();
   const ownerPage = await ownerCtx.newPage();
   await login(ownerPage, owner.email);
-  await ownerPage.goto(`/u/pending-${unique}`);
+  await ownerPage.goto(`/u/pending_${unique}`);
   await expect(ownerPage.getByRole("link", { name: /respond to request/i })).toBeVisible();
   await ownerCtx.close();
 });

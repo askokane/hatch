@@ -9,8 +9,10 @@ import { TextArea } from "@/components/ui/TextArea";
 import { TagPicker } from "@/components/ui/TagPicker";
 import { Button } from "@/components/ui/Button";
 import { useToast } from "@/components/ui/ToastProvider";
+import { SchoolPicker } from "@/components/profile/SchoolPicker";
 import type { TagDTO } from "@/actions/tags";
-import { INTENT_KINDS, INTENT_LABELS } from "@/lib/constants";
+import { BASED_IN_MAX, INTENT_KINDS, INTENT_LABELS } from "@/lib/constants";
+import { HANDLE_HINT, normalizeHandleInput } from "@/lib/handle";
 
 const YEARS = Array.from({ length: 8 }, (_, i) => 2025 + i);
 
@@ -19,6 +21,7 @@ export type ProfileEditInitial = {
   handle: string;
   school: string;
   gradYear: number;
+  basedIn: string;
   bio: string;
   links: { label: string; url: string }[];
   skills: TagDTO[];
@@ -44,6 +47,7 @@ export function ProfileEditForm({
   const [handle, setHandle] = useState(initial.handle);
   const [school, setSchool] = useState(initial.school);
   const [gradYear, setGradYear] = useState(String(initial.gradYear));
+  const [basedIn, setBasedIn] = useState(initial.basedIn);
   const [bio, setBio] = useState(initial.bio);
   const [links, setLinks] = useState<{ label: string; url: string }[]>(initial.links);
   const [skills, setSkills] = useState<TagDTO[]>(initial.skills);
@@ -69,6 +73,7 @@ export function ProfileEditForm({
       handle: handle.trim().toLowerCase(),
       school: school.trim(),
       gradYear: Number(gradYear),
+      basedIn: basedIn.trim(),
       bio: bio.trim(),
       links: links.filter((l) => l.label && l.url),
       skillTagIds: skills.map((t) => t.id),
@@ -99,16 +104,28 @@ export function ProfileEditForm({
         <Input
           label="Handle"
           value={handle}
-          onChange={(e) => setHandle(e.target.value.toLowerCase())}
+          onChange={(e) => setHandle(normalizeHandleInput(e.target.value))}
           disabled={initial.handleLocked}
-          hint={initial.handleLocked ? "Locked (7+ days old)." : "Editable for 7 days after creation."}
+          hint={
+            initial.handleLocked
+              ? "Locked (7+ days old)."
+              : `${HANDLE_HINT} Editable for 7 days after creation.`
+          }
         />
-        <Input label="School" value={school} onChange={(e) => setSchool(e.target.value)} />
+        <SchoolPicker value={school} onChange={setSchool} />
         <Select
           label="Graduation year"
           value={gradYear}
           onChange={(e) => setGradYear(e.target.value)}
           options={YEARS.map((y) => ({ value: String(y), label: String(y) }))}
+        />
+        <Input
+          label="Based in"
+          value={basedIn}
+          onChange={(e) => setBasedIn(e.target.value)}
+          placeholder="City, Country"
+          maxLength={BASED_IN_MAX}
+          hint="Optional. City and country."
         />
       </div>
 

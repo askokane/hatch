@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { db } from "@/lib/db";
 import { requireSession } from "@/lib/session";
 import { newAvatarSeed } from "@/lib/avatar";
+import { ensureSchool } from "@/lib/school-catalog";
 import { onboardingSchema } from "@/lib/validation/profile.schema";
 import { ok, fail, type ActionResult } from "@/lib/action-result";
 
@@ -12,6 +13,7 @@ type OnboardingInput = {
   handle: string;
   school: string;
   gradYear: number;
+  basedIn: string;
   bio: string;
   skillTagIds: string[];
   learningTagIds: string[];
@@ -55,14 +57,19 @@ export async function completeOnboardingAction(
     return fail("That handle is taken. Choose another.", { handle: "That handle is taken." });
   }
 
+  // Add the school to the shared catalog (or adopt the catalog's spelling of it
+  // if someone got here first) so the next person can pick it from the dropdown.
+  const school = await ensureSchool(data.school);
+
   try {
     await db.profile.create({
       data: {
         userId: session.userId,
         handle: data.handle,
         name: data.name,
-        school: data.school,
+        school,
         gradYear: data.gradYear,
+        basedIn: data.basedIn ?? "",
         bio: data.bio ?? "",
         avatarSeed: newAvatarSeed(),
         onboardedAt: new Date(),

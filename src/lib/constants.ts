@@ -80,9 +80,24 @@ export const MAX_PENDING_OUTBOUND = 5;
 // Profile constraints
 export const HANDLE_IMMUTABLE_DAYS = 7;
 export const BIO_MAX = 600;
+// "Based in" is one line at city/country granularity, not an address — the cap is
+// set to fit the longest real "City, Country" with room to spare while making it
+// obvious the field is not somewhere to write a paragraph.
+export const BASED_IN_MAX = 80;
 export const MIN_SKILL_TAGS = 3;
 export const MIN_LEARNING_TAGS = 1;
 export const MIN_INTENTS = 1;
+
+// Ceilings on what a user may add to the two shared catalogs (School, Tag).
+// Anyone can create a row in either, so these are the guard that keeps a
+// paste-in from becoming a permanent dropdown entry everyone else has to scroll
+// past.
+export const SCHOOL_NAME_MIN = 2;
+export const SCHOOL_NAME_MAX = 120;
+export const TAG_LABEL_MIN = 2;
+export const TAG_LABEL_MAX = 40;
+// Type-ahead results per dropdown.
+export const CATALOG_SUGGESTION_LIMIT = 20;
 
 // Pagination
 export const PAGE_SIZE = 20;

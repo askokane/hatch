@@ -1,12 +1,16 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { searchTagsAction, suggestTagAction, type TagDTO } from "@/actions/tags";
+import { searchTagsAction, createTagAction, type TagDTO } from "@/actions/tags";
 import { TagBadge } from "./TagBadge";
 
-// Autocomplete tag picker. Only lets the user select tags that resolve to a Tag
-// row (via searchTagsAction). Typing something with no match offers to log a
-// TagSuggestion — it never fabricates a tag.
+// Autocomplete tag picker over the shared taxonomy.
+//
+// Typing something with no match offers to ADD it. The added tag is a real Tag
+// row, so the next person to start typing it gets it as a suggestion instead of
+// creating a parallel copy — which is the entire reason a skill picker is worth
+// having over a free-text field. Selection still only ever holds real rows; the
+// creation round-trips through the server before anything enters `selected`.
 export function TagPicker({
   label,
   kind,
@@ -23,7 +27,14 @@ export function TagPicker({
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<TagDTO[]>([]);
   const [open, setOpen] = useState(false);
-  const [suggested, setSuggested] = useState(false);
+  const [creating, setCreating] = useState(false);
+  const [createError, setCreateError] = useState<string | null>(null);
+  // The query the current `results` actually answer. "No match, add it" is gated
+  // on this matching what is typed now, so the offer to CREATE a tag can never
+  // appear during the debounce window on results belonging to an older query —
+  // which is how someone ends up creating a duplicate of a tag the search was
+  // about to find.
+  const [searchedFor, setSearchedFor] = useState("");
   const boxRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -31,6 +42,7 @@ export function TagPicker({
     const q = query.trim();
     if (!q) {
       setResults([]);
+      setSearchedFor("");
       return;
     }
     const t = setTimeout(async () => {
@@ -39,6 +51,7 @@ export function TagPicker({
       if (res.ok) {
         const selectedIds = new Set(selected.map((s) => s.id));
         setResults(res.data.filter((r) => !selectedIds.has(r.id)));
+        setSearchedFor(q);
         setOpen(true);
       }
     }, 150);
@@ -57,23 +70,36 @@ export function TagPicker({
   }, []);
 
   function add(tag: TagDTO) {
-    onChange([...selected, tag]);
+    // Guard against the create path returning a tag that is already selected —
+    // createTagAction is idempotent by slug, so typing an existing tag with
+    // different punctuation resolves to a row that may already be in the list.
+    if (!selected.some((t) => t.id === tag.id)) onChange([...selected, tag]);
     setQuery("");
     setResults([]);
     setOpen(false);
-    setSuggested(false);
+    setCreateError(null);
   }
 
   function remove(id: string) {
     onChange(selected.filter((t) => t.id !== id));
   }
 
-  async function suggest() {
-    await suggestTagAction(query.trim(), kind);
-    setSuggested(true);
+  async function create() {
+    setCreating(true);
+    setCreateError(null);
+    const res = await createTagAction(query.trim(), kind);
+    setCreating(false);
+    if (!res.ok) {
+      setCreateError(res.error);
+      return;
+    }
+    add(res.data);
   }
 
   const inputId = `tagpicker-${label.replace(/\s+/g, "-").toLowerCase()}`;
+
+  // Offer creation only for a query the search has already come back empty on.
+  const canCreate = results.length === 0 && query.trim().length > 1 && searchedFor === query.trim();
 
   return (
     <div className="flex flex-col gap-1" ref={boxRef}>
@@ -91,17 +117,17 @@ export function TagPicker({
           value={query}
           onChange={(e) => {
             setQuery(e.target.value);
-            setSuggested(false);
+            setCreateError(null);
           }}
           onFocus={() => query && setOpen(true)}
-          placeholder="Search tags…"
+          placeholder="Search or add a tag…"
           autoComplete="off"
           role="combobox"
           aria-expanded={open}
           aria-controls={`${inputId}-list`}
           className="w-full border border-hairline bg-white px-3 py-2 text-base focus:border-ink"
         />
-        {open && (results.length > 0 || query.trim().length > 1) && (
+        {open && (results.length > 0 || canCreate) && (
           <ul
             id={`${inputId}-list`}
             role="listbox"
@@ -121,13 +147,18 @@ export function TagPicker({
                 </button>
               </li>
             ))}
-            {results.length === 0 && query.trim().length > 1 && (
+            {canCreate && (
               <li className="px-3 py-2 text-2xs text-ink-muted">
-                {suggested ? (
-                  <span>Thanks — “{query.trim()}” was sent for review.</span>
+                {createError ? (
+                  <span className="text-brick">{createError}</span>
                 ) : (
-                  <button type="button" onClick={suggest} className="mono text-pine hover:underline">
-                    No match. Suggest “{query.trim()}” for the taxonomy →
+                  <button
+                    type="button"
+                    onClick={create}
+                    disabled={creating}
+                    className="mono text-pine hover:underline disabled:opacity-60"
+                  >
+                    {creating ? "Adding…" : `No match. Add “${query.trim()}” →`}
                   </button>
                 )}
               </li>

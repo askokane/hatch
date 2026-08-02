@@ -31,6 +31,7 @@ type ProfileWithRelations = {
   name: string;
   school: string;
   gradYear: number;
+  basedIn: string;
   bio: string;
   avatarSeed: string;
   links: unknown;
@@ -45,6 +46,7 @@ function toViewData(p: ProfileWithRelations): ProfileViewData {
     name: p.name,
     school: p.school,
     gradYear: p.gradYear,
+    basedIn: p.basedIn,
     bio: p.bio,
     avatarSeed: p.avatarSeed,
     links: Array.isArray(p.links) ? (p.links as { label: string; url: string }[]) : [],

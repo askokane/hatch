@@ -16,7 +16,7 @@ test("the requests nav badge counts pending requests and caps at 9+", async ({ p
   await signupAndOnboard(page, {
     email,
     name: `Badge Tester ${unique}`,
-    handle: `badge-${unique}`,
+    handle: `badge_${unique}`,
   });
 
   const me = await testDb.user.findUnique({ where: { email }, include: { profile: true } });

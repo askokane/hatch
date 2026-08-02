@@ -47,7 +47,7 @@ test("intro-request constraints are enforced", async ({ page }) => {
   await page.goto("/onboarding");
   await completeOnboarding(page, {
     name: `Constraint Tester ${unique}`,
-    handle: `ctester-${unique}`,
+    handle: `ctester_${unique}`,
     school: "State University",
     skills: ["React", "TypeScript", "Node"],
     learning: ["Rust"],

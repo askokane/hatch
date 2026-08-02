@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { db } from "@/lib/db";
 import { requireSession, requireProfile } from "@/lib/session";
+import { ensureSchool } from "@/lib/school-catalog";
 import { updateProfileSchema } from "@/lib/validation/profile.schema";
 import { HANDLE_IMMUTABLE_DAYS } from "@/lib/constants";
 import { ok, fail, type ActionResult } from "@/lib/action-result";
@@ -12,6 +13,7 @@ type UpdateProfileInput = {
   handle: string;
   school: string;
   gradYear: number;
+  basedIn: string;
   bio: string;
   links: { label: string; url: string }[];
   skillTagIds: string[];
@@ -62,14 +64,19 @@ export async function updateProfileAction(
     return fail("Keep at least 3 skill tags and 1 learning tag.");
   }
 
+  // Same catalog write as onboarding: editing your profile to a school nobody
+  // has used yet is the other way a school enters the dropdown.
+  const school = await ensureSchool(data.school);
+
   await db.$transaction([
     db.profile.update({
       where: { id: profileId },
       data: {
         name: data.name,
         handle: data.handle,
-        school: data.school,
+        school,
         gradYear: data.gradYear,
+        basedIn: data.basedIn ?? "",
         bio: data.bio ?? "",
         links: data.links,
         isDiscoverable: data.isDiscoverable,

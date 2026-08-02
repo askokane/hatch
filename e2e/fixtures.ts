@@ -52,7 +52,13 @@ export async function completeOnboarding(
   // Step 1 — identity
   await page.getByLabel("Name").fill(opts.name);
   await page.getByLabel("Handle").fill(opts.handle);
-  await page.getByLabel("School").fill(opts.school);
+  // The school field is a ComboBox: typing a known school pops a suggestion list
+  // that overlays the fields below it. Tabbing out blurs the input, which closes
+  // the list and — because the search is debounced — also suppresses a late
+  // result from re-opening it over the Continue button.
+  const school = page.getByLabel(/university \/ school/i);
+  await school.fill(opts.school);
+  await school.press("Tab");
   await page.getByRole("button", { name: /continue/i }).click();
 
   // Step 2 — skills

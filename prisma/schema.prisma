@@ -145,6 +145,9 @@ model Profile {
   name             String
   school           String
   gradYear         Int
+  // Free text, "City, Country" by convention. Optional — a profile with no
+  // location is complete, so nothing gates on it.
+  basedIn          String         @default("")
   bio              String         @default("")
   links            Json           @default("[]")
   avatarSeed       String
@@ -176,6 +179,27 @@ model Profile {
   @@index([isDiscoverable, updatedAt])
 }
 
+// The shared university/school catalog behind the type-ahead on onboarding and
+// profile edit. Unlike Tag, this is user-grown: the first person to type a school
+// creates the row, and everyone after them picks it from the dropdown instead of
+// re-typing it. `Profile.school` still stores the name as free text — this table
+// is the suggestion source, not a foreign key, so a school can be renamed or
+// merged here without rewriting every profile.
+//
+// `slug` is the identity: lowercase, non-alphanumerics collapsed to "-". It is
+// what stops "MIT", "M.I.T." and "mit" from becoming three catalog entries. See
+// catalogSlug() in lib/catalog-slug.ts — the migration's backfill uses the same
+// normalization in SQL, and the two must stay in step.
+model School {
+  id        String   @id @default(cuid())
+  slug      String   @unique
+  name      String
+  createdAt DateTime @default(now())
+
+  // Serves the prefix/substring type-ahead ordering.
+  @@index([name])
+}
+
 model Tag {
   id          String       @id @default(cuid())
   slug        String       @unique
@@ -189,8 +213,12 @@ model Tag {
   @@index([kind])
 }
 
-// Free-text tag input that did not match the taxonomy. Logged for review;
-// never auto-promoted to a Tag row.
+// Audit log of free-text tag input that did not match the taxonomy. The taxonomy
+// is now user-grown — createTagAction() creates the Tag row on the spot — so this
+// is no longer a queue of things to action. It is kept as the provenance record:
+// `rawText` is what the user actually typed before normalization, and
+// `resolvedTagId` is the row it produced, which is what makes a bad or duplicate
+// tag traceable back to its origin.
 model TagSuggestion {
   id            String   @id @default(cuid())
   rawText       String

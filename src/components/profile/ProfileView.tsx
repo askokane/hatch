@@ -8,6 +8,7 @@ export type ProfileViewData = {
   name: string;
   school: string;
   gradYear: number;
+  basedIn: string;
   bio: string;
   avatarSeed: string;
   links: { label: string; url: string }[];
@@ -46,6 +47,9 @@ export function ProfileView({
             <p className="mt-1 text-xs text-ink-muted">
               {data.school} · Class of {data.gradYear}
             </p>
+            {data.basedIn && (
+              <p className="mono mt-1 text-2xs text-ink-muted">based in {data.basedIn}</p>
+            )}
             {isOwn && !data.isDiscoverable && (
               <p className="mono mt-1 text-2xs text-brick">[ hidden from discovery ]</p>
             )}

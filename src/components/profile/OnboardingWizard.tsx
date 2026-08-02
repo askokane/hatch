@@ -8,8 +8,10 @@ import { TextArea } from "@/components/ui/TextArea";
 import { TagPicker } from "@/components/ui/TagPicker";
 import { Button } from "@/components/ui/Button";
 import { TagBadge } from "@/components/ui/TagBadge";
+import { SchoolPicker } from "@/components/profile/SchoolPicker";
 import type { TagDTO } from "@/actions/tags";
-import { INTENT_KINDS, INTENT_LABELS } from "@/lib/constants";
+import { BASED_IN_MAX, INTENT_KINDS, INTENT_LABELS } from "@/lib/constants";
+import { HANDLE_CHARSET_MESSAGE, HANDLE_HINT, HANDLE_PATTERN, normalizeHandleInput } from "@/lib/handle";
 
 const YEARS = Array.from({ length: 8 }, (_, i) => 2025 + i);
 
@@ -24,6 +26,7 @@ export function OnboardingWizard({ email }: { email: string }) {
   const [handle, setHandle] = useState("");
   const [school, setSchool] = useState("");
   const [gradYear, setGradYear] = useState(String(new Date().getFullYear() + 2));
+  const [basedIn, setBasedIn] = useState("");
   const [bio, setBio] = useState("");
   const [skills, setSkills] = useState<TagDTO[]>([]);
   const [learning, setLearning] = useState<TagDTO[]>([]);
@@ -37,8 +40,9 @@ export function OnboardingWizard({ email }: { email: string }) {
     if (step === 0) {
       if (!name.trim()) return "Enter your name.";
       if (handle.trim().length < 3) return "Choose a handle (3+ characters).";
-      if (!/^[a-z0-9-]+$/.test(handle.trim().toLowerCase()))
-        return "Handles use lowercase letters, numbers, and hyphens only.";
+      if (!HANDLE_PATTERN.test(handle.trim().toLowerCase())) return HANDLE_CHARSET_MESSAGE;
+      if (handle.startsWith("_") || handle.endsWith("_"))
+        return "Handle cannot start or end with an underscore.";
       if (school.trim().length < 2) return "Enter your school.";
     }
     if (step === 1) {
@@ -74,6 +78,7 @@ export function OnboardingWizard({ email }: { email: string }) {
       handle: handle.trim().toLowerCase(),
       school: school.trim(),
       gradYear: Number(gradYear),
+      basedIn: basedIn.trim(),
       bio: bio.trim(),
       skillTagIds: skills.map((t) => t.id),
       learningTagIds: learning.map((t) => t.id),
@@ -121,16 +126,24 @@ export function OnboardingWizard({ email }: { email: string }) {
           <Input
             label="Handle"
             value={handle}
-            onChange={(e) => setHandle(e.target.value.toLowerCase())}
-            hint="Your public @handle. Lowercase, letters/numbers/hyphens. Locked after 7 days."
+            onChange={(e) => setHandle(normalizeHandleInput(e.target.value))}
+            hint={`Your public @handle. ${HANDLE_HINT} Locked after 7 days.`}
             required
           />
-          <Input label="School" value={school} onChange={(e) => setSchool(e.target.value)} required />
+          <SchoolPicker value={school} onChange={setSchool} />
           <Select
             label="Graduation year"
             value={gradYear}
             onChange={(e) => setGradYear(e.target.value)}
             options={YEARS.map((y) => ({ value: String(y), label: String(y) }))}
+          />
+          <Input
+            label="Based in"
+            value={basedIn}
+            onChange={(e) => setBasedIn(e.target.value)}
+            placeholder="City, Country"
+            maxLength={BASED_IN_MAX}
+            hint="Optional. Where you're based — city and country is plenty."
           />
           <TextArea
             label="Bio"

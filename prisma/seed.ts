@@ -11,6 +11,8 @@
  */
 import { PrismaClient, TagKind, TagRelation, IntentKind, ProjectStage, ProjectVisibility, Commitment, RoleStatus, ContextType, RequestStatus } from "@prisma/client";
 import bcrypt from "bcryptjs";
+// Relative, not "@/..." — tsx runs this file without tsconfig path resolution.
+import { catalogSlug } from "../src/lib/catalog-slug";
 
 const prisma = new PrismaClient();
 
@@ -161,9 +163,31 @@ type UserSeed = {
   intents: IntentSeed[];
 };
 
+// "Based in" is derived rather than written into all 24 records: most students
+// are near their campus, so the school implies the city, and only the exceptions
+// are worth stating.
+const CAMPUS_CITY: Record<string, string> = {
+  "State University": "Austin, United States",
+  "Northgate University": "Seattle, United States",
+  "Riverside Institute of Technology": "Chicago, United States",
+  "Lakeside College": "Madison, United States",
+  "Bay Metropolitan University": "San Francisco, United States",
+};
+
+// Handles whose location is not their campus city. The empty string is
+// deliberate — "based in" is optional, and the demo data has to contain a
+// profile that omits it so the no-location render path is exercised.
+const BASED_IN_OVERRIDES: Record<string, string> = {
+  yuki_tanaka: "Tokyo, Japan",
+  amara_okonkwo: "Lagos, Nigeria",
+  omar_haddad: "Amman, Jordan",
+  isabella_rossi: "Milan, Italy",
+  sam_torres: "",
+};
+
 const USERS: UserSeed[] = [
   {
-    handle: "alex-demo",
+    handle: "alex_demo",
     email: "demo@stateu.edu",
     name: "Alex Rivera",
     school: "State University",
@@ -181,7 +205,7 @@ const USERS: UserSeed[] = [
     ],
   },
   {
-    handle: "jordan-okafor",
+    handle: "jordan_okafor",
     email: "admin@hatchdemo.edu",
     name: "Jordan Okafor",
     school: "Northgate University",
@@ -194,7 +218,7 @@ const USERS: UserSeed[] = [
     intents: [{ kind: IntentKind.MENTOR, note: "Looking for a mentor who's done product at an early-stage startup." }],
   },
   {
-    handle: "maya-chen",
+    handle: "maya_chen",
     email: "maya-chen@stateu.edu",
     name: "Maya Chen",
     school: "State University",
@@ -209,7 +233,7 @@ const USERS: UserSeed[] = [
     ],
   },
   {
-    handle: "deepak-nair",
+    handle: "deepak_nair",
     email: "deepak-nair@stateu.edu",
     name: "Deepak Nair",
     school: "Riverside Institute of Technology",
@@ -224,7 +248,7 @@ const USERS: UserSeed[] = [
     intents: [{ kind: IntentKind.COFOUNDER, note: "Looking for a product-minded co-founder; I'll own the backend and infra." }],
   },
   {
-    handle: "sofia-marino",
+    handle: "sofia_marino",
     email: "sofia-marino@hatchdemo.edu",
     name: "Sofia Marino",
     school: "Lakeside College",
@@ -239,7 +263,7 @@ const USERS: UserSeed[] = [
     ],
   },
   {
-    handle: "liam-osei",
+    handle: "liam_osei",
     email: "liam-osei@stateu.edu",
     name: "Liam Osei",
     school: "State University",
@@ -254,7 +278,7 @@ const USERS: UserSeed[] = [
     ],
   },
   {
-    handle: "priya-shah",
+    handle: "priya_shah",
     email: "priya-shah@stateu.edu",
     name: "Priya Shah",
     school: "Bay Metropolitan University",
@@ -266,7 +290,7 @@ const USERS: UserSeed[] = [
     intents: [{ kind: IntentKind.TEAMMATE, note: "Need a backend teammate to take my shift-swap app past the prototype." }],
   },
   {
-    handle: "noah-berg",
+    handle: "noah_berg",
     email: "noah-berg@hatchdemo.edu",
     name: "Noah Bergstrom",
     school: "Northgate University",
@@ -281,7 +305,7 @@ const USERS: UserSeed[] = [
     ],
   },
   {
-    handle: "hana-kim",
+    handle: "hana_kim",
     email: "hana-kim@stateu.edu",
     name: "Hana Kim",
     school: "State University",
@@ -293,7 +317,7 @@ const USERS: UserSeed[] = [
     intents: [{ kind: IntentKind.TEAMMATE, note: "Want to join a small team that takes user research seriously." }],
   },
   {
-    handle: "marcus-webb",
+    handle: "marcus_webb",
     email: "marcus-webb@stateu.edu",
     name: "Marcus Webb",
     school: "Riverside Institute of Technology",
@@ -311,7 +335,7 @@ const USERS: UserSeed[] = [
     ],
   },
   {
-    handle: "yuki-tanaka",
+    handle: "yuki_tanaka",
     email: "yuki-tanaka@hatchdemo.edu",
     name: "Yuki Tanaka",
     school: "Lakeside College",
@@ -326,7 +350,7 @@ const USERS: UserSeed[] = [
     ],
   },
   {
-    handle: "amara-okonkwo",
+    handle: "amara_okonkwo",
     email: "amara-okonkwo@stateu.edu",
     name: "Amara Okonkwo",
     school: "Bay Metropolitan University",
@@ -338,7 +362,7 @@ const USERS: UserSeed[] = [
     intents: [{ kind: IntentKind.COFOUNDER, note: "Looking for a technical co-founder; I'll own growth, product, and story." }],
   },
   {
-    handle: "ethan-park",
+    handle: "ethan_park",
     email: "ethan-park@stateu.edu",
     name: "Ethan Park",
     school: "State University",
@@ -353,7 +377,7 @@ const USERS: UserSeed[] = [
     ],
   },
   {
-    handle: "isabella-rossi",
+    handle: "isabella_rossi",
     email: "isabella-rossi@hatchdemo.edu",
     name: "Isabella Rossi",
     school: "Northgate University",
@@ -365,7 +389,7 @@ const USERS: UserSeed[] = [
     intents: [{ kind: IntentKind.INTERNSHIP, note: "Seeking a research-leaning ML or CV internship." }],
   },
   {
-    handle: "omar-haddad",
+    handle: "omar_haddad",
     email: "omar-haddad@stateu.edu",
     name: "Omar Haddad",
     school: "Riverside Institute of Technology",
@@ -380,7 +404,7 @@ const USERS: UserSeed[] = [
     ],
   },
   {
-    handle: "grace-liu",
+    handle: "grace_liu",
     email: "grace-liu@stateu.edu",
     name: "Grace Liu",
     school: "State University",
@@ -392,7 +416,7 @@ const USERS: UserSeed[] = [
     intents: [{ kind: IntentKind.TEAMMATE, note: "Want to be the founding designer on something ambitious." }],
   },
   {
-    handle: "daniel-mendez",
+    handle: "daniel_mendez",
     email: "daniel-mendez@hatchdemo.edu",
     name: "Daniel Mendez",
     school: "Lakeside College",
@@ -407,7 +431,7 @@ const USERS: UserSeed[] = [
     ],
   },
   {
-    handle: "fatima-ali",
+    handle: "fatima_ali",
     email: "fatima-ali@stateu.edu",
     name: "Fatima Ali",
     school: "Bay Metropolitan University",
@@ -422,7 +446,7 @@ const USERS: UserSeed[] = [
     ],
   },
   {
-    handle: "tyler-nguyen",
+    handle: "tyler_nguyen",
     email: "tyler-nguyen@stateu.edu",
     name: "Tyler Nguyen",
     school: "State University",
@@ -437,7 +461,7 @@ const USERS: UserSeed[] = [
     ],
   },
   {
-    handle: "lena-petrova",
+    handle: "lena_petrova",
     email: "lena-petrova@hatchdemo.edu",
     name: "Lena Petrova",
     school: "Northgate University",
@@ -450,7 +474,7 @@ const USERS: UserSeed[] = [
     intents: [{ kind: IntentKind.INTERNSHIP, note: "Looking for a data-engineering internship for next summer." }],
   },
   {
-    handle: "kevin-osborne",
+    handle: "kevin_osborne",
     email: "kevin-osborne@stateu.edu",
     name: "Kevin Osborne",
     school: "Riverside Institute of Technology",
@@ -465,7 +489,7 @@ const USERS: UserSeed[] = [
     ],
   },
   {
-    handle: "nadia-hassan",
+    handle: "nadia_hassan",
     email: "nadia-hassan@stateu.edu",
     name: "Nadia Hassan",
     school: "State University",
@@ -478,7 +502,7 @@ const USERS: UserSeed[] = [
     intents: [{ kind: IntentKind.TEAMMATE, note: "Interested in joining a team that values research and clear docs." }],
   },
   {
-    handle: "sam-torres",
+    handle: "sam_torres",
     email: "sam-torres@hatchdemo.edu",
     name: "Sam Torres",
     school: "Lakeside College",
@@ -493,7 +517,7 @@ const USERS: UserSeed[] = [
     ],
   },
   {
-    handle: "chloe-adams",
+    handle: "chloe_adams",
     email: "chloe-adams@stateu.edu",
     name: "Chloe Adams",
     school: "Bay Metropolitan University",
@@ -536,17 +560,17 @@ const PROJECTS: ProjectSeed[] = [
     description: "NoteMesh turns lecture recordings into searchable, timestamped notes you can actually study from. Upload a recording, get a clean transcript with the important moments pulled out and linked back to the audio.",
     stage: ProjectStage.LAUNCHED,
     links: [{ label: "Website", url: "https://notemesh.app" }],
-    ownerHandle: "alex-demo",
+    ownerHandle: "alex_demo",
     members: [
-      { handle: "alex-demo", role: "Founder" },
-      { handle: "ethan-park", role: "Engineer" },
-      { handle: "grace-liu", role: "Designer" },
+      { handle: "alex_demo", role: "Founder" },
+      { handle: "ethan_park", role: "Engineer" },
+      { handle: "grace_liu", role: "Designer" },
     ],
     tags: ["nextjs", "typescript", "machine-learning", "edtech", "developer-tools"],
     updates: [
-      { authorHandle: "alex-demo", body: "Launched to my two intro CS sections this week. 60 people signed up in the first day, mostly from a single Discord message. Servers held, barely.", daysAgo: 21 },
-      { authorHandle: "ethan-park", body: "Rewrote the transcript search to use full-text indexing instead of scanning every note. Search went from ~2s to under 100ms on the big lectures.", daysAgo: 12 },
-      { authorHandle: "grace-liu", body: "Redesigned the note view so the audio scrubber stays pinned while you scroll. Small change, but three testers said it's the thing that made it click.", daysAgo: 4 },
+      { authorHandle: "alex_demo", body: "Launched to my two intro CS sections this week. 60 people signed up in the first day, mostly from a single Discord message. Servers held, barely.", daysAgo: 21 },
+      { authorHandle: "ethan_park", body: "Rewrote the transcript search to use full-text indexing instead of scanning every note. Search went from ~2s to under 100ms on the big lectures.", daysAgo: 12 },
+      { authorHandle: "grace_liu", body: "Redesigned the note view so the audio scrubber stays pinned while you scroll. Small change, but three testers said it's the thing that made it click.", daysAgo: 4 },
     ],
     roles: [
       { title: "iOS Engineer", description: "We want a native iOS app so students can record and review on their phones. You'd own the app end to end — recording, offline sync, and playback. Real Swift experience required, not tutorial-following.", commitment: Commitment.STEADY, tags: ["swift", "ios"] },
@@ -559,17 +583,17 @@ const PROJECTS: ProjectSeed[] = [
     description: "ShiftSwap lets student workers trade hourly shifts without the group-chat chaos. Post a shift, see who can cover, get manager approval in one tap. Live on two dining halls right now.",
     stage: ProjectStage.BUILDING,
     links: [{ label: "Demo", url: "https://shiftswap.dev" }],
-    ownerHandle: "priya-shah",
+    ownerHandle: "priya_shah",
     members: [
-      { handle: "priya-shah", role: "Founder" },
-      { handle: "marcus-webb", role: "Engineer" },
-      { handle: "amara-okonkwo", role: "Growth" },
+      { handle: "priya_shah", role: "Founder" },
+      { handle: "marcus_webb", role: "Engineer" },
+      { handle: "amara_okonkwo", role: "Growth" },
     ],
     tags: ["react", "node", "postgres", "productivity"],
     updates: [
-      { authorHandle: "priya-shah", body: "Swapped our auth flow to magic links after three people got locked out during finals week. Also fixed the timezone bug that made Sunday shifts show up as Monday for anyone west of Chicago.", daysAgo: 18 },
-      { authorHandle: "marcus-webb", body: "Added manager approvals behind a proper role check. Took longer than it should have because I underestimated how many edge cases 'who can approve whose shift' actually has.", daysAgo: 9 },
-      { authorHandle: "amara-okonkwo", body: "Ran a sign-up push at the second dining hall. 40 new workers in three days. The referral line 'stop begging in the group chat' outperformed everything else by a lot.", daysAgo: 3 },
+      { authorHandle: "priya_shah", body: "Swapped our auth flow to magic links after three people got locked out during finals week. Also fixed the timezone bug that made Sunday shifts show up as Monday for anyone west of Chicago.", daysAgo: 18 },
+      { authorHandle: "marcus_webb", body: "Added manager approvals behind a proper role check. Took longer than it should have because I underestimated how many edge cases 'who can approve whose shift' actually has.", daysAgo: 9 },
+      { authorHandle: "amara_okonkwo", body: "Ran a sign-up push at the second dining hall. 40 new workers in three days. The referral line 'stop begging in the group chat' outperformed everything else by a lot.", daysAgo: 3 },
     ],
     roles: [
       { title: "Backend Engineer", description: "Our shift-matching logic is getting gnarly and we need someone who likes untangling that. You'd own the scheduling engine and the approval workflow. Postgres and Node experience expected.", commitment: Commitment.STEADY, tags: ["node", "postgres"] },
@@ -582,17 +606,17 @@ const PROJECTS: ProjectSeed[] = [
     description: "Plotline reads a stack of research papers and gives you a plain-language map of how they connect — shared methods, contradicting results, who cites whom. Built for students drowning in a lit review.",
     stage: ProjectStage.BUILDING,
     links: [{ label: "GitHub", url: "https://github.com/plotline/plotline" }],
-    ownerHandle: "maya-chen",
+    ownerHandle: "maya_chen",
     members: [
-      { handle: "maya-chen", role: "Founder" },
-      { handle: "isabella-rossi", role: "ML Engineer" },
-      { handle: "noah-berg", role: "Data" },
+      { handle: "maya_chen", role: "Founder" },
+      { handle: "isabella_rossi", role: "ML Engineer" },
+      { handle: "noah_berg", role: "Data" },
     ],
     tags: ["python", "pytorch", "nlp", "machine-learning", "edtech"],
     updates: [
-      { authorHandle: "maya-chen", body: "Got the citation-graph extraction working on a test set of 200 papers. Precision is decent, recall is embarrassing. Next up is fixing how we parse reference sections, which are apparently held together with hope.", daysAgo: 16 },
-      { authorHandle: "isabella-rossi", body: "Switched the summary model to a smaller fine-tuned one running locally. Slightly worse summaries, but it's 8x cheaper and doesn't call out to anything, which matters for the privacy story.", daysAgo: 8 },
-      { authorHandle: "noah-berg", body: "Cleaned up the ingestion pipeline so a bad PDF no longer takes down the whole batch. Also added a dead-simple dashboard so we can see where papers get stuck.", daysAgo: 2 },
+      { authorHandle: "maya_chen", body: "Got the citation-graph extraction working on a test set of 200 papers. Precision is decent, recall is embarrassing. Next up is fixing how we parse reference sections, which are apparently held together with hope.", daysAgo: 16 },
+      { authorHandle: "isabella_rossi", body: "Switched the summary model to a smaller fine-tuned one running locally. Slightly worse summaries, but it's 8x cheaper and doesn't call out to anything, which matters for the privacy story.", daysAgo: 8 },
+      { authorHandle: "noah_berg", body: "Cleaned up the ingestion pipeline so a bad PDF no longer takes down the whole batch. Also added a dead-simple dashboard so we can see where papers get stuck.", daysAgo: 2 },
     ],
     roles: [
       { title: "NLP Research Assistant", description: "Help us make the paper-linking actually accurate. You'd work on reference parsing and entity resolution across papers. Comfort with transformer models and a tolerance for messy academic text required.", commitment: Commitment.HEAVY, tags: ["nlp", "pytorch", "python"] },
@@ -605,17 +629,17 @@ const PROJECTS: ProjectSeed[] = [
     description: "Curbside is a live map of the food trucks around campus — who's parked where, what's the wait, and when they're leaving. Crowd-sourced from students, kept honest by the truck owners themselves.",
     stage: ProjectStage.LAUNCHED,
     links: [{ label: "App", url: "https://curbside.food" }],
-    ownerHandle: "deepak-nair",
+    ownerHandle: "deepak_nair",
     members: [
-      { handle: "deepak-nair", role: "Founder" },
-      { handle: "kevin-osborne", role: "Mobile" },
-      { handle: "hana-kim", role: "Designer" },
+      { handle: "deepak_nair", role: "Founder" },
+      { handle: "kevin_osborne", role: "Mobile" },
+      { handle: "hana_kim", role: "Designer" },
     ],
     tags: ["go", "react-native", "postgres", "logistics"],
     updates: [
-      { authorHandle: "deepak-nair", body: "Moved the location backend to a single Go service and killed the three Lambdas that kept cold-starting. p95 latency on the map endpoint dropped from 1.4s to 180ms.", daysAgo: 20 },
-      { authorHandle: "kevin-osborne", body: "Shipped push notifications for 'your favorite truck just parked.' Opt-in rate is 70%, way higher than I expected. Turns out people really care about the birria guy.", daysAgo: 11 },
-      { authorHandle: "hana-kim", body: "Ran five usability sessions on the new map filters. Everyone missed the 'open now' toggle because it looked disabled. Fixed the contrast and it stopped being a problem.", daysAgo: 5 },
+      { authorHandle: "deepak_nair", body: "Moved the location backend to a single Go service and killed the three Lambdas that kept cold-starting. p95 latency on the map endpoint dropped from 1.4s to 180ms.", daysAgo: 20 },
+      { authorHandle: "kevin_osborne", body: "Shipped push notifications for 'your favorite truck just parked.' Opt-in rate is 70%, way higher than I expected. Turns out people really care about the birria guy.", daysAgo: 11 },
+      { authorHandle: "hana_kim", body: "Ran five usability sessions on the new map filters. Everyone missed the 'open now' toggle because it looked disabled. Fixed the contrast and it stopped being a problem.", daysAgo: 5 },
     ],
     roles: [
       { title: "Growth Marketer", description: "We're strong on one campus and want a second. You'd own the playbook for launching Curbside at a new school — truck partnerships, student ambassadors, launch week. Scrappy and organized.", commitment: Commitment.LIGHT, tags: ["growth", "product-management"] },
@@ -627,16 +651,16 @@ const PROJECTS: ProjectSeed[] = [
     description: "Canvasly is a calmer place to get design critique. Drop in a screen, ask a specific question, and get structured feedback instead of a pile of drive-by comments. Still an idea, looking for a builder.",
     stage: ProjectStage.IDEA,
     links: [{ label: "Concept", url: "https://canvasly.notion.site" }],
-    ownerHandle: "sofia-marino",
+    ownerHandle: "sofia_marino",
     members: [
-      { handle: "sofia-marino", role: "Founder" },
-      { handle: "grace-liu", role: "Designer" },
+      { handle: "sofia_marino", role: "Founder" },
+      { handle: "grace_liu", role: "Designer" },
     ],
     tags: ["figma", "design-systems", "react", "developer-tools"],
     updates: [
-      { authorHandle: "sofia-marino", body: "Interviewed 12 student designers about how they get feedback right now. The answer is 'a chaotic Discord thread' or 'nobody responds.' There's clearly a gap here — writing up the notes.", daysAgo: 14 },
-      { authorHandle: "grace-liu", body: "Sketched the core critique flow. The key insight from Sofia's interviews: the person asking has to commit to a specific question, or the feedback is useless. Designing around that constraint.", daysAgo: 7 },
-      { authorHandle: "sofia-marino", body: "Built a clickable Figma prototype and tested it with six people. Five of them immediately understood it. The sixth wanted it to also be Slack, which, no.", daysAgo: 2 },
+      { authorHandle: "sofia_marino", body: "Interviewed 12 student designers about how they get feedback right now. The answer is 'a chaotic Discord thread' or 'nobody responds.' There's clearly a gap here — writing up the notes.", daysAgo: 14 },
+      { authorHandle: "grace_liu", body: "Sketched the core critique flow. The key insight from Sofia's interviews: the person asking has to commit to a specific question, or the feedback is useless. Designing around that constraint.", daysAgo: 7 },
+      { authorHandle: "sofia_marino", body: "Built a clickable Figma prototype and tested it with six people. Five of them immediately understood it. The sixth wanted it to also be Slack, which, no.", daysAgo: 2 },
     ],
     roles: [
       { title: "Founding Engineer", description: "This is an idea with real user research behind it and no code yet. You'd be the first engineer and a genuine partner in shaping it. Full-stack, comfortable with ambiguity, wants ownership. React preferred.", commitment: Commitment.HEAVY, tags: ["react", "typescript", "node"] },
@@ -648,17 +672,17 @@ const PROJECTS: ProjectSeed[] = [
     description: "GreenLoop helps student organizations measure and cut the carbon footprint of their events — travel, catering, materials. Turns a guilty guess into an actual number you can improve on.",
     stage: ProjectStage.BUILDING,
     links: [{ label: "Site", url: "https://greenloop.eco" }],
-    ownerHandle: "amara-okonkwo",
+    ownerHandle: "amara_okonkwo",
     members: [
-      { handle: "amara-okonkwo", role: "Founder" },
-      { handle: "lena-petrova", role: "Data" },
-      { handle: "fatima-ali", role: "Engineer" },
+      { handle: "amara_okonkwo", role: "Founder" },
+      { handle: "lena_petrova", role: "Data" },
+      { handle: "fatima_ali", role: "Engineer" },
     ],
     tags: ["python", "data-viz", "climate-tech", "sustainability"],
     updates: [
-      { authorHandle: "amara-okonkwo", body: "Signed up our fourth student org — the debate team, of all people, because they travel constantly and feel bad about it. Now at 900 tracked event-attendees total.", daysAgo: 17 },
-      { authorHandle: "lena-petrova", body: "Rebuilt the emissions dataset on real EPA factors instead of the back-of-envelope numbers we started with. Some estimates moved 30%, which is a little terrifying but a lot more honest.", daysAgo: 10 },
-      { authorHandle: "fatima-ali", body: "Shipped the report view that org leaders actually asked for: one number up top, then the breakdown. Removed the fancy chart nobody understood. Simpler won.", daysAgo: 3 },
+      { authorHandle: "amara_okonkwo", body: "Signed up our fourth student org — the debate team, of all people, because they travel constantly and feel bad about it. Now at 900 tracked event-attendees total.", daysAgo: 17 },
+      { authorHandle: "lena_petrova", body: "Rebuilt the emissions dataset on real EPA factors instead of the back-of-envelope numbers we started with. Some estimates moved 30%, which is a little terrifying but a lot more honest.", daysAgo: 10 },
+      { authorHandle: "fatima_ali", body: "Shipped the report view that org leaders actually asked for: one number up top, then the breakdown. Removed the fancy chart nobody understood. Simpler won.", daysAgo: 3 },
     ],
     roles: [
       { title: "Data Engineer", description: "Our emissions data comes from a dozen messy sources and we need someone to make it trustworthy and automated. You'd own the data pipeline and the factor database. Python and SQL required.", commitment: Commitment.STEADY, tags: ["python", "sql", "data-engineering"] },
@@ -671,17 +695,17 @@ const PROJECTS: ProjectSeed[] = [
     description: "Ledgerly splits shared expenses for roommates without the passive-aggressive spreadsheet. Snap a receipt, split it, settle up with a tap. Real money, real ledger, no more 'I'll get you back later.'",
     stage: ProjectStage.LAUNCHED,
     links: [{ label: "Website", url: "https://ledgerly.app" }],
-    ownerHandle: "marcus-webb",
+    ownerHandle: "marcus_webb",
     members: [
-      { handle: "marcus-webb", role: "Founder" },
-      { handle: "chloe-adams", role: "Engineer" },
-      { handle: "omar-haddad", role: "Engineer" },
+      { handle: "marcus_webb", role: "Founder" },
+      { handle: "chloe_adams", role: "Engineer" },
+      { handle: "omar_haddad", role: "Engineer" },
     ],
     tags: ["node", "react", "mysql", "fintech"],
     updates: [
-      { authorHandle: "marcus-webb", body: "Hit 400 signups this week, mostly from a CS Discord post. The settle-up flow via Venmo deep link is holding up, but I want a real double-entry ledger before it breaks in some way I can't undo.", daysAgo: 19 },
-      { authorHandle: "omar-haddad", body: "Replaced the running-balance hack with an actual immutable transaction log. Every balance is now derived, not stored. Reconciliation bugs basically disappeared overnight.", daysAgo: 9 },
-      { authorHandle: "chloe-adams", body: "Redid the receipt-split screen so you can drag amounts between people. Sounds gimmicky, tested great — splitting an uneven grocery run went from annoying to almost fun.", daysAgo: 4 },
+      { authorHandle: "marcus_webb", body: "Hit 400 signups this week, mostly from a CS Discord post. The settle-up flow via Venmo deep link is holding up, but I want a real double-entry ledger before it breaks in some way I can't undo.", daysAgo: 19 },
+      { authorHandle: "omar_haddad", body: "Replaced the running-balance hack with an actual immutable transaction log. Every balance is now derived, not stored. Reconciliation bugs basically disappeared overnight.", daysAgo: 9 },
+      { authorHandle: "chloe_adams", body: "Redid the receipt-split screen so you can drag amounts between people. Sounds gimmicky, tested great — splitting an uneven grocery run went from annoying to almost fun.", daysAgo: 4 },
     ],
     roles: [
       { title: "Designer", description: "We're engineers who've taken this as far as engineer-design goes. You'd own the visual and interaction design as we add group budgets. Fintech means trust — the design has to feel solid. Figma required.", commitment: Commitment.LIGHT, tags: ["figma", "ui-design"] },
@@ -694,16 +718,16 @@ const PROJECTS: ProjectSeed[] = [
     stage: ProjectStage.IDEA,
     visibility: ProjectVisibility.UNLISTED,
     links: [{ label: "Waitlist", url: "https://pitchdeck.ai" }],
-    ownerHandle: "noah-berg",
+    ownerHandle: "noah_berg",
     members: [
-      { handle: "noah-berg", role: "Founder" },
-      { handle: "amara-okonkwo", role: "Growth" },
+      { handle: "noah_berg", role: "Founder" },
+      { handle: "amara_okonkwo", role: "Growth" },
     ],
     tags: ["python", "machine-learning", "nlp", "startups"],
     updates: [
-      { authorHandle: "noah-berg", body: "Fed it 30 real student pitch decks and compared its notes to what actual judges said at our startup competition. Overlap was maybe 50%. The model loves to nitpick fonts and miss the broken business model.", daysAgo: 13 },
-      { authorHandle: "amara-okonkwo", body: "Talked to eight founders about whether they'd trust AI deck feedback. Split down the middle. The believers all said the same thing: they want it before they embarrass themselves in front of a human.", daysAgo: 6 },
-      { authorHandle: "noah-berg", body: "Rebuilt the prompt to force the model to grade the narrative first, design last. Immediately better. Keeping it unlisted until the feedback stops being politely useless.", daysAgo: 2 },
+      { authorHandle: "noah_berg", body: "Fed it 30 real student pitch decks and compared its notes to what actual judges said at our startup competition. Overlap was maybe 50%. The model loves to nitpick fonts and miss the broken business model.", daysAgo: 13 },
+      { authorHandle: "amara_okonkwo", body: "Talked to eight founders about whether they'd trust AI deck feedback. Split down the middle. The believers all said the same thing: they want it before they embarrass themselves in front of a human.", daysAgo: 6 },
+      { authorHandle: "noah_berg", body: "Rebuilt the prompt to force the model to grade the narrative first, design last. Immediately better. Keeping it unlisted until the feedback stops being politely useless.", daysAgo: 2 },
     ],
     roles: [
       { title: "Founding Designer", description: "The product is a wall of text right now. You'd shape how blunt feedback gets delivered without making founders defensive — that's a real design problem. Early, unlisted, high-ownership. Figma and product sense.", commitment: Commitment.STEADY, tags: ["figma", "ui-design", "prototyping"] },
@@ -715,17 +739,17 @@ const PROJECTS: ProjectSeed[] = [
     description: "CourseFlow is degree planning that isn't a spreadsheet from 2011. Map every requirement, see what unlocks what, and catch the prerequisite trap that pushes you a semester behind. Built by students who got burned.",
     stage: ProjectStage.BUILDING,
     links: [{ label: "Beta", url: "https://courseflow.study" }],
-    ownerHandle: "ethan-park",
+    ownerHandle: "ethan_park",
     members: [
-      { handle: "ethan-park", role: "Founder" },
-      { handle: "fatima-ali", role: "Engineer" },
-      { handle: "nadia-hassan", role: "UX" },
+      { handle: "ethan_park", role: "Founder" },
+      { handle: "fatima_ali", role: "Engineer" },
+      { handle: "nadia_hassan", role: "UX" },
     ],
     tags: ["nextjs", "prisma", "postgres", "edtech"],
     updates: [
-      { authorHandle: "ethan-park", body: "Modeled prerequisites as a real DAG instead of a list of strings, which is what the registrar basically hands you. Cycle detection immediately found two impossible course chains in our own catalog.", daysAgo: 15 },
-      { authorHandle: "nadia-hassan", body: "Watched eight students plan a semester in the beta. The word 'prerequisite' means nothing to a stressed sophomore at 11pm. Rewrote every label around 'you need X first' and comprehension jumped.", daysAgo: 8 },
-      { authorHandle: "fatima-ali", body: "Added the 'what happens if I drop this' view. It ripples the change through your whole plan and flags what breaks. This is the feature three advisors asked us to build for them too.", daysAgo: 3 },
+      { authorHandle: "ethan_park", body: "Modeled prerequisites as a real DAG instead of a list of strings, which is what the registrar basically hands you. Cycle detection immediately found two impossible course chains in our own catalog.", daysAgo: 15 },
+      { authorHandle: "nadia_hassan", body: "Watched eight students plan a semester in the beta. The word 'prerequisite' means nothing to a stressed sophomore at 11pm. Rewrote every label around 'you need X first' and comprehension jumped.", daysAgo: 8 },
+      { authorHandle: "fatima_ali", body: "Added the 'what happens if I drop this' view. It ripples the change through your whole plan and flags what breaks. This is the feature three advisors asked us to build for them too.", daysAgo: 3 },
     ],
     roles: [
       { title: "UX Researcher", description: "We're making decisions about a stressful, high-stakes flow and we want them grounded in real student behavior. You'd run studies and turn them into design direction. Research chops and clear writing required.", commitment: Commitment.LIGHT, tags: ["ux-research"] },
@@ -739,16 +763,16 @@ const PROJECTS: ProjectSeed[] = [
     stage: ProjectStage.IDEA,
     visibility: ProjectVisibility.UNLISTED,
     links: [{ label: "Prototype", url: "https://arcadelab.games" }],
-    ownerHandle: "tyler-nguyen",
+    ownerHandle: "tyler_nguyen",
     members: [
-      { handle: "tyler-nguyen", role: "Founder" },
-      { handle: "omar-haddad", role: "Engineer" },
+      { handle: "tyler_nguyen", role: "Founder" },
+      { handle: "omar_haddad", role: "Engineer" },
     ],
     tags: ["unity", "game-dev", "webgl", "gaming"],
     updates: [
-      { authorHandle: "tyler-nguyen", body: "Ran our club's jam through a rough version of the platform. 14 teams submitted, 9 builds actually ran in-browser. The other 5 were WebGL memory limits, which is now my whole life.", daysAgo: 12 },
-      { authorHandle: "omar-haddad", body: "Got voting working with a simple anti-brigading check so one team can't spam its own game to the top. Nothing fancy — rate limits and a per-account cap — but it held up during the test jam.", daysAgo: 6 },
-      { authorHandle: "tyler-nguyen", body: "Shrank the average build size by pushing teams to a shared texture-compression setting. Playable-build rate went from 64% to 90%. Keeping it unlisted until that's reliably 100%.", daysAgo: 2 },
+      { authorHandle: "tyler_nguyen", body: "Ran our club's jam through a rough version of the platform. 14 teams submitted, 9 builds actually ran in-browser. The other 5 were WebGL memory limits, which is now my whole life.", daysAgo: 12 },
+      { authorHandle: "omar_haddad", body: "Got voting working with a simple anti-brigading check so one team can't spam its own game to the top. Nothing fancy — rate limits and a per-account cap — but it held up during the test jam.", daysAgo: 6 },
+      { authorHandle: "tyler_nguyen", body: "Shrank the average build size by pushing teams to a shared texture-compression setting. Playable-build rate went from 64% to 90%. Keeping it unlisted until that's reliably 100%.", daysAgo: 2 },
     ],
     roles: [
       { title: "Game Designer", description: "Help us design the jam experience itself — themes, constraints, how voting rewards fun over polish. You'd shape what makes a jam on Arcade Lab feel special. Game design instincts matter more than a specific engine.", commitment: Commitment.LIGHT, tags: ["game-dev"] },
@@ -776,133 +800,133 @@ type AcceptedSeed = {
 
 const ACCEPTED_REQUESTS: AcceptedSeed[] = [
   {
-    fromHandle: "ethan-park",
+    fromHandle: "ethan_park",
     context: { type: "ROLE", projectSlug: "plotline", roleTitle: "Frontend Engineer" },
     note: "Saw the Frontend Engineer role on Plotline — I've been building a degree-planning tool in Next.js and info-dense UI is exactly the problem I keep chewing on. Would love to talk about the paper-graph interface.",
     daysAgo: 14,
     messages: [
-      { authorHandle: "ethan-park", body: "Thanks for accepting! I'm curious how you're rendering the citation graph right now — is it all client-side or are you precomputing layout on the backend?" },
-      { authorHandle: "maya-chen", body: "Right now it's a Jupyter notebook and a lot of imagination, honestly. Backend spits out nodes and edges as JSON, no layout at all yet. That's basically the whole job." },
-      { authorHandle: "ethan-park", body: "Perfect, that's the fun part. I'd probably start with a force-directed layout and then let people pin nodes. Are the graphs usually under a few hundred nodes or can they blow up?" },
-      { authorHandle: "maya-chen", body: "A lit review is usually 50-300 papers, so it's tractable. Want to hop on a call this week? I can walk you through the data shape and where it's messy." },
-      { authorHandle: "ethan-park", body: "Yes — Thursday afternoon works for me. I'll come with a rough prototype so we have something concrete to argue about." },
+      { authorHandle: "ethan_park", body: "Thanks for accepting! I'm curious how you're rendering the citation graph right now — is it all client-side or are you precomputing layout on the backend?" },
+      { authorHandle: "maya_chen", body: "Right now it's a Jupyter notebook and a lot of imagination, honestly. Backend spits out nodes and edges as JSON, no layout at all yet. That's basically the whole job." },
+      { authorHandle: "ethan_park", body: "Perfect, that's the fun part. I'd probably start with a force-directed layout and then let people pin nodes. Are the graphs usually under a few hundred nodes or can they blow up?" },
+      { authorHandle: "maya_chen", body: "A lit review is usually 50-300 papers, so it's tractable. Want to hop on a call this week? I can walk you through the data shape and where it's messy." },
+      { authorHandle: "ethan_park", body: "Yes — Thursday afternoon works for me. I'll come with a rough prototype so we have something concrete to argue about." },
     ],
   },
   {
-    fromHandle: "kevin-osborne",
+    fromHandle: "kevin_osborne",
     context: { type: "ROLE", projectSlug: "shiftswap", roleTitle: "Mobile Developer" },
     note: "The Mobile Developer role on ShiftSwap lines up perfectly with what I did on Curbside — React Native, on-the-go approvals, all of it. Managers wanting a phone app is a story I've lived. Would love to help.",
     daysAgo: 12,
     messages: [
-      { authorHandle: "kevin-osborne", body: "Appreciate you accepting! Quick question up front — are you hoping to share code between the web app and mobile, or build the mobile client fresh?" },
-      { authorHandle: "priya-shah", body: "Ideally share the shift-matching logic at least. The web app is React so I was hoping React Native would let us reuse the core hooks. Is that realistic or am I dreaming?" },
-      { authorHandle: "kevin-osborne", body: "Mostly realistic. The pure logic and API layer share fine; the UI won't. I'd pull the matching logic into a plain TS package both can import. Want me to sketch that structure?" },
-      { authorHandle: "priya-shah", body: "That would be amazing. If you can put together a rough plan I'll get you access to the repo and the staging backend." },
+      { authorHandle: "kevin_osborne", body: "Appreciate you accepting! Quick question up front — are you hoping to share code between the web app and mobile, or build the mobile client fresh?" },
+      { authorHandle: "priya_shah", body: "Ideally share the shift-matching logic at least. The web app is React so I was hoping React Native would let us reuse the core hooks. Is that realistic or am I dreaming?" },
+      { authorHandle: "kevin_osborne", body: "Mostly realistic. The pure logic and API layer share fine; the UI won't. I'd pull the matching logic into a plain TS package both can import. Want me to sketch that structure?" },
+      { authorHandle: "priya_shah", body: "That would be amazing. If you can put together a rough plan I'll get you access to the repo and the staging backend." },
     ],
   },
   {
-    fromHandle: "fatima-ali",
+    fromHandle: "fatima_ali",
     context: { type: "ROLE", projectSlug: "greenloop", roleTitle: "Frontend Developer" },
     note: "GreenLoop's mission is exactly the kind of thing I want to build. I'm a full-stack Python dev drifting toward the frontend, and 'make the report something people want to share' is a challenge I'd take seriously.",
     daysAgo: 11,
     messages: [
-      { authorHandle: "fatima-ali", body: "Thanks Amara! I read that update about cutting the fancy chart nobody understood — that resonated. What does the current report page look like?" },
-      { authorHandle: "amara-okonkwo", body: "Right now it's one big number and a table. Functional, ugly. Org leaders want to post their results to their group, so it needs to look good enough to screenshot proudly." },
-      { authorHandle: "fatima-ali", body: "Got it — so a shareable public report page is really the goal, not just an internal dashboard. That changes the priorities a lot. I have some ideas for a clean summary card." },
-      { authorHandle: "amara-okonkwo", body: "Exactly. Let's start there. I'll add you to the repo and share the three reports leaders have actually screenshotted so far so you can see what they're proud of." },
+      { authorHandle: "fatima_ali", body: "Thanks Amara! I read that update about cutting the fancy chart nobody understood — that resonated. What does the current report page look like?" },
+      { authorHandle: "amara_okonkwo", body: "Right now it's one big number and a table. Functional, ugly. Org leaders want to post their results to their group, so it needs to look good enough to screenshot proudly." },
+      { authorHandle: "fatima_ali", body: "Got it — so a shareable public report page is really the goal, not just an internal dashboard. That changes the priorities a lot. I have some ideas for a clean summary card." },
+      { authorHandle: "amara_okonkwo", body: "Exactly. Let's start there. I'll add you to the repo and share the three reports leaders have actually screenshotted so far so you can see what they're proud of." },
     ],
   },
   {
-    fromHandle: "grace-liu",
+    fromHandle: "grace_liu",
     context: { type: "PROJECT", projectSlug: "canvasly" },
     note: "Canvasly is the tool I've wanted every time I've begged for feedback in a dead Discord thread. I'm a designer who codes a bit and cares about design systems — I'd love to help shape it beyond the prototype.",
     daysAgo: 10,
     messages: [
-      { authorHandle: "grace-liu", body: "So happy you accepted — I've been quietly obsessed with this problem too. What's the biggest open question in the design right now?" },
-      { authorHandle: "sofia-marino", body: "Honestly it's how much structure to force. Too little and you get drive-by 'looks good.' Too much and people bounce before submitting. Where's the line?" },
-      { authorHandle: "grace-liu", body: "I think the line is one required question and everything else optional. Make the asker commit to what they actually want judged, then get out of the way. We could test that against your six interviews." },
-      { authorHandle: "sofia-marino", body: "That's basically the insight I landed on too, which is reassuring. Let's pair on a proper flow this weekend — I'll share the Figma and the interview notes." },
+      { authorHandle: "grace_liu", body: "So happy you accepted — I've been quietly obsessed with this problem too. What's the biggest open question in the design right now?" },
+      { authorHandle: "sofia_marino", body: "Honestly it's how much structure to force. Too little and you get drive-by 'looks good.' Too much and people bounce before submitting. Where's the line?" },
+      { authorHandle: "grace_liu", body: "I think the line is one required question and everything else optional. Make the asker commit to what they actually want judged, then get out of the way. We could test that against your six interviews." },
+      { authorHandle: "sofia_marino", body: "That's basically the insight I landed on too, which is reassuring. Let's pair on a proper flow this weekend — I'll share the Figma and the interview notes." },
     ],
   },
   {
-    fromHandle: "omar-haddad",
+    fromHandle: "omar_haddad",
     context: { type: "PROJECT", projectSlug: "ledgerly" },
     note: "I read your update about moving Ledgerly to an immutable transaction log — that's exactly the kind of correctness-first thinking I care about. I've done a lot of on-chain ledger work and I'd love to compare approaches.",
     daysAgo: 9,
     messages: [
-      { authorHandle: "omar-haddad", body: "Thanks for accepting! Your double-entry rewrite caught my eye. Did you go with a true debit/credit model or a simpler append-only log with derived balances?" },
-      { authorHandle: "marcus-webb", body: "Append-only log with derived balances. I considered full double-entry but it felt like overkill for roommate splits. Curious if you think that'll bite us later." },
-      { authorHandle: "omar-haddad", body: "For your scale it's fine. The place it bites is multi-currency and refunds — that's where double-entry earns its keep. If you never do those, don't add the complexity." },
-      { authorHandle: "marcus-webb", body: "That's reassuring, thanks. No multi-currency plans. Would you be up for reviewing the reconciliation code sometime? A second set of eyes on the money path would help me sleep." },
-      { authorHandle: "omar-haddad", body: "Happy to. Send me the repo link and I'll do a pass this week." },
+      { authorHandle: "omar_haddad", body: "Thanks for accepting! Your double-entry rewrite caught my eye. Did you go with a true debit/credit model or a simpler append-only log with derived balances?" },
+      { authorHandle: "marcus_webb", body: "Append-only log with derived balances. I considered full double-entry but it felt like overkill for roommate splits. Curious if you think that'll bite us later." },
+      { authorHandle: "omar_haddad", body: "For your scale it's fine. The place it bites is multi-currency and refunds — that's where double-entry earns its keep. If you never do those, don't add the complexity." },
+      { authorHandle: "marcus_webb", body: "That's reassuring, thanks. No multi-currency plans. Would you be up for reviewing the reconciliation code sometime? A second set of eyes on the money path would help me sleep." },
+      { authorHandle: "omar_haddad", body: "Happy to. Send me the repo link and I'll do a pass this week." },
     ],
   },
   {
-    fromHandle: "alex-demo",
+    fromHandle: "alex_demo",
     context: { type: "ROLE", projectSlug: "curbside", roleTitle: "Growth Marketer" },
     note: "I run NoteMesh and I'm about to try launching at a second school — your Curbside 'one campus to two' playbook is exactly what I don't know how to do yet. Would love to swap notes on campus launches even though I'm not applying.",
     daysAgo: 8,
     messages: [
-      { authorHandle: "alex-demo", body: "Thanks Deepak! I know I'm not exactly a growth-marketer applicant — I mostly wanted to learn how you're thinking about the second-campus launch. NoteMesh is stuck at one." },
-      { authorHandle: "deepak-nair", body: "Ha, no worries, happy to trade. The single biggest thing for us: find the one obsessed student on the new campus before you launch, not after. They do more than any ad." },
-      { authorHandle: "alex-demo", body: "That's such a good reframe. I've been thinking channels-first when I should be thinking people-first. How'd you find that person at the second school?" },
-      { authorHandle: "deepak-nair", body: "Posted in the campus subreddit asking who complains most about food-truck timing. The angriest reply became our ambassador. Anger is underrated signal." },
-      { authorHandle: "alex-demo", body: "Amazing. I'm going to go find the person most furious about lecture notes. Thanks — this genuinely unblocked me." },
+      { authorHandle: "alex_demo", body: "Thanks Deepak! I know I'm not exactly a growth-marketer applicant — I mostly wanted to learn how you're thinking about the second-campus launch. NoteMesh is stuck at one." },
+      { authorHandle: "deepak_nair", body: "Ha, no worries, happy to trade. The single biggest thing for us: find the one obsessed student on the new campus before you launch, not after. They do more than any ad." },
+      { authorHandle: "alex_demo", body: "That's such a good reframe. I've been thinking channels-first when I should be thinking people-first. How'd you find that person at the second school?" },
+      { authorHandle: "deepak_nair", body: "Posted in the campus subreddit asking who complains most about food-truck timing. The angriest reply became our ambassador. Anger is underrated signal." },
+      { authorHandle: "alex_demo", body: "Amazing. I'm going to go find the person most furious about lecture notes. Thanks — this genuinely unblocked me." },
     ],
   },
   {
-    fromHandle: "nadia-hassan",
+    fromHandle: "nadia_hassan",
     context: { type: "ROLE", projectSlug: "courseflow", roleTitle: "UX Researcher" },
     note: "CourseFlow's UX Researcher role is almost exactly the work I most want to do — high-stakes, stressful flow, real students. I read your note about 'prerequisite' meaning nothing at 11pm and I've seen the same thing. Let's talk.",
     daysAgo: 7,
     messages: [
-      { authorHandle: "nadia-hassan", body: "Thanks Ethan! That prerequisite-comprehension finding you posted is exactly the kind of thing I love chasing. How are you currently deciding what to study?" },
-      { authorHandle: "ethan-park", body: "Very unscientifically — I watch someone use it and write down where they get stuck. It works but it doesn't scale and I know I'm cherry-picking. That's why I want a real researcher." },
-      { authorHandle: "nadia-hassan", body: "That's a great starting instinct, honestly. I'd formalize it into a short recurring study with the same tasks so you can see if changes actually move comprehension. Want me to draft a protocol?" },
-      { authorHandle: "ethan-park", body: "Please. If you can put together a lightweight study plan I'll recruit five beta students for this week." },
+      { authorHandle: "nadia_hassan", body: "Thanks Ethan! That prerequisite-comprehension finding you posted is exactly the kind of thing I love chasing. How are you currently deciding what to study?" },
+      { authorHandle: "ethan_park", body: "Very unscientifically — I watch someone use it and write down where they get stuck. It works but it doesn't scale and I know I'm cherry-picking. That's why I want a real researcher." },
+      { authorHandle: "nadia_hassan", body: "That's a great starting instinct, honestly. I'd formalize it into a short recurring study with the same tasks so you can see if changes actually move comprehension. Want me to draft a protocol?" },
+      { authorHandle: "ethan_park", body: "Please. If you can put together a lightweight study plan I'll recruit five beta students for this week." },
     ],
   },
   {
-    fromHandle: "sam-torres",
+    fromHandle: "sam_torres",
     context: { type: "ROLE", projectSlug: "greenloop", roleTitle: "Data Engineer" },
     note: "GreenLoop's Data Engineer role is right in my wheelhouse — messy multi-source data that needs to become trustworthy and automated is my favorite kind of problem. I've built pipelines on exactly this stack. Would love to help.",
     daysAgo: 6,
     messages: [
-      { authorHandle: "sam-torres", body: "Thanks for accepting, Amara! Lena's update about rebuilding on real EPA factors caught my attention. Is the factor data updated by hand right now?" },
-      { authorHandle: "amara-okonkwo", body: "Painfully by hand, yes. Lena updates a spreadsheet and we import it. It works until she's busy, and then it doesn't. Automating that is basically the whole role." },
-      { authorHandle: "sam-torres", body: "That's very fixable. I'd set up a versioned source for the factors with a validation step so a bad update can't silently corrupt everyone's numbers. Trust is the real deliverable here." },
-      { authorHandle: "amara-okonkwo", body: "'Trust is the deliverable' — yes, that's exactly it. Let me connect you with Lena so you two can look at the current pipeline together." },
+      { authorHandle: "sam_torres", body: "Thanks for accepting, Amara! Lena's update about rebuilding on real EPA factors caught my attention. Is the factor data updated by hand right now?" },
+      { authorHandle: "amara_okonkwo", body: "Painfully by hand, yes. Lena updates a spreadsheet and we import it. It works until she's busy, and then it doesn't. Automating that is basically the whole role." },
+      { authorHandle: "sam_torres", body: "That's very fixable. I'd set up a versioned source for the factors with a validation step so a bad update can't silently corrupt everyone's numbers. Trust is the real deliverable here." },
+      { authorHandle: "amara_okonkwo", body: "'Trust is the deliverable' — yes, that's exactly it. Let me connect you with Lena so you two can look at the current pipeline together." },
     ],
   },
 ];
 
 const PENDING_TO_DEMO: { fromHandle: string; context: ContextRef; note: string; daysAgo: number }[] = [
   {
-    fromHandle: "liam-osei",
+    fromHandle: "liam_osei",
     context: { type: "ROLE", projectSlug: "notemesh", roleTitle: "iOS Engineer" },
     note: "The NoteMesh iOS Engineer role is exactly what I want to build. I've shipped a SwiftUI habit tracker with a few thousand downloads and I'm dying to own recording, offline sync, and playback end to end. Can we talk?",
     daysAgo: 5,
   },
   {
-    fromHandle: "amara-okonkwo",
+    fromHandle: "amara_okonkwo",
     context: { type: "ROLE", projectSlug: "notemesh", roleTitle: "Growth Lead" },
     note: "I took a campus sustainability app from zero to 900 signups on basically no budget, and 'two sections to two schools' is the exact problem I love. I'd bring a real channel-testing playbook to the NoteMesh Growth Lead role.",
     daysAgo: 4,
   },
   {
-    fromHandle: "noah-berg",
+    fromHandle: "noah_berg",
     context: { type: "PROJECT", projectSlug: "notemesh" },
     note: "Not applying to a specific role — I just think NoteMesh is genuinely useful and I'm building an AI feedback tool in an adjacent space. Would love to compare notes on how you handle transcription quality and student privacy.",
     daysAgo: 3,
   },
   {
-    fromHandle: "maya-chen",
-    context: { type: "INTENT", handle: "alex-demo", intentKind: IntentKind.FEEDBACK },
+    fromHandle: "maya_chen",
+    context: { type: "INTENT", handle: "alex_demo", intentKind: IntentKind.FEEDBACK },
     note: "You mentioned you're happy to trade product feedback on early student tools — I'd love to take you up on that. Plotline is at the stage where I can't tell if the interface is confusing or if I've just stared at it too long.",
     daysAgo: 2,
   },
   {
-    fromHandle: "kevin-osborne",
+    fromHandle: "kevin_osborne",
     context: { type: "ROLE", projectSlug: "notemesh", roleTitle: "iOS Engineer" },
     note: "I know the NoteMesh iOS role asks for Swift specifically and I'm primarily React Native — but I'm learning Swift fast and I've shipped real mobile apps to real users. If you'd consider a hybrid approach, I'd love to make the case.",
     daysAgo: 1,
@@ -927,73 +951,73 @@ type PostSeed = { handle: string; body: string; daysAgo: number; hoursAgo?: numb
 
 const POSTS: PostSeed[] = [
   {
-    handle: "alex-demo",
+    handle: "alex_demo",
     body: "Watched someone open NoteMesh for the first time with no explanation from me. They tried to search before uploading anything, then sat there for a full minute. The empty state never tells you what to do first. Fixing that tonight.",
     daysAgo: 1,
     hoursAgo: 3,
   },
   {
-    handle: "maya-chen",
+    handle: "maya_chen",
     body: "Note to past me: a PDF is not a document, it's a crime scene. Spent today writing a reference parser for a format with no rules. It works on 84% of the test set and I am choosing to call that a win.",
     daysAgo: 2,
   },
   {
-    handle: "priya-shah",
+    handle: "priya_shah",
     body: "Ran my first real migration against a live database today. Backed everything up three times, ran it, then stared at the logs for twenty minutes waiting for something to break. Nothing broke. I still don't trust it.",
     daysAgo: 3,
     hoursAgo: 4,
   },
   {
-    handle: "alex-demo",
+    handle: "alex_demo",
     body: "The hardest part of building for students isn't the code, it's getting fifteen people to open a link. I wrote a few thousand lines this month and the thing that actually moved the numbers was one well-timed Discord message.",
     daysAgo: 5,
   },
   {
-    handle: "grace-liu",
+    handle: "grace_liu",
     body: "Drew 40 empty-state illustrations this weekend for a component library nobody asked for. Do I regret it? No. Will I use more than six of them? Also no.",
     daysAgo: 6,
     hoursAgo: 3,
   },
   {
-    handle: "deepak-nair",
+    handle: "deepak_nair",
     body: "Load-tested the Curbside map endpoint at 10x our real traffic just to find where it falls over. It didn't. Mildly annoyed — I had cleared the whole evening to fix something.",
     daysAgo: 7,
   },
   {
-    handle: "tyler-nguyen",
+    handle: "tyler_nguyen",
     body: "Ran the club game jam this weekend. 14 teams, 48 hours, and one team that spent 40 of those hours on a menu screen. Their menu is genuinely the best thing anyone made.",
     daysAgo: 9,
     hoursAgo: 5,
   },
   {
-    handle: "sofia-marino",
+    handle: "sofia_marino",
     body: "Every design portfolio I see is polished final screens. Nobody posts the eleven versions before it. My honest ratio is about one good screen per eleven bad ones, and the bad ones are where all the thinking happened.",
     daysAgo: 10,
   },
   {
-    handle: "marcus-webb",
+    handle: "marcus_webb",
     body: "Someone found a bug where splitting $0.01 three ways in Ledgerly quietly loses a penny. It has been live for four months. Four months of pennies evaporating. Fixed now, and I am afraid of floating point in an entirely new way.",
     daysAgo: 13,
   },
   {
-    handle: "hana-kim",
+    handle: "hana_kim",
     body: "Bribed six people with coffee to use a prototype for ten minutes each. Cost me $27 and it stopped us building a feature nobody wanted. Best money this project has spent.",
     daysAgo: 15,
     hoursAgo: 2,
   },
   {
-    handle: "noah-berg",
+    handle: "noah_berg",
     body: "Spent the week convincing a model to stop complimenting people's fonts and start questioning their revenue model. Being useful and being nice turn out to be in direct tension, and I have to pick one.",
     daysAgo: 17,
   },
   {
-    handle: "yuki-tanaka",
+    handle: "yuki_tanaka",
     body: "The sensor board finally talked to the cloud backend. Three weeks. The bug was a byte-order mismatch I had 'already checked' four separate times.",
     daysAgo: 19,
     hoursAgo: 6,
   },
   {
-    handle: "chloe-adams",
+    handle: "chloe_adams",
     body: "Rewrote a component in React to prove I could, and it took four hours to do what takes me twenty minutes in Vue. Losing framework arguments is much easier when you're simply bad at the other one.",
     daysAgo: 22,
   },
@@ -1025,6 +1049,9 @@ async function wipe() {
   await prisma.tagSuggestion.deleteMany();
   await prisma.tag.deleteMany();
   await prisma.profile.deleteMany();
+  // School has no FK to anything — Profile.school is free text — so it can go
+  // any time after the profiles that named the schools.
+  await prisma.school.deleteMany();
   await prisma.passwordResetToken.deleteMany();
   await prisma.loginAttempt.deleteMany();
   await prisma.session.deleteMany();
@@ -1084,6 +1111,16 @@ async function main() {
   }
   console.log(`[HATCH seed] created ${TAGS.length} tags`);
 
+  // --- School catalog ---
+  // Every school the seeded profiles attend, so a fresh signup gets a working
+  // type-ahead instead of an empty dropdown. In production this table grows the
+  // same way, one ensureSchool() call at a time.
+  const schoolNames = [...new Set(USERS.map((u) => u.school))].sort();
+  for (const name of schoolNames) {
+    await prisma.school.create({ data: { slug: catalogSlug(name), name } });
+  }
+  console.log(`[HATCH seed] created ${schoolNames.length} schools`);
+
   // --- Users + profiles ---
   const passwordHash = await bcrypt.hash(PASSWORD, BCRYPT_COST);
   const profileId = new Map<string, string>(); // handle -> profileId
@@ -1106,6 +1143,7 @@ async function main() {
         name: u.name,
         school: u.school,
         gradYear: u.gradYear,
+        basedIn: BASED_IN_OVERRIDES[u.handle] ?? CAMPUS_CITY[u.school] ?? "",
         bio: u.bio,
         links: u.links,
         avatarSeed: `${u.handle}-${Math.random().toString(36).slice(2, 10)}`,

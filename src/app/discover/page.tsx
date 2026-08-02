@@ -166,6 +166,7 @@ async function PeopleTab({
                 name: p.name,
                 school: p.school,
                 gradYear: p.gradYear,
+                basedIn: p.basedIn,
                 bio: p.bio,
                 avatarSeed: p.avatarSeed,
                 tags: p.tags.map((t) => ({ relation: t.relation, tag: t.tag })),

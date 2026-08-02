@@ -16,5 +16,10 @@ next-env.d.ts
 .DS_Store
 *.pem
 npm-debug.log*
+dev-server.log
 *.tsbuildinfo
 .vercel
+
+# Pre-migration handle snapshots (contain user data)
+handle-backup-*.json
+snapshot-handles.mjs

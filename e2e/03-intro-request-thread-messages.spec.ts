@@ -35,7 +35,7 @@ test("intro request, accept, two-way messaging, survives restart", async ({ brow
 
   const unique = Date.now();
   const senderEmail = `restarttester${unique}@e2e.edu`;
-  const senderHandle = `restart-tester-${unique}`;
+  const senderHandle = `restart_tester_${unique}`;
 
   // --- Sender context: fresh account, onboarded ---
   const senderCtx = await browser.newContext();

@@ -12,7 +12,7 @@ test("a new account is usable immediately, with no verification step", async ({ 
   await signupAndOnboard(page, {
     email,
     name: `No Verify ${unique}`,
-    handle: `noverify-${unique}`,
+    handle: `noverify_${unique}`,
   });
 
   // No nag banner anywhere in the shell.
