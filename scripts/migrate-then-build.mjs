@@ -159,4 +159,10 @@ if (migrateStatus !== 0) {
   process.exit(migrateStatus);
 }
 
-console.log("[build] migrations applied.");
+// Deliberately not "migrations applied": this line also prints when there were
+// none pending, and a build log that says it applied migrations one line after
+// Prisma says "No pending migrations to apply" is a log that lies in the exact
+// situation someone is reading it to find out what happened. Prisma's own output
+// immediately above already names what was applied; this only reports that the
+// step finished.
+console.log("[build] prisma migrate deploy completed.");

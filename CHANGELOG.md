@@ -4,8 +4,9 @@ Every commit on `main`, numbered `v0.0` upward in chronological order. There are
 no GitHub issues or PRs, so the "issues resolved" sections below are drawn from
 what each commit states it fixed.
 
-Annotated tags exist for `v0.0`–`v0.6`. `v0.7` onward are not tagged yet — the
-numbering here is the source of truth either way.
+Every version listed below has an annotated git tag. The commit that *updates*
+this file cannot number itself, so it is always documented one update later —
+which is why the newest commit on `main` is briefly absent from the table.
 
 | Version | Commit | Date | Title |
 | --- | --- | --- | --- |
@@ -23,6 +24,7 @@ numbering here is the source of truth either way.
 | [v0.11](#v011--security-and-image-documentation) | `6fe6de8` | 2026-08-05 | Document the EXIF stripping, the USAGE revoke, and the RLS-on-new-tables rule |
 | [v0.12](#v012--e2e-port-guard) | `4b426f6` | 2026-08-05 | Reclaim an orphaned e2e server instead of refusing to run |
 | [v0.13](#v013--migrations-run-from-the-build) | `11bdce9` | 2026-08-06 | Apply migrations from the build, on production deploys only |
+| [v0.14](#v014--changelog-through-v013) | `6993e31` | 2026-08-06 | Document v0.7 through v0.13 in the CHANGELOG |
 
 ---
 
@@ -496,3 +498,15 @@ Migrations now run while the **previous** release is still serving, so every
 migration must be backward-compatible with the release before it. Add columns;
 do not rename or drop them in the same deploy that stops using them. Widen now,
 narrow in a later deploy once nothing reads the old shape.
+
+---
+
+## v0.14 — Changelog through v0.13
+
+**Commit** `6993e31` · 2026-08-06 · 1 file, +203 −3
+
+Documentation only. Numbers the seven commits since `v0.7`.
+
+Corrects a claim in this file's own header while there: it stated the repo
+carried no git tags, which stopped being true in the very commit that wrote the
+sentence — `v0.0`–`v0.6` were tagged by it.
