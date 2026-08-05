@@ -13,6 +13,10 @@ next-env.d.ts
 /test-results/
 /playwright-report/
 /playwright/.cache/
+# Runtime handle for the e2e server, written by e2e/server-control.ts. Transient
+# by nature, and a committed one would name a PID from someone else's machine —
+# which the harness now reads as "an orphan of mine is holding the port".
+/e2e/.server.pid
 .DS_Store
 *.pem
 npm-debug.log*

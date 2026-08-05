@@ -55,20 +55,38 @@ async function waitUntilReady(timeoutMs = 60_000): Promise<void> {
 }
 
 export async function startServer(): Promise<void> {
-  // Refuse to start on top of a server this run did not spawn.
+  // Never start on top of a server this run did not spawn.
   //
   // Without this the suite can report a completely false result: an orphan from a
   // previous run (one killed before global teardown, so its PID file was never
   // consumed) keeps holding the port, the freshly spawned `next start` silently
   // fails to bind, and waitUntilReady() is satisfied by the ORPHAN's reply. Every
   // spec then runs green or red against a stale build while appearing to test the
-  // working tree. Failing loudly here is far better than testing the wrong code.
+  // working tree.
+  //
+  // There are two ways to reach an occupied port, and they deserve different
+  // answers. If a PID file is present, the occupant is an orphan THIS HARNESS
+  // spawned and then lost — that is not ambiguous, and reclaiming it is strictly
+  // better than making the next person run taskkill by hand. (An interrupted run
+  // leaves the file behind precisely because teardown is what removes it.) With
+  // no PID file the occupant is something else entirely, and guessing is how you
+  // kill a developer's own dev server, so that still refuses.
   if (await ping()) {
-    throw new Error(
-      `Refusing to start the e2e server: something is already listening on port ${PORT}. ` +
-        `It is most likely an orphaned server from an interrupted run, which would make this ` +
-        `run test a stale build. Kill the process holding the port and try again.`
-    );
+    if (existsSync(PID_FILE)) {
+      await stopServer();
+      if (await ping()) {
+        throw new Error(
+          `Port ${PORT} is still held after stopping the orphaned server from a previous run. ` +
+            `Kill the process holding it and try again.`
+        );
+      }
+    } else {
+      throw new Error(
+        `Refusing to start the e2e server: something is already listening on port ${PORT}, ` +
+          `and it was not started by this harness (no PID file). Testing against it would ` +
+          `report results for code that is not in this working tree. Kill it and try again.`
+      );
+    }
   }
 
   const nextBin = join(process.cwd(), "node_modules", ".bin", isWin ? "next.cmd" : "next");
