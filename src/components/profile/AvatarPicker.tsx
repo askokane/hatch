@@ -46,12 +46,15 @@ export function AvatarPicker({
   // Client-side triage: a courtesy that saves a pointless round trip, never the
   // guard. /api/avatar re-checks both type and size against the same constants,
   // because anything decided here can be skipped by posting to the route directly.
-  function reject(file: File): string | null {
+  //
+  // Type is checked up front; SIZE IS NOT, and that ordering is the point. The
+  // cap applies to what gets uploaded, and what gets uploaded is the 256 px
+  // re-encode — so checking the original would reject an ordinary 4 MB phone
+  // photo that downscales to about fifty kilobytes. Rejecting a picture we were
+  // about to shrink anyway is the wrong answer to the wrong question.
+  function rejectType(file: File): string | null {
     if (!IMAGE_MIME.includes(file.type)) {
       return `${file.name || "That file"} isn't a supported image — use JPEG, PNG, GIF or WebP.`;
-    }
-    if (file.size > AVATAR_BYTES_MAX) {
-      return `${file.name} is ${formatBytes(file.size)} — profile pictures cap at ${formatBytes(AVATAR_BYTES_MAX)}.`;
     }
     return null;
   }
@@ -64,7 +67,7 @@ export function AvatarPicker({
     if (!file) return;
 
     setError(null);
-    const problem = reject(file);
+    const problem = rejectType(file);
     if (problem) {
       setError(problem);
       return;
@@ -72,12 +75,22 @@ export function AvatarPicker({
 
     setBusy("upload");
 
-    // Downscale before the wire, not after. The cap is checked against what the
-    // user picked (above) so the error message names the file they chose, but
-    // what actually travels is the 256 px re-encode — a fraction of the bytes,
-    // and the size everyone else's browser will be fetching on every people
-    // search. Falls back to the original file on any failure.
+    // Downscale before the wire. Falls back to the original file on any failure
+    // — an animated GIF, a browser without a usable canvas, an image that was
+    // already smaller than the re-encode.
     const upload = await downscaleAvatar(file);
+
+    // Now the size check, against what is actually about to travel. This only
+    // trips when the downscale could not help, which is why the message says so
+    // rather than quoting a limit the user cannot act on.
+    if (upload.size > AVATAR_BYTES_MAX) {
+      setBusy(null);
+      setError(
+        `That image is ${formatBytes(upload.size)} and couldn't be shrunk below ` +
+          `${formatBytes(AVATAR_BYTES_MAX)}. Try a JPEG or PNG rather than an animated GIF.`
+      );
+      return;
+    }
 
     const form = new FormData();
     form.append("file", upload);
@@ -164,12 +177,15 @@ export function AvatarPicker({
             )}
           </div>
 
+          {/* No byte limit quoted: the cap applies to the resized copy, not to
+              what you pick, so naming it would only make people compress photos
+              by hand for no reason. */}
           <p className="mono mt-2 text-2xs text-ink-muted">
-            JPEG, PNG, GIF or WebP · up to {formatBytes(AVATAR_BYTES_MAX)}. Saves immediately —
-            it does not wait for &ldquo;Save changes&rdquo;.
+            JPEG, PNG, GIF or WebP · large photos are resized automatically. Saves
+            immediately — it does not wait for &ldquo;Save changes&rdquo;.
           </p>
           <p className="mono mt-1 text-2xs text-ink-muted">
-            With no photo, your generated pattern is used.
+            Location data is removed. With no photo, your generated pattern is used.
           </p>
 
           {error && (
