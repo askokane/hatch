@@ -162,15 +162,19 @@ because `postgres` owns these tables and has `rolbypassrls`, which
 The line that actually settles it is `anon_can_select` on `User`, `Session`,
 `PasswordResetToken`, `Message` and `MediaAsset` — all false.
 
-Two residuals, both known, both verified harmless. The migration's own header is
-more confident than this about the second one; trust this paragraph:
+Migration `20260805150000_revoke_public_schema_usage` then closes the inherited
+half. Postgres grants schema `USAGE` to the pseudo-role `PUBLIC`, which every role
+inherits, so the targeted `REVOKE ... FROM anon` in the previous migration was a
+silent no-op — `has_schema_privilege` kept returning true. Revoking from `PUBLIC`
+is what actually removes it, and the migration re-grants `CURRENT_USER`
+explicitly so it is also safe on a plain Postgres, where the application would
+otherwise have been relying on that same inherited grant. This is defence in
+depth rather than a fix for an exploitable gap — USAGE alone confers no data
+access, since reading a row also needs a table privilege — but it is the one part
+of the lockdown that is structural rather than per-object, so a future table
+inherits nothing.
 
-- **Schema `USAGE` is still effectively held** by `anon`. Postgres grants USAGE on
-  `public` to the pseudo-role `PUBLIC`, which every role inherits, so the targeted
-  `REVOKE ... FROM anon` is a silent no-op; closing it means
-  `REVOKE USAGE ON SCHEMA public FROM PUBLIC`, which reaches well beyond these two
-  roles. It confers no data access on its own — reading a row also needs a table
-  privilege, and those are gone.
+One residual remains, known and verified harmless:
 - **`supabase_admin`'s default privileges** on `public` still name `anon`. Clearing
   them needs membership in that role, which `postgres` does not have, so the
   migration's handler logs and carries on. It governs only objects created *by*
@@ -182,6 +186,41 @@ grants, which are the equivalent of the database password and secret by design.
 
 If this project ever does adopt the Supabase client libraries, re-grant per-table
 alongside real RLS policies — not wholesale back to the default.
+
+**Enabling RLS on a new table is not automatic.** The migration covered the tables
+that existed when it ran, and the usual way to automate the rest — an event trigger
+on `CREATE TABLE` — needs superuser, which this role does not have. So it is a rule
+instead: a migration that adds a table adds
+`ALTER TABLE "X" ENABLE ROW LEVEL SECURITY;` in the same file. `npm run audit:db`
+exits non-zero if one is missed, along with any `anon` grant or any default
+privilege that would re-open the schema, so it is worth running in CI rather than
+by hand.
+
+## Uploaded images
+
+- **EXIF is stripped server-side, on every image upload.** Bytes used to be stored
+  and served verbatim, so a photo off a phone disclosed the GPS coordinates of
+  wherever it was taken to any signed-in member — on a network whose premise is
+  strangers meeting to collaborate, with the picture on every screen.
+  `src/lib/image-metadata.ts` removes the EXIF/XMP/comment segments from JPEG, PNG
+  and WebP with no new dependency. It is a metadata remover, not a re-encoder:
+  pixels are never touched. Every parser is bounds-checked and forward-only, and
+  bails to the original file rather than emit something corrupt — a file we cannot
+  parse is one whose metadata we also cannot locate, and rejecting all such uploads
+  would refuse legitimate images to no benefit. GIF is passed through: it has no
+  EXIF container, and cameras do not produce GIFs.
+- **The client downscales before uploading, and that is the bandwidth fix, not the
+  privacy one.** An avatar is drawn at 24–72 px and was shipping at whatever the
+  phone produced; a people search renders twenty of them. `lib/image-resize.ts`
+  re-encodes to 256 px through a canvas, typically turning megabytes into tens of
+  kilobytes. Re-encoding also discards metadata — but as a *side effect*, and it is
+  skippable by posting to the route directly, which is exactly why the server pass
+  above is what the guarantee rests on.
+- **The size cap is checked against the resized copy, not the file you picked.**
+  Checking the original would reject an ordinary 4 MB phone photo that downscales
+  to about fifty kilobytes. Type is checked up front, since that answer cannot
+  change; size is checked after the downscale, where it only trips when resizing
+  genuinely could not help.
 
 ## Load characteristics
 
