@@ -3,7 +3,12 @@
 import { db } from "@/lib/db";
 import { requireSession } from "@/lib/session";
 import { catalogSlug } from "@/lib/catalog-slug";
-import { CATALOG_SUGGESTION_LIMIT, TAG_LABEL_MAX, TAG_LABEL_MIN } from "@/lib/constants";
+import {
+  CATALOG_SUGGESTION_LIMIT,
+  TAG_ALIAS_SCAN_MAX,
+  TAG_LABEL_MAX,
+  TAG_LABEL_MIN,
+} from "@/lib/constants";
 import { ok, fail, type ActionResult } from "@/lib/action-result";
 
 export type TagDTO = { id: string; slug: string; label: string; kind: string };
@@ -38,13 +43,18 @@ export async function searchTagsAction(
   // is a Json array, which Prisma cannot search element-wise here.
   //
   // The `NOT aliases = []` filter is what keeps that affordable now that the
-  // taxonomy is user-grown rather than a fixed ~100 seeded rows. Only curated
+  // taxonomy is user-grown rather than a fixed set of seeded rows. Only curated
   // rows carry aliases — createTagAction() deliberately writes none — so this
   // scans the curated set alone, and no amount of user-created tags can push a
   // seeded row out of the `take` window and silently break "k8s".
+  //
+  // TAG_ALIAS_SCAN_MAX is the bound on that curated set, and it has to stay
+  // ahead of it: the catalog expansion took the set from 99 rows to 326. See
+  // the note on the constant for why the answer past a certain size is an
+  // indexed table rather than a larger number.
   const aliased = await db.tag.findMany({
     where: { ...(kind ? { kind } : {}), NOT: { aliases: { equals: [] } } },
-    take: 500,
+    take: TAG_ALIAS_SCAN_MAX,
   });
   const aliasMatches = aliased.filter((t) => {
     const aliases = (t.aliases as unknown as string[]) ?? [];

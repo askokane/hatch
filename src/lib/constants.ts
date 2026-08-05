@@ -99,6 +99,24 @@ export const TAG_LABEL_MAX = 40;
 // Type-ahead results per dropdown.
 export const CATALOG_SUGGESTION_LIMIT = 20;
 
+// Ceiling on the alias scan in searchTagsAction.
+//
+// Alias matching ("k8s" → Kubernetes) cannot be done in the database: `aliases`
+// is a Json array and Prisma cannot search it element-wise, so the rows that
+// carry aliases are pulled into memory and filtered there. Only curated rows
+// have aliases — createTagAction deliberately writes none — so this scans the
+// curated set alone, never the user-grown tail.
+//
+// It was 500 when the curated set was 99 rows. The catalog expansion added 227,
+// taking it to 326, and a bound sized for the old set is the kind of thing that
+// stops working silently: past the limit, alias lookups for whichever rows fall
+// outside the window simply stop resolving, with no error. 2000 restores a wide
+// margin.
+//
+// This is a stopgap, not a design. If the curated set ever approaches this
+// number, the fix is a real TagAlias table with an index — not a bigger constant.
+export const TAG_ALIAS_SCAN_MAX = 2000;
+
 // Pagination
 export const PAGE_SIZE = 20;
 

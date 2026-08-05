@@ -1,0 +1,8114 @@
+[
+  {
+    "slug": "aalborg-university",
+    "name": "Aalborg University",
+    "country": "Denmark",
+    "sitelinks": 28
+  },
+  {
+    "slug": "aalto-university",
+    "name": "Aalto University",
+    "country": "Finland",
+    "sitelinks": 34
+  },
+  {
+    "slug": "aarhus-university",
+    "name": "Aarhus University",
+    "country": "Denmark",
+    "sitelinks": 43
+  },
+  {
+    "slug": "aberystwyth-university",
+    "name": "Aberystwyth University",
+    "country": "United Kingdom",
+    "sitelinks": 31
+  },
+  {
+    "slug": "abkhazian-state-university",
+    "name": "Abkhazian State University",
+    "country": "Georgia",
+    "sitelinks": 20
+  },
+  {
+    "slug": "abo-akademi-university",
+    "name": "Åbo Akademi University",
+    "country": "Finland",
+    "sitelinks": 32
+  },
+  {
+    "slug": "academia-europaea",
+    "name": "Academia Europaea",
+    "country": "United Kingdom",
+    "sitelinks": 36
+  },
+  {
+    "slug": "academia-sinica",
+    "name": "Academia Sinica",
+    "country": "Taiwan",
+    "sitelinks": 25
+  },
+  {
+    "slug": "academia-valenciana-de-la-llengua",
+    "name": "Acadèmia Valenciana de la Llengua",
+    "country": "Spain",
+    "sitelinks": 22
+  },
+  {
+    "slug": "academie-colarossi",
+    "name": "Académie Colarossi",
+    "country": "France",
+    "sitelinks": 23
+  },
+  {
+    "slug": "academie-de-la-grande-chaumiere",
+    "name": "Académie de la Grande Chaumière",
+    "country": "France",
+    "sitelinks": 25
+  },
+  {
+    "slug": "academie-des-beaux-arts",
+    "name": "Académie des beaux-arts",
+    "country": "France",
+    "sitelinks": 40
+  },
+  {
+    "slug": "academie-des-inscriptions-et-belles-lettres",
+    "name": "Académie des Inscriptions et Belles-Lettres",
+    "country": "France",
+    "sitelinks": 31
+  },
+  {
+    "slug": "academie-francaise",
+    "name": "Académie Française",
+    "country": "France",
+    "sitelinks": 78
+  },
+  {
+    "slug": "academie-julian",
+    "name": "Académie Julian",
+    "country": "France",
+    "sitelinks": 38
+  },
+  {
+    "slug": "academie-royale-de-peinture-et-de-sculpture",
+    "name": "Académie royale de peinture et de sculpture",
+    "country": "France",
+    "sitelinks": 30
+  },
+  {
+    "slug": "academy-of-arts-berlin",
+    "name": "Academy of Arts, Berlin",
+    "country": "Germany",
+    "sitelinks": 25
+  },
+  {
+    "slug": "academy-of-athens",
+    "name": "Academy of Athens",
+    "country": "Greece",
+    "sitelinks": 25
+  },
+  {
+    "slug": "academy-of-esperanto",
+    "name": "Academy of Esperanto",
+    "country": "",
+    "sitelinks": 48
+  },
+  {
+    "slug": "academy-of-fine-arts-vienna",
+    "name": "Academy of Fine Arts Vienna",
+    "country": "Austria",
+    "sitelinks": 38
+  },
+  {
+    "slug": "academy-of-fine-arts-florence",
+    "name": "Academy of Fine Arts, Florence",
+    "country": "Italy",
+    "sitelinks": 26
+  },
+  {
+    "slug": "academy-of-fine-arts-munich",
+    "name": "Academy of Fine Arts, Munich",
+    "country": "Germany",
+    "sitelinks": 33
+  },
+  {
+    "slug": "academy-of-fine-arts-umea",
+    "name": "Academy of Fine Arts, Umeå",
+    "country": "Sweden",
+    "sitelinks": 23
+  },
+  {
+    "slug": "academy-of-gondishapur",
+    "name": "Academy of Gondishapur",
+    "country": "Abbasid Caliphate",
+    "sitelinks": 28
+  },
+  {
+    "slug": "academy-of-motion-picture-arts-and-sciences",
+    "name": "Academy of Motion Picture Arts and Sciences",
+    "country": "United States",
+    "sitelinks": 62
+  },
+  {
+    "slug": "academy-of-performing-arts",
+    "name": "Academy of Performing Arts",
+    "country": "Czech Republic",
+    "sitelinks": 27
+  },
+  {
+    "slug": "academy-of-persian-language-and-literature",
+    "name": "Academy of Persian Language and Literature",
+    "country": "Iran",
+    "sitelinks": 24
+  },
+  {
+    "slug": "academy-of-sciences-and-arts-of-kosovo",
+    "name": "Academy of Sciences and Arts of Kosovo",
+    "country": "Kosovo",
+    "sitelinks": 28
+  },
+  {
+    "slug": "academy-of-sciences-of-albania",
+    "name": "Academy of Sciences of Albania",
+    "country": "Albania",
+    "sitelinks": 33
+  },
+  {
+    "slug": "academy-of-sciences-of-lisbon",
+    "name": "Academy of Sciences of Lisbon",
+    "country": "Portugal",
+    "sitelinks": 21
+  },
+  {
+    "slug": "academy-of-sciences-of-the-ussr",
+    "name": "Academy of Sciences of the USSR",
+    "country": "Soviet Union",
+    "sitelinks": 29
+  },
+  {
+    "slug": "academy-of-the-hebrew-language",
+    "name": "Academy of the Hebrew Language",
+    "country": "Israel",
+    "sitelinks": 57
+  },
+  {
+    "slug": "accademia-della-crusca",
+    "name": "Accademia della Crusca",
+    "country": "Italy",
+    "sitelinks": 32
+  },
+  {
+    "slug": "accademia-di-san-luca",
+    "name": "Accademia di San Luca",
+    "country": "Italy",
+    "sitelinks": 22
+  },
+  {
+    "slug": "accademia-nazionale-dei-lincei",
+    "name": "Accademia Nazionale dei Lincei",
+    "country": "Italy",
+    "sitelinks": 29
+  },
+  {
+    "slug": "accademia-nazionale-di-santa-cecilia",
+    "name": "Accademia Nazionale di Santa Cecilia",
+    "country": "Italy",
+    "sitelinks": 29
+  },
+  {
+    "slug": "adam-mickiewicz-university-in-poznan",
+    "name": "Adam Mickiewicz University in Poznań",
+    "country": "Poland",
+    "sitelinks": 35
+  },
+  {
+    "slug": "addis-ababa-university",
+    "name": "Addis Ababa University",
+    "country": "Ethiopia",
+    "sitelinks": 33
+  },
+  {
+    "slug": "agh-university-of-science-and-technology",
+    "name": "AGH University of Science and Technology",
+    "country": "Poland",
+    "sitelinks": 21
+  },
+  {
+    "slug": "agroparistech-paris-saclay-university",
+    "name": "AgroParisTech, Paris-Saclay University",
+    "country": "France",
+    "sitelinks": 23
+  },
+  {
+    "slug": "ahmadu-bello-university",
+    "name": "Ahmadu Bello University",
+    "country": "Nigeria",
+    "sitelinks": 22
+  },
+  {
+    "slug": "ain-shams-university",
+    "name": "Ain Shams University",
+    "country": "Egypt",
+    "sitelinks": 32
+  },
+  {
+    "slug": "airlangga-university",
+    "name": "Airlangga University",
+    "country": "Indonesia",
+    "sitelinks": 40
+  },
+  {
+    "slug": "aix-marseille-university",
+    "name": "Aix-Marseille University",
+    "country": "France",
+    "sitelinks": 40
+  },
+  {
+    "slug": "al-aqsa-university",
+    "name": "al-Aqsa University",
+    "country": "Palestine",
+    "sitelinks": 22
+  },
+  {
+    "slug": "al-azhar-university",
+    "name": "Al-Azhar University",
+    "country": "Egypt",
+    "sitelinks": 88
+  },
+  {
+    "slug": "al-azhar-university-gaza",
+    "name": "Al-Azhar University – Gaza",
+    "country": "Palestine",
+    "sitelinks": 20
+  },
+  {
+    "slug": "al-farabi-kazakh-national-university",
+    "name": "Al-Farabi Kazakh National University",
+    "country": "Kazakhstan",
+    "sitelinks": 27
+  },
+  {
+    "slug": "al-mustansiriya-university",
+    "name": "Al-Mustansiriya University",
+    "country": "Iraq",
+    "sitelinks": 23
+  },
+  {
+    "slug": "alexandria-university",
+    "name": "Alexandria University",
+    "country": "Egypt",
+    "sitelinks": 34
+  },
+  {
+    "slug": "alexandru-ioan-cuza-university",
+    "name": "Alexandru Ioan Cuza University",
+    "country": "Romania",
+    "sitelinks": 33
+  },
+  {
+    "slug": "aligarh-muslim-university",
+    "name": "Aligarh Muslim University",
+    "country": "India",
+    "sitelinks": 35
+  },
+  {
+    "slug": "all-souls-college",
+    "name": "All Souls College",
+    "country": "United Kingdom",
+    "sitelinks": 30
+  },
+  {
+    "slug": "american-academy-of-arts-and-letters",
+    "name": "American Academy of Arts and Letters",
+    "country": "United States",
+    "sitelinks": 24
+  },
+  {
+    "slug": "american-academy-of-dramatic-arts",
+    "name": "American Academy of Dramatic Arts",
+    "country": "United States",
+    "sitelinks": 28
+  },
+  {
+    "slug": "american-film-institute",
+    "name": "American Film Institute",
+    "country": "United States",
+    "sitelinks": 56
+  },
+  {
+    "slug": "american-university",
+    "name": "American University",
+    "country": "United States",
+    "sitelinks": 31
+  },
+  {
+    "slug": "american-university-of-armenia",
+    "name": "American University of Armenia",
+    "country": "Armenia",
+    "sitelinks": 20
+  },
+  {
+    "slug": "american-university-of-beirut",
+    "name": "American University of Beirut",
+    "country": "Lebanon",
+    "sitelinks": 47
+  },
+  {
+    "slug": "amherst-college",
+    "name": "Amherst College",
+    "country": "United States",
+    "sitelinks": 30
+  },
+  {
+    "slug": "anadolu-university",
+    "name": "Anadolu University",
+    "country": "Turkey",
+    "sitelinks": 24
+  },
+  {
+    "slug": "anglia-ruskin-university",
+    "name": "Anglia Ruskin University",
+    "country": "United Kingdom",
+    "sitelinks": 29
+  },
+  {
+    "slug": "ankara-university",
+    "name": "Ankara University",
+    "country": "Turkey",
+    "sitelinks": 40
+  },
+  {
+    "slug": "ariel-university",
+    "name": "Ariel University",
+    "country": "Israel",
+    "sitelinks": 25
+  },
+  {
+    "slug": "aristotle-university-of-thessaloniki",
+    "name": "Aristotle University of Thessaloniki",
+    "country": "Greece",
+    "sitelinks": 37
+  },
+  {
+    "slug": "arizona-state-university",
+    "name": "Arizona State University",
+    "country": "United States",
+    "sitelinks": 44
+  },
+  {
+    "slug": "arkansas-state-university",
+    "name": "Arkansas State University",
+    "country": "United States",
+    "sitelinks": 20
+  },
+  {
+    "slug": "arts-et-metiers-paristech",
+    "name": "Arts et Métiers ParisTech",
+    "country": "France",
+    "sitelinks": 33
+  },
+  {
+    "slug": "aston-university",
+    "name": "Aston University",
+    "country": "United Kingdom",
+    "sitelinks": 29
+  },
+  {
+    "slug": "ateneo-de-manila-university",
+    "name": "Ateneo de Manila University",
+    "country": "Philippines",
+    "sitelinks": 24
+  },
+  {
+    "slug": "athens-university-of-economics-and-business",
+    "name": "Athens University of Economics and Business",
+    "country": "Greece",
+    "sitelinks": 20
+  },
+  {
+    "slug": "auburn-university",
+    "name": "Auburn University",
+    "country": "United States",
+    "sitelinks": 34
+  },
+  {
+    "slug": "auckland-university-of-technology",
+    "name": "Auckland University of Technology",
+    "country": "New Zealand",
+    "sitelinks": 22
+  },
+  {
+    "slug": "audencia-business-school",
+    "name": "Audencia Business School",
+    "country": "France",
+    "sitelinks": 36
+  },
+  {
+    "slug": "austral-university-of-chile",
+    "name": "Austral University of Chile",
+    "country": "Chile",
+    "sitelinks": 24
+  },
+  {
+    "slug": "australian-national-university",
+    "name": "Australian National University",
+    "country": "Australia",
+    "sitelinks": 57
+  },
+  {
+    "slug": "austrian-academy-of-sciences",
+    "name": "Austrian Academy of Sciences",
+    "country": "Austria",
+    "sitelinks": 34
+  },
+  {
+    "slug": "autonomous-university-of-barcelona",
+    "name": "Autonomous University of Barcelona",
+    "country": "Spain",
+    "sitelinks": 31
+  },
+  {
+    "slug": "autonomous-university-of-madrid",
+    "name": "Autonomous University of Madrid",
+    "country": "Spain",
+    "sitelinks": 33
+  },
+  {
+    "slug": "azerbaijan-national-academy-of-sciences",
+    "name": "Azerbaijan National Academy of Sciences",
+    "country": "Azerbaijan",
+    "sitelinks": 55
+  },
+  {
+    "slug": "azerbaijan-state-university-of-economics",
+    "name": "Azerbaijan State University of Economics",
+    "country": "Azerbaijan",
+    "sitelinks": 25
+  },
+  {
+    "slug": "azerbaijan-technical-university",
+    "name": "Azerbaijan Technical University",
+    "country": "Azerbaijan",
+    "sitelinks": 31
+  },
+  {
+    "slug": "babes-bolyai-university",
+    "name": "Babeș-Bolyai University",
+    "country": "Romania",
+    "sitelinks": 33
+  },
+  {
+    "slug": "baku-state-university",
+    "name": "Baku State University",
+    "country": "Azerbaijan",
+    "sitelinks": 70
+  },
+  {
+    "slug": "ball-state-university",
+    "name": "Ball State University",
+    "country": "United States",
+    "sitelinks": 20
+  },
+  {
+    "slug": "balliol-college",
+    "name": "Balliol College",
+    "country": "United Kingdom",
+    "sitelinks": 32
+  },
+  {
+    "slug": "banaras-hindu-university",
+    "name": "Banaras Hindu University",
+    "country": "India",
+    "sitelinks": 41
+  },
+  {
+    "slug": "bandung-institute-of-technology",
+    "name": "Bandung Institute of Technology",
+    "country": "Indonesia",
+    "sitelinks": 29
+  },
+  {
+    "slug": "bangor-university",
+    "name": "Bangor University",
+    "country": "United Kingdom",
+    "sitelinks": 27
+  },
+  {
+    "slug": "bar-ilan-university",
+    "name": "Bar-Ilan University",
+    "country": "Israel",
+    "sitelinks": 37
+  },
+  {
+    "slug": "bard-college",
+    "name": "Bard College",
+    "country": "United States",
+    "sitelinks": 22
+  },
+  {
+    "slug": "barnard-college",
+    "name": "Barnard College",
+    "country": "United States",
+    "sitelinks": 29
+  },
+  {
+    "slug": "bates-college",
+    "name": "Bates College",
+    "country": "United States",
+    "sitelinks": 21
+  },
+  {
+    "slug": "bauman-moscow-state-technical-university",
+    "name": "Bauman Moscow State Technical University",
+    "country": "Russia",
+    "sitelinks": 34
+  },
+  {
+    "slug": "bavarian-academy-of-sciences-and-humanities",
+    "name": "Bavarian Academy of Sciences and Humanities",
+    "country": "Germany",
+    "sitelinks": 29
+  },
+  {
+    "slug": "baylor-university",
+    "name": "Baylor University",
+    "country": "United States",
+    "sitelinks": 28
+  },
+  {
+    "slug": "beaux-arts-de-paris",
+    "name": "Beaux-Arts de Paris",
+    "country": "France",
+    "sitelinks": 42
+  },
+  {
+    "slug": "beihang-university",
+    "name": "Beihang University",
+    "country": "People's Republic of China",
+    "sitelinks": 22
+  },
+  {
+    "slug": "beijing-film-academy",
+    "name": "Beijing Film Academy",
+    "country": "People's Republic of China",
+    "sitelinks": 21
+  },
+  {
+    "slug": "beijing-foreign-studies-university",
+    "name": "Beijing Foreign Studies University",
+    "country": "People's Republic of China",
+    "sitelinks": 31
+  },
+  {
+    "slug": "beijing-normal-university",
+    "name": "Beijing Normal University",
+    "country": "People's Republic of China",
+    "sitelinks": 31
+  },
+  {
+    "slug": "belarusian-state-university",
+    "name": "Belarusian State University",
+    "country": "Belarus",
+    "sitelinks": 35
+  },
+  {
+    "slug": "belarusian-state-university-of-informatics-and-radioelectronics",
+    "name": "Belarusian State University of Informatics and Radioelectronics",
+    "country": "Belarus",
+    "sitelinks": 23
+  },
+  {
+    "slug": "ben-gurion-university-of-the-negev",
+    "name": "Ben-Gurion University of the Negev",
+    "country": "Israel",
+    "sitelinks": 38
+  },
+  {
+    "slug": "berklee-college-of-music",
+    "name": "Berklee College of Music",
+    "country": "United States",
+    "sitelinks": 39
+  },
+  {
+    "slug": "berlin-university-of-the-arts",
+    "name": "Berlin University of the Arts",
+    "country": "Germany",
+    "sitelinks": 29
+  },
+  {
+    "slug": "bezalel-academy-of-art-and-design",
+    "name": "Bezalel Academy of Art and Design",
+    "country": "Israel",
+    "sitelinks": 37
+  },
+  {
+    "slug": "bielefeld-university",
+    "name": "Bielefeld University",
+    "country": "Germany",
+    "sitelinks": 21
+  },
+  {
+    "slug": "bifrost-university",
+    "name": "Bifröst University",
+    "country": "Iceland",
+    "sitelinks": 24
+  },
+  {
+    "slug": "bilkent-university",
+    "name": "Bilkent University",
+    "country": "Turkey",
+    "sitelinks": 26
+  },
+  {
+    "slug": "binghamton-university",
+    "name": "Binghamton University",
+    "country": "United States",
+    "sitelinks": 27
+  },
+  {
+    "slug": "birkbeck-university-of-london",
+    "name": "Birkbeck, University of London",
+    "country": "United Kingdom",
+    "sitelinks": 30
+  },
+  {
+    "slug": "birzeit-university",
+    "name": "Birzeit University",
+    "country": "Palestine",
+    "sitelinks": 23
+  },
+  {
+    "slug": "black-mountain-college",
+    "name": "Black Mountain College",
+    "country": "United States",
+    "sitelinks": 21
+  },
+  {
+    "slug": "bocconi-university",
+    "name": "Bocconi University",
+    "country": "Italy",
+    "sitelinks": 42
+  },
+  {
+    "slug": "bogazici-university",
+    "name": "Boğaziçi University",
+    "country": "Turkey",
+    "sitelinks": 39
+  },
+  {
+    "slug": "bond-university",
+    "name": "Bond University",
+    "country": "Australia",
+    "sitelinks": 20
+  },
+  {
+    "slug": "boston-college",
+    "name": "Boston College",
+    "country": "United States",
+    "sitelinks": 37
+  },
+  {
+    "slug": "boston-university",
+    "name": "Boston University",
+    "country": "United States",
+    "sitelinks": 70
+  },
+  {
+    "slug": "bowdoin-college",
+    "name": "Bowdoin College",
+    "country": "United States",
+    "sitelinks": 22
+  },
+  {
+    "slug": "bowling-green-state-university",
+    "name": "Bowling Green State University",
+    "country": "United States",
+    "sitelinks": 24
+  },
+  {
+    "slug": "brandeis-university",
+    "name": "Brandeis University",
+    "country": "United States",
+    "sitelinks": 38
+  },
+  {
+    "slug": "brasenose-college",
+    "name": "Brasenose College",
+    "country": "United Kingdom",
+    "sitelinks": 29
+  },
+  {
+    "slug": "brazilian-academy-of-letters",
+    "name": "Brazilian Academy of Letters",
+    "country": "Brazil",
+    "sitelinks": 23
+  },
+  {
+    "slug": "brera-academy",
+    "name": "Brera Academy",
+    "country": "Italy",
+    "sitelinks": 23
+  },
+  {
+    "slug": "brigham-young-university",
+    "name": "Brigham Young University",
+    "country": "United States",
+    "sitelinks": 43
+  },
+  {
+    "slug": "british-academy",
+    "name": "British Academy",
+    "country": "United Kingdom",
+    "sitelinks": 41
+  },
+  {
+    "slug": "brno-university-of-technology",
+    "name": "Brno University of Technology",
+    "country": "Czech Republic",
+    "sitelinks": 23
+  },
+  {
+    "slug": "brock-university",
+    "name": "Brock University",
+    "country": "Canada",
+    "sitelinks": 20
+  },
+  {
+    "slug": "brooklyn-college",
+    "name": "Brooklyn College",
+    "country": "United States",
+    "sitelinks": 22
+  },
+  {
+    "slug": "brown-university",
+    "name": "Brown University",
+    "country": "United States",
+    "sitelinks": 74
+  },
+  {
+    "slug": "brunel-university-london",
+    "name": "Brunel University London",
+    "country": "United Kingdom",
+    "sitelinks": 35
+  },
+  {
+    "slug": "bryn-mawr-college",
+    "name": "Bryn Mawr College",
+    "country": "United States",
+    "sitelinks": 29
+  },
+  {
+    "slug": "budapest-university-of-technology-and-economics",
+    "name": "Budapest University of Technology and Economics",
+    "country": "Hungary",
+    "sitelinks": 30
+  },
+  {
+    "slug": "bulgarian-academy-of-sciences",
+    "name": "Bulgarian Academy of Sciences",
+    "country": "Bulgaria",
+    "sitelinks": 30
+  },
+  {
+    "slug": "ca-foscari-university-of-venice",
+    "name": "Ca' Foscari University of Venice",
+    "country": "Italy",
+    "sitelinks": 34
+  },
+  {
+    "slug": "cairo-university",
+    "name": "Cairo University",
+    "country": "Egypt",
+    "sitelinks": 62
+  },
+  {
+    "slug": "california-academy-of-sciences",
+    "name": "California Academy of Sciences",
+    "country": "United States",
+    "sitelinks": 25
+  },
+  {
+    "slug": "california-institute-of-technology",
+    "name": "California Institute of Technology",
+    "country": "United States",
+    "sitelinks": 85
+  },
+  {
+    "slug": "california-institute-of-the-arts",
+    "name": "California Institute of the Arts",
+    "country": "United States",
+    "sitelinks": 22
+  },
+  {
+    "slug": "california-polytechnic-state-university",
+    "name": "California Polytechnic State University",
+    "country": "United States",
+    "sitelinks": 25
+  },
+  {
+    "slug": "california-state-university",
+    "name": "California State University",
+    "country": "United States",
+    "sitelinks": 36
+  },
+  {
+    "slug": "cankaya-university",
+    "name": "Çankaya University",
+    "country": "Turkey",
+    "sitelinks": 27
+  },
+  {
+    "slug": "cardiff-university",
+    "name": "Cardiff University",
+    "country": "United Kingdom",
+    "sitelinks": 45
+  },
+  {
+    "slug": "carleton-university",
+    "name": "Carleton University",
+    "country": "Canada",
+    "sitelinks": 31
+  },
+  {
+    "slug": "carnegie-mellon-university",
+    "name": "Carnegie Mellon University",
+    "country": "United States",
+    "sitelinks": 55
+  },
+  {
+    "slug": "case-western-reserve-university",
+    "name": "Case Western Reserve University",
+    "country": "United States",
+    "sitelinks": 29
+  },
+  {
+    "slug": "catholic-university-of-leuven",
+    "name": "Catholic University of Leuven",
+    "country": "Belgium",
+    "sitelinks": 32
+  },
+  {
+    "slug": "catholic-university-of-paris",
+    "name": "Catholic University of Paris",
+    "country": "France",
+    "sitelinks": 24
+  },
+  {
+    "slug": "catholic-university-of-the-most-holy-conception",
+    "name": "Catholic University of the Most Holy Conception",
+    "country": "Chile",
+    "sitelinks": 26
+  },
+  {
+    "slug": "catholic-university-of-the-sacred-heart",
+    "name": "Catholic University of the Sacred Heart",
+    "country": "Italy",
+    "sitelinks": 48
+  },
+  {
+    "slug": "central-european-university",
+    "name": "Central European University",
+    "country": "Austria",
+    "sitelinks": 67
+  },
+  {
+    "slug": "central-michigan-university",
+    "name": "Central Michigan University",
+    "country": "United States",
+    "sitelinks": 21
+  },
+  {
+    "slug": "central-university-of-venezuela",
+    "name": "Central University of Venezuela",
+    "country": "Venezuela",
+    "sitelinks": 29
+  },
+  {
+    "slug": "centralesupelec",
+    "name": "CentraleSupélec",
+    "country": "France",
+    "sitelinks": 51
+  },
+  {
+    "slug": "chalmers-university-of-technology",
+    "name": "Chalmers University of Technology",
+    "country": "Sweden",
+    "sitelinks": 34
+  },
+  {
+    "slug": "charite",
+    "name": "Charité",
+    "country": "Germany",
+    "sitelinks": 40
+  },
+  {
+    "slug": "charles-sturt-university",
+    "name": "Charles Sturt University",
+    "country": "Australia",
+    "sitelinks": 24
+  },
+  {
+    "slug": "charles-university",
+    "name": "Charles University",
+    "country": "Czech Republic",
+    "sitelinks": 83
+  },
+  {
+    "slug": "chernivtsi-university",
+    "name": "Chernivtsi University",
+    "country": "Ukraine",
+    "sitelinks": 30
+  },
+  {
+    "slug": "chiang-mai-university",
+    "name": "Chiang Mai University",
+    "country": "Thailand",
+    "sitelinks": 22
+  },
+  {
+    "slug": "chimie-paristech",
+    "name": "Chimie ParisTech",
+    "country": "France",
+    "sitelinks": 29
+  },
+  {
+    "slug": "chinese-academy-of-sciences",
+    "name": "Chinese Academy of Sciences",
+    "country": "People's Republic of China",
+    "sitelinks": 42
+  },
+  {
+    "slug": "chinese-academy-of-social-sciences",
+    "name": "Chinese Academy of Social Sciences",
+    "country": "People's Republic of China",
+    "sitelinks": 23
+  },
+  {
+    "slug": "chopin-university-of-music",
+    "name": "Chopin University of Music",
+    "country": "Poland",
+    "sitelinks": 20
+  },
+  {
+    "slug": "christ-church",
+    "name": "Christ Church",
+    "country": "United Kingdom",
+    "sitelinks": 33
+  },
+  {
+    "slug": "christ-s-college",
+    "name": "Christ's College",
+    "country": "United Kingdom",
+    "sitelinks": 31
+  },
+  {
+    "slug": "chulalongkorn-university",
+    "name": "Chulalongkorn University",
+    "country": "Thailand",
+    "sitelinks": 42
+  },
+  {
+    "slug": "chung-ang-university",
+    "name": "Chung-Ang University",
+    "country": "South Korea",
+    "sitelinks": 26
+  },
+  {
+    "slug": "city-college-of-new-york",
+    "name": "City College of New York",
+    "country": "United States",
+    "sitelinks": 35
+  },
+  {
+    "slug": "city-university-of-hong-kong",
+    "name": "City University of Hong Kong",
+    "country": "People's Republic of China",
+    "sitelinks": 20
+  },
+  {
+    "slug": "city-university-of-new-york",
+    "name": "City University of New York",
+    "country": "United States",
+    "sitelinks": 29
+  },
+  {
+    "slug": "city-university-of-london",
+    "name": "City, University of London",
+    "country": "United Kingdom",
+    "sitelinks": 32
+  },
+  {
+    "slug": "clare-college",
+    "name": "Clare College",
+    "country": "United Kingdom",
+    "sitelinks": 22
+  },
+  {
+    "slug": "clark-university",
+    "name": "Clark University",
+    "country": "United States",
+    "sitelinks": 26
+  },
+  {
+    "slug": "claude-bernard-university-lyon-1",
+    "name": "Claude Bernard University Lyon 1",
+    "country": "France",
+    "sitelinks": 20
+  },
+  {
+    "slug": "clemson-university",
+    "name": "Clemson University",
+    "country": "United States",
+    "sitelinks": 27
+  },
+  {
+    "slug": "clermont-school-of-business",
+    "name": "Clermont School of Business",
+    "country": "France",
+    "sitelinks": 29
+  },
+  {
+    "slug": "colgate-university",
+    "name": "Colgate University",
+    "country": "United States",
+    "sitelinks": 23
+  },
+  {
+    "slug": "college-de-france",
+    "name": "Collège de France",
+    "country": "France",
+    "sitelinks": 71
+  },
+  {
+    "slug": "college-of-europe",
+    "name": "College of Europe",
+    "country": "",
+    "sitelinks": 37
+  },
+  {
+    "slug": "college-of-william-mary",
+    "name": "College of William & Mary",
+    "country": "United States",
+    "sitelinks": 36
+  },
+  {
+    "slug": "colorado-state-university",
+    "name": "Colorado State University",
+    "country": "United States",
+    "sitelinks": 30
+  },
+  {
+    "slug": "columbia-university",
+    "name": "Columbia University",
+    "country": "United States",
+    "sitelinks": 96
+  },
+  {
+    "slug": "comenius-university",
+    "name": "Comenius University",
+    "country": "Slovakia",
+    "sitelinks": 43
+  },
+  {
+    "slug": "communist-university-of-the-national-minorities-of-the-west",
+    "name": "Communist University of the National Minorities of the West",
+    "country": "Soviet Union",
+    "sitelinks": 22
+  },
+  {
+    "slug": "communist-university-of-the-toilers-of-the-east",
+    "name": "Communist University of the Toilers of the East",
+    "country": "Soviet Union",
+    "sitelinks": 27
+  },
+  {
+    "slug": "complutense-university-of-madrid",
+    "name": "Complutense University of Madrid",
+    "country": "Spain",
+    "sitelinks": 56
+  },
+  {
+    "slug": "concordia-university",
+    "name": "Concordia University",
+    "country": "Canada",
+    "sitelinks": 29
+  },
+  {
+    "slug": "conservatoire-de-paris",
+    "name": "Conservatoire de Paris",
+    "country": "France",
+    "sitelinks": 39
+  },
+  {
+    "slug": "conservatoire-national-des-arts-et-metiers",
+    "name": "Conservatoire national des Arts et Métiers",
+    "country": "France",
+    "sitelinks": 69
+  },
+  {
+    "slug": "conservatoire-national-superieur-d-art-dramatique",
+    "name": "Conservatoire national supérieur d'art dramatique",
+    "country": "France",
+    "sitelinks": 27
+  },
+  {
+    "slug": "cooper-union",
+    "name": "Cooper Union",
+    "country": "United States",
+    "sitelinks": 24
+  },
+  {
+    "slug": "cornell-university",
+    "name": "Cornell University",
+    "country": "United States",
+    "sitelinks": 97
+  },
+  {
+    "slug": "corpus-christi-college",
+    "name": "Corpus Christi College",
+    "country": "United Kingdom",
+    "sitelinks": 25
+  },
+  {
+    "slug": "corvinus-university-of-budapest",
+    "name": "Corvinus University of Budapest",
+    "country": "Hungary",
+    "sitelinks": 25
+  },
+  {
+    "slug": "courant-institute-school-of-mathematics-computing-and-data-science",
+    "name": "Courant Institute School of Mathematics, Computing, and Data Science",
+    "country": "United States",
+    "sitelinks": 20
+  },
+  {
+    "slug": "courtauld-institute-of-art",
+    "name": "Courtauld Institute of Art",
+    "country": "United Kingdom",
+    "sitelinks": 27
+  },
+  {
+    "slug": "coventry-university",
+    "name": "Coventry University",
+    "country": "United Kingdom",
+    "sitelinks": 27
+  },
+  {
+    "slug": "cranfield-university",
+    "name": "Cranfield University",
+    "country": "United Kingdom",
+    "sitelinks": 22
+  },
+  {
+    "slug": "croatian-academy-of-sciences-and-arts",
+    "name": "Croatian Academy of Sciences and Arts",
+    "country": "Croatia",
+    "sitelinks": 28
+  },
+  {
+    "slug": "curtin-university",
+    "name": "Curtin University",
+    "country": "Australia",
+    "sitelinks": 28
+  },
+  {
+    "slug": "curtis-institute-of-music",
+    "name": "Curtis Institute of Music",
+    "country": "United States",
+    "sitelinks": 22
+  },
+  {
+    "slug": "czech-academy-of-sciences",
+    "name": "Czech Academy of Sciences",
+    "country": "Czech Republic",
+    "sitelinks": 26
+  },
+  {
+    "slug": "czech-technical-university-in-prague",
+    "name": "Czech Technical University in Prague",
+    "country": "Czech Republic",
+    "sitelinks": 32
+  },
+  {
+    "slug": "d-annunzio-university-of-chieti-pescara",
+    "name": "D'Annunzio University of Chieti–Pescara",
+    "country": "Italy",
+    "sitelinks": 20
+  },
+  {
+    "slug": "dalhousie-university",
+    "name": "Dalhousie University",
+    "country": "Canada",
+    "sitelinks": 30
+  },
+  {
+    "slug": "damascus-university",
+    "name": "Damascus University",
+    "country": "Syria",
+    "sitelinks": 43
+  },
+  {
+    "slug": "danish-language-council",
+    "name": "Danish Language Council",
+    "country": "Denmark",
+    "sitelinks": 21
+  },
+  {
+    "slug": "dartmouth-college",
+    "name": "Dartmouth College",
+    "country": "United States",
+    "sitelinks": 63
+  },
+  {
+    "slug": "deakin-university",
+    "name": "Deakin University",
+    "country": "Australia",
+    "sitelinks": 25
+  },
+  {
+    "slug": "delft-university-of-technology",
+    "name": "Delft University of Technology",
+    "country": "Netherlands",
+    "sitelinks": 44
+  },
+  {
+    "slug": "depaul-university",
+    "name": "DePaul University",
+    "country": "United States",
+    "sitelinks": 24
+  },
+  {
+    "slug": "dongguk-university",
+    "name": "Dongguk University",
+    "country": "South Korea",
+    "sitelinks": 23
+  },
+  {
+    "slug": "doshisha-university",
+    "name": "Doshisha University",
+    "country": "Japan",
+    "sitelinks": 28
+  },
+  {
+    "slug": "drexel-university",
+    "name": "Drexel University",
+    "country": "United States",
+    "sitelinks": 28
+  },
+  {
+    "slug": "dublin-city-university",
+    "name": "Dublin City University",
+    "country": "Ireland",
+    "sitelinks": 24
+  },
+  {
+    "slug": "duke-university",
+    "name": "Duke University",
+    "country": "United States",
+    "sitelinks": 74
+  },
+  {
+    "slug": "durham-university",
+    "name": "Durham University",
+    "country": "United Kingdom",
+    "sitelinks": 57
+  },
+  {
+    "slug": "dusseldorf-school-of-painting",
+    "name": "Düsseldorf school of painting",
+    "country": "Prussia",
+    "sitelinks": 27
+  },
+  {
+    "slug": "dutch-language-union",
+    "name": "Dutch Language Union",
+    "country": "Belgium",
+    "sitelinks": 38
+  },
+  {
+    "slug": "east-china-normal-university",
+    "name": "East China Normal University",
+    "country": "People's Republic of China",
+    "sitelinks": 36
+  },
+  {
+    "slug": "eastern-michigan-university",
+    "name": "Eastern Michigan University",
+    "country": "United States",
+    "sitelinks": 20
+  },
+  {
+    "slug": "ecole-centrale-de-lille",
+    "name": "École Centrale de Lille",
+    "country": "France",
+    "sitelinks": 34
+  },
+  {
+    "slug": "ecole-centrale-de-lyon",
+    "name": "École Centrale de Lyon",
+    "country": "France",
+    "sitelinks": 32
+  },
+  {
+    "slug": "ecole-centrale-de-nantes",
+    "name": "École Centrale de Nantes",
+    "country": "France",
+    "sitelinks": 21
+  },
+  {
+    "slug": "ecole-centrale-paris",
+    "name": "École Centrale Paris",
+    "country": "France",
+    "sitelinks": 25
+  },
+  {
+    "slug": "ecole-de-management-de-normandie",
+    "name": "École de management de Normandie",
+    "country": "Ireland",
+    "sitelinks": 29
+  },
+  {
+    "slug": "ecole-des-chartes",
+    "name": "École des chartes",
+    "country": "France",
+    "sitelinks": 44
+  },
+  {
+    "slug": "ecole-du-louvre",
+    "name": "École du Louvre",
+    "country": "France",
+    "sitelinks": 29
+  },
+  {
+    "slug": "ecole-militaire",
+    "name": "École Militaire",
+    "country": "France",
+    "sitelinks": 31
+  },
+  {
+    "slug": "ecole-nationale-d-administration",
+    "name": "École nationale d'administration",
+    "country": "France",
+    "sitelinks": 42
+  },
+  {
+    "slug": "ecole-nationale-des-ponts-et-chaussees",
+    "name": "École Nationale des Ponts et Chaussées",
+    "country": "France",
+    "sitelinks": 60
+  },
+  {
+    "slug": "ecole-nationale-superieure-de-mecanique-et-des-microtechniques",
+    "name": "École Nationale Supérieure de Mécanique et des Microtechniques",
+    "country": "France",
+    "sitelinks": 20
+  },
+  {
+    "slug": "ecole-nationale-superieure-des-arts-decoratifs",
+    "name": "École nationale supérieure des arts décoratifs",
+    "country": "France",
+    "sitelinks": 20
+  },
+  {
+    "slug": "ecole-nationale-superieure-des-mines-de-saint-etienne",
+    "name": "École Nationale Supérieure des Mines de Saint-Étienne",
+    "country": "France",
+    "sitelinks": 20
+  },
+  {
+    "slug": "ecole-normale-superieure",
+    "name": "École Normale Supérieure",
+    "country": "France",
+    "sitelinks": 70
+  },
+  {
+    "slug": "ecole-normale-superieure-de-lyon",
+    "name": "École Normale Supérieure de Lyon",
+    "country": "France",
+    "sitelinks": 28
+  },
+  {
+    "slug": "ecole-normale-superieure-paris-saclay",
+    "name": "École normale supérieure Paris-Saclay",
+    "country": "France",
+    "sitelinks": 33
+  },
+  {
+    "slug": "ecole-polytechnique",
+    "name": "École polytechnique",
+    "country": "France",
+    "sitelinks": 77
+  },
+  {
+    "slug": "ecole-pour-l-informatique-et-les-nouvelles-technologies",
+    "name": "École pour l'informatique et les nouvelles technologies",
+    "country": "Spain",
+    "sitelinks": 25
+  },
+  {
+    "slug": "ecole-pour-l-informatique-et-les-techniques-avancees",
+    "name": "École pour l'informatique et les techniques avancées",
+    "country": "France",
+    "sitelinks": 22
+  },
+  {
+    "slug": "ecole-pratique-des-hautes-etudes",
+    "name": "École pratique des hautes études",
+    "country": "France",
+    "sitelinks": 49
+  },
+  {
+    "slug": "ecole-speciale-militaire-de-saint-cyr",
+    "name": "École Spéciale Militaire de Saint-Cyr",
+    "country": "France",
+    "sitelinks": 28
+  },
+  {
+    "slug": "ecole-superieure-des-sciences-commerciales-d-angers",
+    "name": "École Supérieure des Sciences Commerciales d’Angers",
+    "country": "Hungary",
+    "sitelinks": 29
+  },
+  {
+    "slug": "edhec-business-school",
+    "name": "EDHEC Business School",
+    "country": "France",
+    "sitelinks": 32
+  },
+  {
+    "slug": "edinburgh-napier-university",
+    "name": "Edinburgh Napier University",
+    "country": "United Kingdom",
+    "sitelinks": 21
+  },
+  {
+    "slug": "eduardo-mondlane-university",
+    "name": "Eduardo Mondlane University",
+    "country": "Mozambique",
+    "sitelinks": 20
+  },
+  {
+    "slug": "eindhoven-university-of-technology",
+    "name": "Eindhoven University of Technology",
+    "country": "Netherlands",
+    "sitelinks": 34
+  },
+  {
+    "slug": "em-strasbourg-business-school",
+    "name": "EM Strasbourg Business School",
+    "country": "France",
+    "sitelinks": 30
+  },
+  {
+    "slug": "emlyon-business-school",
+    "name": "Emlyon Business School",
+    "country": "France",
+    "sitelinks": 40
+  },
+  {
+    "slug": "emmanuel-college",
+    "name": "Emmanuel College",
+    "country": "United Kingdom",
+    "sitelinks": 20
+  },
+  {
+    "slug": "emory-university",
+    "name": "Emory University",
+    "country": "United States",
+    "sitelinks": 42
+  },
+  {
+    "slug": "ensae-paris",
+    "name": "ENSAE Paris",
+    "country": "France",
+    "sitelinks": 30
+  },
+  {
+    "slug": "ensta-paris",
+    "name": "ENSTA Paris",
+    "country": "France",
+    "sitelinks": 31
+  },
+  {
+    "slug": "eotvos-lorand-university",
+    "name": "Eötvös Loránd University",
+    "country": "Hungary",
+    "sitelinks": 47
+  },
+  {
+    "slug": "erasmus-university-rotterdam",
+    "name": "Erasmus University Rotterdam",
+    "country": "Netherlands",
+    "sitelinks": 39
+  },
+  {
+    "slug": "esc-rennes-school-of-business",
+    "name": "ESC Rennes School of Business",
+    "country": "France",
+    "sitelinks": 29
+  },
+  {
+    "slug": "escp-business-school",
+    "name": "ESCP Business School",
+    "country": "Spain",
+    "sitelinks": 57
+  },
+  {
+    "slug": "esme-sudria",
+    "name": "ESME Sudria",
+    "country": "France",
+    "sitelinks": 29
+  },
+  {
+    "slug": "espci-paris-psl-university",
+    "name": "ESPCI Paris, PSL University",
+    "country": "France",
+    "sitelinks": 47
+  },
+  {
+    "slug": "essec-business-school",
+    "name": "ESSEC Business School",
+    "country": "France",
+    "sitelinks": 41
+  },
+  {
+    "slug": "estonian-academy-of-arts",
+    "name": "Estonian Academy of Arts",
+    "country": "Estonia",
+    "sitelinks": 32
+  },
+  {
+    "slug": "estonian-academy-of-music-and-theatre",
+    "name": "Estonian Academy of Music and Theatre",
+    "country": "Estonia",
+    "sitelinks": 24
+  },
+  {
+    "slug": "estonian-academy-of-sciences",
+    "name": "Estonian Academy of Sciences",
+    "country": "Estonia",
+    "sitelinks": 30
+  },
+  {
+    "slug": "estonian-aviation-academy",
+    "name": "Estonian Aviation Academy",
+    "country": "Estonia",
+    "sitelinks": 21
+  },
+  {
+    "slug": "estonian-university-of-life-sciences",
+    "name": "Estonian University of Life Sciences",
+    "country": "Estonia",
+    "sitelinks": 23
+  },
+  {
+    "slug": "eth-zurich",
+    "name": "ETH Zurich",
+    "country": "Switzerland",
+    "sitelinks": 72
+  },
+  {
+    "slug": "european-academy-of-sciences-and-arts",
+    "name": "European Academy of Sciences and Arts",
+    "country": "Austria",
+    "sitelinks": 28
+  },
+  {
+    "slug": "european-film-academy",
+    "name": "European Film Academy",
+    "country": "Germany",
+    "sitelinks": 32
+  },
+  {
+    "slug": "european-union-agency-for-law-enforcement-training",
+    "name": "European Union Agency for Law Enforcement Training",
+    "country": "Hungary",
+    "sitelinks": 25
+  },
+  {
+    "slug": "european-university-institute",
+    "name": "European University Institute",
+    "country": "Italy",
+    "sitelinks": 27
+  },
+  {
+    "slug": "european-university-viadrina",
+    "name": "European University Viadrina",
+    "country": "Germany",
+    "sitelinks": 22
+  },
+  {
+    "slug": "euskaltzaindia",
+    "name": "Euskaltzaindia",
+    "country": "Spain",
+    "sitelinks": 27
+  },
+  {
+    "slug": "ewha-womans-university",
+    "name": "Ewha Womans University",
+    "country": "South Korea",
+    "sitelinks": 28
+  },
+  {
+    "slug": "excelia",
+    "name": "Excelia",
+    "country": "France",
+    "sitelinks": 29
+  },
+  {
+    "slug": "exeter-college",
+    "name": "Exeter College",
+    "country": "United Kingdom",
+    "sitelinks": 26
+  },
+  {
+    "slug": "ez-zitouna-university",
+    "name": "Ez-Zitouna University",
+    "country": "Tunisia",
+    "sitelinks": 21
+  },
+  {
+    "slug": "faculty-of-humanities-charles-university",
+    "name": "Faculty of Humanities, Charles University",
+    "country": "Czech Republic",
+    "sitelinks": 33
+  },
+  {
+    "slug": "far-eastern-federal-university",
+    "name": "Far Eastern Federal University",
+    "country": "Russia",
+    "sitelinks": 29
+  },
+  {
+    "slug": "federal-center-of-technological-education-celso-suckow-da-fonseca",
+    "name": "Federal Center of Technological Education Celso Suckow da Fonseca",
+    "country": "Brazil",
+    "sitelinks": 102
+  },
+  {
+    "slug": "federal-center-of-technological-education-of-minas-gerais",
+    "name": "Federal Center of Technological Education of Minas Gerais",
+    "country": "Brazil",
+    "sitelinks": 103
+  },
+  {
+    "slug": "federal-university-of-bahia",
+    "name": "Federal University of Bahia",
+    "country": "Brazil",
+    "sitelinks": 104
+  },
+  {
+    "slug": "federal-university-of-minas-gerais",
+    "name": "Federal University of Minas Gerais",
+    "country": "Brazil",
+    "sitelinks": 105
+  },
+  {
+    "slug": "federal-university-of-rio-de-janeiro",
+    "name": "Federal University of Rio de Janeiro",
+    "country": "Brazil",
+    "sitelinks": 42
+  },
+  {
+    "slug": "fernuniversitat-in-hagen",
+    "name": "FernUniversität in Hagen",
+    "country": "Germany",
+    "sitelinks": 21
+  },
+  {
+    "slug": "film-and-television-institute-of-india",
+    "name": "Film and Television Institute of India",
+    "country": "India",
+    "sitelinks": 21
+  },
+  {
+    "slug": "film-and-tv-school-of-the-academy-of-performing-arts-in-prague",
+    "name": "Film and TV School of the Academy of Performing Arts in Prague",
+    "country": "Czech Republic",
+    "sitelinks": 21
+  },
+  {
+    "slug": "florida-atlantic-university",
+    "name": "Florida Atlantic University",
+    "country": "United States",
+    "sitelinks": 23
+  },
+  {
+    "slug": "florida-international-university",
+    "name": "Florida International University",
+    "country": "United States",
+    "sitelinks": 36
+  },
+  {
+    "slug": "florida-state-university",
+    "name": "Florida State University",
+    "country": "United States",
+    "sitelinks": 41
+  },
+  {
+    "slug": "flying-university",
+    "name": "Flying University",
+    "country": "Congress Poland",
+    "sitelinks": 20
+  },
+  {
+    "slug": "foras-na-gaeilge",
+    "name": "Foras na Gaeilge",
+    "country": "Northern Ireland",
+    "sitelinks": 22
+  },
+  {
+    "slug": "fordham-university",
+    "name": "Fordham University",
+    "country": "United States",
+    "sitelinks": 38
+  },
+  {
+    "slug": "franz-liszt-academy-of-music",
+    "name": "Franz Liszt Academy of Music",
+    "country": "Hungary",
+    "sitelinks": 32
+  },
+  {
+    "slug": "freiberg-university-of-mining-and-technology",
+    "name": "Freiberg University of Mining and Technology",
+    "country": "Germany",
+    "sitelinks": 27
+  },
+  {
+    "slug": "freie-universitat-berlin",
+    "name": "Freie Universität Berlin",
+    "country": "Germany",
+    "sitelinks": 59
+  },
+  {
+    "slug": "french-academy-of-sciences",
+    "name": "French Academy of Sciences",
+    "country": "France",
+    "sitelinks": 60
+  },
+  {
+    "slug": "french-azerbaijani-university",
+    "name": "French-Azerbaijani University",
+    "country": "Azerbaijan",
+    "sitelinks": 28
+  },
+  {
+    "slug": "fu-jen-catholic-university",
+    "name": "Fu Jen Catholic University",
+    "country": "Taiwan",
+    "sitelinks": 42
+  },
+  {
+    "slug": "fudan-university",
+    "name": "Fudan University",
+    "country": "People's Republic of China",
+    "sitelinks": 55
+  },
+  {
+    "slug": "gadjah-mada-university",
+    "name": "Gadjah Mada University",
+    "country": "Indonesia",
+    "sitelinks": 33
+  },
+  {
+    "slug": "gakushuin-university",
+    "name": "Gakushuin University",
+    "country": "Japan",
+    "sitelinks": 22
+  },
+  {
+    "slug": "gallaudet-university",
+    "name": "Gallaudet University",
+    "country": "United States",
+    "sitelinks": 32
+  },
+  {
+    "slug": "gazi-university",
+    "name": "Gazi University",
+    "country": "Turkey",
+    "sitelinks": 23
+  },
+  {
+    "slug": "gaziantep-university",
+    "name": "Gaziantep University",
+    "country": "Turkey",
+    "sitelinks": 33
+  },
+  {
+    "slug": "gdansk-university-of-technology",
+    "name": "Gdańsk University of Technology",
+    "country": "Poland",
+    "sitelinks": 30
+  },
+  {
+    "slug": "geneva-graduate-institute",
+    "name": "Geneva Graduate Institute",
+    "country": "Switzerland",
+    "sitelinks": 47
+  },
+  {
+    "slug": "george-mason-university",
+    "name": "George Mason University",
+    "country": "United States",
+    "sitelinks": 33
+  },
+  {
+    "slug": "george-washington-university",
+    "name": "George Washington University",
+    "country": "United States",
+    "sitelinks": 47
+  },
+  {
+    "slug": "georgetown-university",
+    "name": "Georgetown University",
+    "country": "United States",
+    "sitelinks": 58
+  },
+  {
+    "slug": "georgia-state-university",
+    "name": "Georgia State University",
+    "country": "United States",
+    "sitelinks": 25
+  },
+  {
+    "slug": "georgia-tech",
+    "name": "Georgia Tech",
+    "country": "United States",
+    "sitelinks": 45
+  },
+  {
+    "slug": "georgian-national-academy-of-sciences",
+    "name": "Georgian National Academy of Sciences",
+    "country": "Georgia",
+    "sitelinks": 27
+  },
+  {
+    "slug": "gerasimov-institute-of-cinematography",
+    "name": "Gerasimov Institute of Cinematography",
+    "country": "Russia",
+    "sitelinks": 38
+  },
+  {
+    "slug": "german-academy-of-sciences-leopoldina",
+    "name": "German Academy of Sciences Leopoldina",
+    "country": "Germany",
+    "sitelinks": 41
+  },
+  {
+    "slug": "ghent-university",
+    "name": "Ghent University",
+    "country": "Belgium",
+    "sitelinks": 46
+  },
+  {
+    "slug": "girton-college",
+    "name": "Girton College",
+    "country": "United Kingdom",
+    "sitelinks": 29
+  },
+  {
+    "slug": "glasgow-caledonian-university",
+    "name": "Glasgow Caledonian University",
+    "country": "United Kingdom",
+    "sitelinks": 24
+  },
+  {
+    "slug": "glasgow-school-of-art",
+    "name": "Glasgow School of Art",
+    "country": "United Kingdom",
+    "sitelinks": 29
+  },
+  {
+    "slug": "goethe-university-frankfurt",
+    "name": "Goethe University Frankfurt",
+    "country": "Germany",
+    "sitelinks": 62
+  },
+  {
+    "slug": "goldsmiths-university-of-london",
+    "name": "Goldsmiths, University of London",
+    "country": "United Kingdom",
+    "sitelinks": 24
+  },
+  {
+    "slug": "gonville-and-caius-college",
+    "name": "Gonville and Caius College",
+    "country": "United Kingdom",
+    "sitelinks": 22
+  },
+  {
+    "slug": "gonzaga-university",
+    "name": "Gonzaga University",
+    "country": "United States",
+    "sitelinks": 21
+  },
+  {
+    "slug": "gottingen-academy-of-sciences-and-humanities-in-lower-saxony",
+    "name": "Göttingen Academy of Sciences and Humanities in Lower Saxony",
+    "country": "Germany",
+    "sitelinks": 21
+  },
+  {
+    "slug": "graz-university-of-technology",
+    "name": "Graz University of Technology",
+    "country": "Austria",
+    "sitelinks": 27
+  },
+  {
+    "slug": "grenoble-alpes-university",
+    "name": "Grenoble Alpes University",
+    "country": "France",
+    "sitelinks": 43
+  },
+  {
+    "slug": "grenoble-school-of-management",
+    "name": "Grenoble School of Management",
+    "country": "France",
+    "sitelinks": 40
+  },
+  {
+    "slug": "griffith-university",
+    "name": "Griffith University",
+    "country": "Australia",
+    "sitelinks": 20
+  },
+  {
+    "slug": "gubkin-university",
+    "name": "Gubkin University",
+    "country": "Russia",
+    "sitelinks": 21
+  },
+  {
+    "slug": "guildhall-school-of-music-and-drama",
+    "name": "Guildhall School of Music and Drama",
+    "country": "United Kingdom",
+    "sitelinks": 25
+  },
+  {
+    "slug": "hacettepe-university",
+    "name": "Hacettepe University",
+    "country": "Turkey",
+    "sitelinks": 21
+  },
+  {
+    "slug": "hankuk-university-of-foreign-studies",
+    "name": "Hankuk University of Foreign Studies",
+    "country": "South Korea",
+    "sitelinks": 26
+  },
+  {
+    "slug": "hanlin-academy",
+    "name": "Hanlin Academy",
+    "country": "Tang dynasty",
+    "sitelinks": 27
+  },
+  {
+    "slug": "hanyang-university",
+    "name": "Hanyang University",
+    "country": "South Korea",
+    "sitelinks": 28
+  },
+  {
+    "slug": "harbin-institute-of-technology",
+    "name": "Harbin Institute of Technology",
+    "country": "People's Republic of China",
+    "sitelinks": 23
+  },
+  {
+    "slug": "harvard-business-school",
+    "name": "Harvard Business School",
+    "country": "United States",
+    "sitelinks": 42
+  },
+  {
+    "slug": "harvard-college",
+    "name": "Harvard College",
+    "country": "United States",
+    "sitelinks": 24
+  },
+  {
+    "slug": "harvard-law-school",
+    "name": "Harvard Law School",
+    "country": "United States",
+    "sitelinks": 34
+  },
+  {
+    "slug": "harvard-medical-school",
+    "name": "Harvard Medical School",
+    "country": "United States",
+    "sitelinks": 26
+  },
+  {
+    "slug": "harvard-university",
+    "name": "Harvard University",
+    "country": "United States",
+    "sitelinks": 151
+  },
+  {
+    "slug": "hashemite-university",
+    "name": "Hashemite University",
+    "country": "Jordan",
+    "sitelinks": 21
+  },
+  {
+    "slug": "hebrew-university-of-jerusalem",
+    "name": "Hebrew University of Jerusalem",
+    "country": "Israel",
+    "sitelinks": 86
+  },
+  {
+    "slug": "hec-paris",
+    "name": "HEC Paris",
+    "country": "France",
+    "sitelinks": 110
+  },
+  {
+    "slug": "heidelberg-university",
+    "name": "Heidelberg University",
+    "country": "Germany",
+    "sitelinks": 84
+  },
+  {
+    "slug": "heiligenkreuz-abbey",
+    "name": "Heiligenkreuz Abbey",
+    "country": "Austria",
+    "sitelinks": 28
+  },
+  {
+    "slug": "helsinki-university-of-technology",
+    "name": "Helsinki University of Technology",
+    "country": "Finland",
+    "sitelinks": 25
+  },
+  {
+    "slug": "heriot-watt-university",
+    "name": "Heriot-Watt University",
+    "country": "United Kingdom",
+    "sitelinks": 32
+  },
+  {
+    "slug": "hertford-college",
+    "name": "Hertford College",
+    "country": "United Kingdom",
+    "sitelinks": 21
+  },
+  {
+    "slug": "hiroshima-university",
+    "name": "Hiroshima University",
+    "country": "Japan",
+    "sitelinks": 25
+  },
+  {
+    "slug": "hitotsubashi-university",
+    "name": "Hitotsubashi University",
+    "country": "Japan",
+    "sitelinks": 22
+  },
+  {
+    "slug": "hofstra-university",
+    "name": "Hofstra University",
+    "country": "United States",
+    "sitelinks": 28
+  },
+  {
+    "slug": "hokkaido-university",
+    "name": "Hokkaido University",
+    "country": "Japan",
+    "sitelinks": 35
+  },
+  {
+    "slug": "hong-kong-polytechnic-university",
+    "name": "Hong Kong Polytechnic University",
+    "country": "People's Republic of China",
+    "sitelinks": 27
+  },
+  {
+    "slug": "hong-kong-university-of-science-and-technology",
+    "name": "Hong Kong University of Science and Technology",
+    "country": "People's Republic of China",
+    "sitelinks": 32
+  },
+  {
+    "slug": "hosei-university",
+    "name": "Hosei University",
+    "country": "Japan",
+    "sitelinks": 22
+  },
+  {
+    "slug": "howard-university",
+    "name": "Howard University",
+    "country": "United States",
+    "sitelinks": 41
+  },
+  {
+    "slug": "humboldt-universitat-zu-berlin",
+    "name": "Humboldt-Universität zu Berlin",
+    "country": "Germany",
+    "sitelinks": 81
+  },
+  {
+    "slug": "hungarian-academy-of-sciences",
+    "name": "Hungarian Academy of Sciences",
+    "country": "Hungary",
+    "sitelinks": 40
+  },
+  {
+    "slug": "hunter-college",
+    "name": "Hunter College",
+    "country": "United States",
+    "sitelinks": 21
+  },
+  {
+    "slug": "i-ya-horbachevsky-ternopil-national-medical-university-of-ministry-of-health-care-of-ukraine",
+    "name": "I. Ya. Horbachevsky Ternopil National Medical University of Ministry of Health Care of Ukraine",
+    "country": "Ukraine",
+    "sitelinks": 22
+  },
+  {
+    "slug": "i-m-sechenov-first-moscow-state-medical-university",
+    "name": "I.M. Sechenov First Moscow State Medical University",
+    "country": "Russia",
+    "sitelinks": 23
+  },
+  {
+    "slug": "iceland-university-of-the-arts",
+    "name": "Iceland University of the Arts",
+    "country": "Iceland",
+    "sitelinks": 20
+  },
+  {
+    "slug": "icn-business-school",
+    "name": "ICN Business School",
+    "country": "France",
+    "sitelinks": 31
+  },
+  {
+    "slug": "ieseg-school-of-management",
+    "name": "IESEG School of Management",
+    "country": "France",
+    "sitelinks": 35
+  },
+  {
+    "slug": "igor-sikorsky-kyiv-polytechnic-institute",
+    "name": "Igor Sikorsky Kyiv Polytechnic Institute",
+    "country": "Ukraine",
+    "sitelinks": 26
+  },
+  {
+    "slug": "illinois-institute-of-technology",
+    "name": "Illinois Institute of Technology",
+    "country": "United States",
+    "sitelinks": 29
+  },
+  {
+    "slug": "illinois-state-university",
+    "name": "Illinois State University",
+    "country": "United States",
+    "sitelinks": 22
+  },
+  {
+    "slug": "imam-hossein-university",
+    "name": "Imam Hossein University",
+    "country": "Iran",
+    "sitelinks": 23
+  },
+  {
+    "slug": "immanuel-kant-baltic-federal-university",
+    "name": "Immanuel Kant Baltic Federal University",
+    "country": "Russia",
+    "sitelinks": 22
+  },
+  {
+    "slug": "imperial-academy-of-arts",
+    "name": "Imperial Academy of Arts",
+    "country": "Russia",
+    "sitelinks": 38
+  },
+  {
+    "slug": "imperial-college-london",
+    "name": "Imperial College London",
+    "country": "United Kingdom",
+    "sitelinks": 65
+  },
+  {
+    "slug": "imperial-japanese-army-academy",
+    "name": "Imperial Japanese Army Academy",
+    "country": "Empire of Japan",
+    "sitelinks": 21
+  },
+  {
+    "slug": "indian-institute-of-science-bengaluru",
+    "name": "Indian Institute of Science, Bengaluru",
+    "country": "India",
+    "sitelinks": 47
+  },
+  {
+    "slug": "indian-institute-of-technology-bombay",
+    "name": "Indian Institute of Technology Bombay",
+    "country": "India",
+    "sitelinks": 27
+  },
+  {
+    "slug": "indian-institute-of-technology-kanpur",
+    "name": "Indian Institute of Technology Kanpur",
+    "country": "India",
+    "sitelinks": 21
+  },
+  {
+    "slug": "indian-institute-of-technology-kharagpur",
+    "name": "Indian Institute of Technology Kharagpur",
+    "country": "India",
+    "sitelinks": 23
+  },
+  {
+    "slug": "indian-institute-of-technology-madras",
+    "name": "Indian Institute of Technology Madras",
+    "country": "India",
+    "sitelinks": 31
+  },
+  {
+    "slug": "indian-institutes-of-management",
+    "name": "Indian Institutes of Management",
+    "country": "India",
+    "sitelinks": 29
+  },
+  {
+    "slug": "indiana-university",
+    "name": "Indiana University",
+    "country": "United States",
+    "sitelinks": 41
+  },
+  {
+    "slug": "indiana-university-bloomington",
+    "name": "Indiana University Bloomington",
+    "country": "United States",
+    "sitelinks": 68
+  },
+  {
+    "slug": "indira-gandhi-national-open-university",
+    "name": "Indira Gandhi National Open University",
+    "country": "India",
+    "sitelinks": 33
+  },
+  {
+    "slug": "insead",
+    "name": "INSEAD",
+    "country": "United States",
+    "sitelinks": 53
+  },
+  {
+    "slug": "institut-de-droit-international",
+    "name": "Institut de Droit International",
+    "country": "Switzerland",
+    "sitelinks": 51
+  },
+  {
+    "slug": "institut-des-hautes-etudes-de-defense-nationale",
+    "name": "Institut des hautes études de défense nationale",
+    "country": "France",
+    "sitelinks": 20
+  },
+  {
+    "slug": "institut-mines-telecom-business-school",
+    "name": "Institut Mines-Telecom Business School",
+    "country": "France",
+    "sitelinks": 29
+  },
+  {
+    "slug": "institut-national-des-langues-et-civilisations-orientales",
+    "name": "Institut national des langues et civilisations orientales",
+    "country": "France",
+    "sitelinks": 41
+  },
+  {
+    "slug": "institut-national-des-sciences-appliquees-de-lyon",
+    "name": "Institut National des Sciences Appliquées de Lyon",
+    "country": "France",
+    "sitelinks": 21
+  },
+  {
+    "slug": "institut-national-des-sciences-appliquees-de-toulouse",
+    "name": "Institut national des sciences appliquées de Toulouse",
+    "country": "France",
+    "sitelinks": 20
+  },
+  {
+    "slug": "institut-polytechnique-des-sciences-avancees",
+    "name": "Institut Polytechnique des Sciences Avancées",
+    "country": "France",
+    "sitelinks": 81
+  },
+  {
+    "slug": "institut-superieur-de-l-aeronautique-et-de-l-espace",
+    "name": "Institut Supérieur de l'Aéronautique et de l'Espace",
+    "country": "France",
+    "sitelinks": 38
+  },
+  {
+    "slug": "institute-of-science-tokyo",
+    "name": "Institute of Science Tokyo",
+    "country": "Japan",
+    "sitelinks": 27
+  },
+  {
+    "slug": "instituto-federal-da-bahia",
+    "name": "Instituto Federal da Bahia",
+    "country": "Brazil",
+    "sitelinks": 100
+  },
+  {
+    "slug": "international-islamic-university-malaysia",
+    "name": "International Islamic University Malaysia",
+    "country": "Malaysia",
+    "sitelinks": 26
+  },
+  {
+    "slug": "international-university-of-monaco",
+    "name": "International University of Monaco",
+    "country": "Monaco",
+    "sitelinks": 21
+  },
+  {
+    "slug": "iowa-state-university",
+    "name": "Iowa State University",
+    "country": "United States",
+    "sitelinks": 34
+  },
+  {
+    "slug": "irkutsk-state-university",
+    "name": "Irkutsk State University",
+    "country": "Russia",
+    "sitelinks": 21
+  },
+  {
+    "slug": "isg-business-school",
+    "name": "ISG Business School",
+    "country": "France",
+    "sitelinks": 36
+  },
+  {
+    "slug": "islamic-azad-university",
+    "name": "Islamic Azad University",
+    "country": "Iran",
+    "sitelinks": 28
+  },
+  {
+    "slug": "islamic-university-of-gaza",
+    "name": "Islamic University of Gaza",
+    "country": "Palestine",
+    "sitelinks": 32
+  },
+  {
+    "slug": "islamic-university-of-madinah",
+    "name": "Islamic University of Madinah",
+    "country": "Saudi Arabia",
+    "sitelinks": 32
+  },
+  {
+    "slug": "israel-academy-of-sciences-and-humanities",
+    "name": "Israel Academy of Sciences and Humanities",
+    "country": "Israel",
+    "sitelinks": 37
+  },
+  {
+    "slug": "istanbul-technical-university",
+    "name": "Istanbul Technical University",
+    "country": "Turkey",
+    "sitelinks": 40
+  },
+  {
+    "slug": "jadavpur-university",
+    "name": "Jadavpur University",
+    "country": "India",
+    "sitelinks": 20
+  },
+  {
+    "slug": "jagiellonian-university",
+    "name": "Jagiellonian University",
+    "country": "Poland",
+    "sitelinks": 72
+  },
+  {
+    "slug": "james-cook-university",
+    "name": "James Cook University",
+    "country": "Australia",
+    "sitelinks": 20
+  },
+  {
+    "slug": "james-madison-university",
+    "name": "James Madison University",
+    "country": "United States",
+    "sitelinks": 20
+  },
+  {
+    "slug": "jan-matejko-academy-of-fine-arts-in-krakow",
+    "name": "Jan Matejko Academy of Fine Arts in Krakow",
+    "country": "Poland",
+    "sitelinks": 20
+  },
+  {
+    "slug": "jawaharlal-nehru-university",
+    "name": "Jawaharlal Nehru University",
+    "country": "India",
+    "sitelinks": 37
+  },
+  {
+    "slug": "jesus-college",
+    "name": "Jesus College",
+    "country": "United Kingdom",
+    "sitelinks": 24
+  },
+  {
+    "slug": "jilin-university",
+    "name": "Jilin University",
+    "country": "People's Republic of China",
+    "sitelinks": 26
+  },
+  {
+    "slug": "johannes-gutenberg-university-mainz",
+    "name": "Johannes Gutenberg University Mainz",
+    "country": "Germany",
+    "sitelinks": 35
+  },
+  {
+    "slug": "johannes-kepler-university-linz",
+    "name": "Johannes Kepler University Linz",
+    "country": "Austria",
+    "sitelinks": 21
+  },
+  {
+    "slug": "john-f-kennedy-school-of-government",
+    "name": "John F. Kennedy School of Government",
+    "country": "United States",
+    "sitelinks": 24
+  },
+  {
+    "slug": "john-paul-ii-catholic-university-of-lublin",
+    "name": "John Paul II Catholic University of Lublin",
+    "country": "Poland",
+    "sitelinks": 30
+  },
+  {
+    "slug": "johns-hopkins-university",
+    "name": "Johns Hopkins University",
+    "country": "United States",
+    "sitelinks": 80
+  },
+  {
+    "slug": "juilliard-school",
+    "name": "Juilliard School",
+    "country": "United States",
+    "sitelinks": 45
+  },
+  {
+    "slug": "k-n-toosi-university-of-technology",
+    "name": "K. N. Toosi University of Technology",
+    "country": "Iran",
+    "sitelinks": 23
+  },
+  {
+    "slug": "kabul-university",
+    "name": "Kabul University",
+    "country": "Afghanistan",
+    "sitelinks": 40
+  },
+  {
+    "slug": "kaist",
+    "name": "KAIST",
+    "country": "South Korea",
+    "sitelinks": 34
+  },
+  {
+    "slug": "kano-school",
+    "name": "Kanō school",
+    "country": "Japan",
+    "sitelinks": 30
+  },
+  {
+    "slug": "kansas-state-university",
+    "name": "Kansas State University",
+    "country": "United States",
+    "sitelinks": 32
+  },
+  {
+    "slug": "karlsruhe-institute-of-technology",
+    "name": "Karlsruhe Institute of Technology",
+    "country": "Germany",
+    "sitelinks": 40
+  },
+  {
+    "slug": "karlstad-university",
+    "name": "Karlstad University",
+    "country": "Sweden",
+    "sitelinks": 27
+  },
+  {
+    "slug": "karolinska-institutet",
+    "name": "Karolinska Institutet",
+    "country": "Sweden",
+    "sitelinks": 58
+  },
+  {
+    "slug": "katholieke-universiteit-leuven",
+    "name": "Katholieke Universiteit Leuven",
+    "country": "Belgium",
+    "sitelinks": 54
+  },
+  {
+    "slug": "kaunas-university-of-technology",
+    "name": "Kaunas University of Technology",
+    "country": "Lithuania",
+    "sitelinks": 29
+  },
+  {
+    "slug": "kazan-federal-university",
+    "name": "Kazan Federal University",
+    "country": "Russia",
+    "sitelinks": 54
+  },
+  {
+    "slug": "kedge-business-school",
+    "name": "KEDGE Business School",
+    "country": "France",
+    "sitelinks": 32
+  },
+  {
+    "slug": "keio-university",
+    "name": "Keio University",
+    "country": "Japan",
+    "sitelinks": 46
+  },
+  {
+    "slug": "kent-state-university",
+    "name": "Kent State University",
+    "country": "United States",
+    "sitelinks": 28
+  },
+  {
+    "slug": "kew-gardens",
+    "name": "Kew Gardens",
+    "country": "United Kingdom",
+    "sitelinks": 52
+  },
+  {
+    "slug": "khazar-university",
+    "name": "Khazar University",
+    "country": "Azerbaijan",
+    "sitelinks": 22
+  },
+  {
+    "slug": "kiel-university",
+    "name": "Kiel University",
+    "country": "Germany",
+    "sitelinks": 47
+  },
+  {
+    "slug": "kim-il-sung-university",
+    "name": "Kim Il-sung University",
+    "country": "North Korea",
+    "sitelinks": 49
+  },
+  {
+    "slug": "king-abdulaziz-university",
+    "name": "King Abdulaziz University",
+    "country": "Saudi Arabia",
+    "sitelinks": 31
+  },
+  {
+    "slug": "king-abdullah-university-of-science-and-technology",
+    "name": "King Abdullah University of Science and Technology",
+    "country": "Saudi Arabia",
+    "sitelinks": 28
+  },
+  {
+    "slug": "king-juan-carlos-university",
+    "name": "King Juan Carlos University",
+    "country": "Spain",
+    "sitelinks": 23
+  },
+  {
+    "slug": "king-saud-university",
+    "name": "King Saud University",
+    "country": "Saudi Arabia",
+    "sitelinks": 36
+  },
+  {
+    "slug": "king-s-college",
+    "name": "King's College",
+    "country": "United Kingdom",
+    "sitelinks": 34
+  },
+  {
+    "slug": "king-s-college-london",
+    "name": "King's College London",
+    "country": "United Kingdom",
+    "sitelinks": 60
+  },
+  {
+    "slug": "kingston-university",
+    "name": "Kingston University",
+    "country": "United Kingdom",
+    "sitelinks": 28
+  },
+  {
+    "slug": "klaipeda-university",
+    "name": "Klaipėda University",
+    "country": "Lithuania",
+    "sitelinks": 29
+  },
+  {
+    "slug": "kobe-university",
+    "name": "Kobe University",
+    "country": "Japan",
+    "sitelinks": 23
+  },
+  {
+    "slug": "koc-university",
+    "name": "Koç University",
+    "country": "Turkey",
+    "sitelinks": 20
+  },
+  {
+    "slug": "konkuk-university",
+    "name": "Konkuk University",
+    "country": "South Korea",
+    "sitelinks": 20
+  },
+  {
+    "slug": "korea-university",
+    "name": "Korea University",
+    "country": "South Korea",
+    "sitelinks": 42
+  },
+  {
+    "slug": "krakow-university-of-economics",
+    "name": "Krakow University of Economics",
+    "country": "Poland",
+    "sitelinks": 20
+  },
+  {
+    "slug": "kuban-state-university",
+    "name": "Kuban State University",
+    "country": "Russia",
+    "sitelinks": 37
+  },
+  {
+    "slug": "kuehne-logistics-university",
+    "name": "Kuehne Logistics University",
+    "country": "Germany",
+    "sitelinks": 34
+  },
+  {
+    "slug": "kunstakademie-dusseldorf",
+    "name": "Kunstakademie Düsseldorf",
+    "country": "Germany",
+    "sitelinks": 27
+  },
+  {
+    "slug": "kyoto-university",
+    "name": "Kyoto University",
+    "country": "Japan",
+    "sitelinks": 84
+  },
+  {
+    "slug": "kyrgyz-national-university",
+    "name": "Kyrgyz National University",
+    "country": "Kyrgyzstan",
+    "sitelinks": 20
+  },
+  {
+    "slug": "kyung-hee-university",
+    "name": "Kyung Hee University",
+    "country": "South Korea",
+    "sitelinks": 24
+  },
+  {
+    "slug": "kyushu-university",
+    "name": "Kyushu University",
+    "country": "Japan",
+    "sitelinks": 36
+  },
+  {
+    "slug": "l-n-gumilyov-eurasian-national-university",
+    "name": "L. N. Gumilyov Eurasian National University",
+    "country": "Kazakhstan",
+    "sitelinks": 20
+  },
+  {
+    "slug": "la-femis",
+    "name": "La Fémis",
+    "country": "France",
+    "sitelinks": 24
+  },
+  {
+    "slug": "la-trobe-university",
+    "name": "La Trobe University",
+    "country": "Australia",
+    "sitelinks": 28
+  },
+  {
+    "slug": "lady-margaret-hall",
+    "name": "Lady Margaret Hall",
+    "country": "United Kingdom",
+    "sitelinks": 20
+  },
+  {
+    "slug": "latvian-academy-of-sciences",
+    "name": "Latvian Academy of Sciences",
+    "country": "Latvia",
+    "sitelinks": 27
+  },
+  {
+    "slug": "laval-university",
+    "name": "Laval University",
+    "country": "Canada",
+    "sitelinks": 38
+  },
+  {
+    "slug": "le-cordon-bleu",
+    "name": "Le Cordon Bleu",
+    "country": "France",
+    "sitelinks": 22
+  },
+  {
+    "slug": "lebanese-university",
+    "name": "Lebanese University",
+    "country": "Lebanon",
+    "sitelinks": 21
+  },
+  {
+    "slug": "leeds-beckett-university",
+    "name": "Leeds Beckett University",
+    "country": "United Kingdom",
+    "sitelinks": 21
+  },
+  {
+    "slug": "lehigh-university",
+    "name": "Lehigh University",
+    "country": "United States",
+    "sitelinks": 27
+  },
+  {
+    "slug": "leibniz-university-hannover",
+    "name": "Leibniz University Hannover",
+    "country": "Germany",
+    "sitelinks": 34
+  },
+  {
+    "slug": "leiden-university",
+    "name": "Leiden University",
+    "country": "Netherlands",
+    "sitelinks": 80
+  },
+  {
+    "slug": "leipzig-university",
+    "name": "Leipzig University",
+    "country": "Germany",
+    "sitelinks": 66
+  },
+  {
+    "slug": "lille-university-of-science-and-technology",
+    "name": "Lille University of Science and Technology",
+    "country": "France",
+    "sitelinks": 24
+  },
+  {
+    "slug": "linkoping-university",
+    "name": "Linköping University",
+    "country": "Sweden",
+    "sitelinks": 37
+  },
+  {
+    "slug": "linnaeus-university",
+    "name": "Linnaeus University",
+    "country": "Sweden",
+    "sitelinks": 30
+  },
+  {
+    "slug": "lithuanian-academy-of-sciences",
+    "name": "Lithuanian Academy of Sciences",
+    "country": "Lithuania",
+    "sitelinks": 24
+  },
+  {
+    "slug": "liverpool-john-moores-university",
+    "name": "Liverpool John Moores University",
+    "country": "United Kingdom",
+    "sitelinks": 22
+  },
+  {
+    "slug": "lomonosov-moscow-state-university",
+    "name": "Lomonosov Moscow State University",
+    "country": "Russia",
+    "sitelinks": 108
+  },
+  {
+    "slug": "london-business-school",
+    "name": "London Business School",
+    "country": "United Kingdom",
+    "sitelinks": 25
+  },
+  {
+    "slug": "london-metropolitan-university",
+    "name": "London Metropolitan University",
+    "country": "United Kingdom",
+    "sitelinks": 20
+  },
+  {
+    "slug": "london-school-of-economics-and-political-science",
+    "name": "London School of Economics and Political Science",
+    "country": "United Kingdom",
+    "sitelinks": 74
+  },
+  {
+    "slug": "loughborough-university",
+    "name": "Loughborough University",
+    "country": "United Kingdom",
+    "sitelinks": 30
+  },
+  {
+    "slug": "louisiana-state-university",
+    "name": "Louisiana State University",
+    "country": "United States",
+    "sitelinks": 37
+  },
+  {
+    "slug": "loyola-marymount-university",
+    "name": "Loyola Marymount University",
+    "country": "United States",
+    "sitelinks": 20
+  },
+  {
+    "slug": "loyola-university-chicago",
+    "name": "Loyola University Chicago",
+    "country": "United States",
+    "sitelinks": 27
+  },
+  {
+    "slug": "ludwig-maximilians-universitat-munchen",
+    "name": "Ludwig-Maximilians-Universität München",
+    "country": "Germany",
+    "sitelinks": 76
+  },
+  {
+    "slug": "lulea-university-of-technology",
+    "name": "Luleå University of Technology",
+    "country": "Sweden",
+    "sitelinks": 23
+  },
+  {
+    "slug": "lund-university",
+    "name": "Lund University",
+    "country": "Sweden",
+    "sitelinks": 66
+  },
+  {
+    "slug": "lviv-polytechnic",
+    "name": "Lviv Polytechnic",
+    "country": "Ukraine",
+    "sitelinks": 25
+  },
+  {
+    "slug": "lviv-university",
+    "name": "Lviv University",
+    "country": "Ukraine",
+    "sitelinks": 50
+  },
+  {
+    "slug": "m-v-frunze-military-academy",
+    "name": "M.V. Frunze Military Academy",
+    "country": "Russia",
+    "sitelinks": 23
+  },
+  {
+    "slug": "maastricht-university",
+    "name": "Maastricht University",
+    "country": "Netherlands",
+    "sitelinks": 43
+  },
+  {
+    "slug": "macedonian-academy-of-sciences-and-arts",
+    "name": "Macedonian Academy of Sciences and Arts",
+    "country": "North Macedonia",
+    "sitelinks": 22
+  },
+  {
+    "slug": "macquarie-university",
+    "name": "Macquarie University",
+    "country": "Australia",
+    "sitelinks": 34
+  },
+  {
+    "slug": "magdalen-college",
+    "name": "Magdalen College",
+    "country": "United Kingdom",
+    "sitelinks": 27
+  },
+  {
+    "slug": "magdalene-college",
+    "name": "Magdalene College",
+    "country": "United Kingdom",
+    "sitelinks": 23
+  },
+  {
+    "slug": "makerere-university",
+    "name": "Makerere University",
+    "country": "Uganda",
+    "sitelinks": 35
+  },
+  {
+    "slug": "malmo-university",
+    "name": "Malmö University",
+    "country": "Sweden",
+    "sitelinks": 32
+  },
+  {
+    "slug": "manchester-metropolitan-university",
+    "name": "Manchester Metropolitan University",
+    "country": "United Kingdom",
+    "sitelinks": 26
+  },
+  {
+    "slug": "manhattan-school-of-music",
+    "name": "Manhattan School of Music",
+    "country": "United States",
+    "sitelinks": 20
+  },
+  {
+    "slug": "maria-curie-sk-odowska-university",
+    "name": "Maria Curie-Skłodowska University",
+    "country": "Poland",
+    "sitelinks": 21
+  },
+  {
+    "slug": "marmara-university",
+    "name": "Marmara University",
+    "country": "Turkey",
+    "sitelinks": 36
+  },
+  {
+    "slug": "marquette-university",
+    "name": "Marquette University",
+    "country": "United States",
+    "sitelinks": 24
+  },
+  {
+    "slug": "martin-luther-university-halle-wittenberg",
+    "name": "Martin Luther University Halle-Wittenberg",
+    "country": "Germany",
+    "sitelinks": 44
+  },
+  {
+    "slug": "masaryk-university",
+    "name": "Masaryk University",
+    "country": "Czech Republic",
+    "sitelinks": 46
+  },
+  {
+    "slug": "massachusetts-institute-of-technology",
+    "name": "Massachusetts Institute of Technology",
+    "country": "United States",
+    "sitelinks": 112
+  },
+  {
+    "slug": "massey-university",
+    "name": "Massey University",
+    "country": "New Zealand",
+    "sitelinks": 25
+  },
+  {
+    "slug": "maxim-gorky-literature-institute",
+    "name": "Maxim Gorky Literature Institute",
+    "country": "Russia",
+    "sitelinks": 31
+  },
+  {
+    "slug": "mcgill-university",
+    "name": "McGill University",
+    "country": "Canada",
+    "sitelinks": 66
+  },
+  {
+    "slug": "mcmaster-university",
+    "name": "McMaster University",
+    "country": "Canada",
+    "sitelinks": 41
+  },
+  {
+    "slug": "medical-university-of-vienna",
+    "name": "Medical University of Vienna",
+    "country": "Austria",
+    "sitelinks": 21
+  },
+  {
+    "slug": "meiji-university",
+    "name": "Meiji University",
+    "country": "Japan",
+    "sitelinks": 27
+  },
+  {
+    "slug": "merton-college",
+    "name": "Merton College",
+    "country": "United Kingdom",
+    "sitelinks": 28
+  },
+  {
+    "slug": "miami-university",
+    "name": "Miami University",
+    "country": "United States",
+    "sitelinks": 26
+  },
+  {
+    "slug": "michigan-state-university",
+    "name": "Michigan State University",
+    "country": "United States",
+    "sitelinks": 49
+  },
+  {
+    "slug": "michigan-technological-university",
+    "name": "Michigan Technological University",
+    "country": "United States",
+    "sitelinks": 21
+  },
+  {
+    "slug": "mid-sweden-university",
+    "name": "Mid Sweden University",
+    "country": "Sweden",
+    "sitelinks": 20
+  },
+  {
+    "slug": "middle-east-technical-university",
+    "name": "Middle East Technical University",
+    "country": "Turkey",
+    "sitelinks": 33
+  },
+  {
+    "slug": "middlebury-college",
+    "name": "Middlebury College",
+    "country": "United States",
+    "sitelinks": 23
+  },
+  {
+    "slug": "middlesex-university",
+    "name": "Middlesex University",
+    "country": "United Kingdom",
+    "sitelinks": 29
+  },
+  {
+    "slug": "mines-paristech",
+    "name": "Mines ParisTech",
+    "country": "France",
+    "sitelinks": 58
+  },
+  {
+    "slug": "minneapolis-institute-of-art",
+    "name": "Minneapolis Institute of Art",
+    "country": "United States",
+    "sitelinks": 23
+  },
+  {
+    "slug": "mit-media-lab",
+    "name": "MIT Media Lab",
+    "country": "United States",
+    "sitelinks": 21
+  },
+  {
+    "slug": "moldova-state-university",
+    "name": "Moldova State University",
+    "country": "Moldova",
+    "sitelinks": 32
+  },
+  {
+    "slug": "monash-university",
+    "name": "Monash University",
+    "country": "Australia",
+    "sitelinks": 44
+  },
+  {
+    "slug": "montana-state-university",
+    "name": "Montana State University",
+    "country": "United States",
+    "sitelinks": 27
+  },
+  {
+    "slug": "montenegrin-academy-of-sciences-and-arts",
+    "name": "Montenegrin Academy of Sciences and Arts",
+    "country": "Montenegro",
+    "sitelinks": 21
+  },
+  {
+    "slug": "monterrey-institute-of-technology-and-higher-education",
+    "name": "Monterrey Institute of Technology and Higher Education",
+    "country": "Mexico",
+    "sitelinks": 23
+  },
+  {
+    "slug": "montpellier-business-school",
+    "name": "Montpellier Business School",
+    "country": "France",
+    "sitelinks": 29
+  },
+  {
+    "slug": "moscow-aviation-institute",
+    "name": "Moscow Aviation Institute",
+    "country": "Russia",
+    "sitelinks": 23
+  },
+  {
+    "slug": "moscow-conservatory",
+    "name": "Moscow Conservatory",
+    "country": "Russia",
+    "sitelinks": 51
+  },
+  {
+    "slug": "moscow-institute-of-physics-and-technology",
+    "name": "Moscow Institute of Physics and Technology",
+    "country": "Russia",
+    "sitelinks": 31
+  },
+  {
+    "slug": "moscow-power-engineering-institute",
+    "name": "Moscow Power Engineering Institute",
+    "country": "Russia",
+    "sitelinks": 20
+  },
+  {
+    "slug": "moscow-state-institute-of-international-relations",
+    "name": "Moscow State Institute of International Relations",
+    "country": "Russia",
+    "sitelinks": 50
+  },
+  {
+    "slug": "mozarteum-university-salzburg",
+    "name": "Mozarteum University Salzburg",
+    "country": "Austria",
+    "sitelinks": 34
+  },
+  {
+    "slug": "museu-nacional",
+    "name": "Museu Nacional",
+    "country": "Brazil",
+    "sitelinks": 45
+  },
+  {
+    "slug": "mykolas-romeris-university",
+    "name": "Mykolas Romeris University",
+    "country": "Lithuania",
+    "sitelinks": 25
+  },
+  {
+    "slug": "nagoya-university",
+    "name": "Nagoya University",
+    "country": "Japan",
+    "sitelinks": 44
+  },
+  {
+    "slug": "nalanda-mahavihara",
+    "name": "Nalanda Mahavihara",
+    "country": "India",
+    "sitelinks": 71
+  },
+  {
+    "slug": "nalanda-university",
+    "name": "Nalanda University",
+    "country": "India",
+    "sitelinks": 24
+  },
+  {
+    "slug": "nanjing-university",
+    "name": "Nanjing University",
+    "country": "People's Republic of China",
+    "sitelinks": 56
+  },
+  {
+    "slug": "nankai-university",
+    "name": "Nankai University",
+    "country": "People's Republic of China",
+    "sitelinks": 22
+  },
+  {
+    "slug": "nantes-university",
+    "name": "Nantes University",
+    "country": "France",
+    "sitelinks": 31
+  },
+  {
+    "slug": "nanyang-technological-university",
+    "name": "Nanyang Technological University",
+    "country": "Singapore",
+    "sitelinks": 59
+  },
+  {
+    "slug": "national-academies-of-sciences-engineering-and-medicine",
+    "name": "National Academies of Sciences, Engineering, and Medicine",
+    "country": "United States",
+    "sitelinks": 21
+  },
+  {
+    "slug": "national-academy-of-engineering",
+    "name": "National Academy of Engineering",
+    "country": "United States",
+    "sitelinks": 24
+  },
+  {
+    "slug": "national-academy-of-sciences",
+    "name": "National Academy of Sciences",
+    "country": "United States",
+    "sitelinks": 54
+  },
+  {
+    "slug": "national-academy-of-sciences-of-armenia",
+    "name": "National Academy of Sciences of Armenia",
+    "country": "Armenia",
+    "sitelinks": 27
+  },
+  {
+    "slug": "national-academy-of-sciences-of-belarus",
+    "name": "National Academy of Sciences of Belarus",
+    "country": "Belarus",
+    "sitelinks": 26
+  },
+  {
+    "slug": "national-academy-of-sciences-of-ukraine",
+    "name": "National Academy of Sciences of Ukraine",
+    "country": "Ukraine",
+    "sitelinks": 39
+  },
+  {
+    "slug": "national-and-kapodistrian-university-of-athens",
+    "name": "National and Kapodistrian University of Athens",
+    "country": "Greece",
+    "sitelinks": 51
+  },
+  {
+    "slug": "national-autonomous-university-of-mexico",
+    "name": "National Autonomous University of Mexico",
+    "country": "Mexico",
+    "sitelinks": 58
+  },
+  {
+    "slug": "national-central-university",
+    "name": "National Central University",
+    "country": "Taiwan",
+    "sitelinks": 27
+  },
+  {
+    "slug": "national-cheng-kung-university",
+    "name": "National Cheng Kung University",
+    "country": "Taiwan",
+    "sitelinks": 21
+  },
+  {
+    "slug": "national-chengchi-university",
+    "name": "National Chengchi University",
+    "country": "Taiwan",
+    "sitelinks": 22
+  },
+  {
+    "slug": "national-defense-university",
+    "name": "National Defense University",
+    "country": "United States",
+    "sitelinks": 23
+  },
+  {
+    "slug": "national-film-school-in-odz",
+    "name": "National Film School in Łódź",
+    "country": "Poland",
+    "sitelinks": 24
+  },
+  {
+    "slug": "national-polytechnic-university-of-armenia",
+    "name": "National Polytechnic University of Armenia",
+    "country": "Armenia",
+    "sitelinks": 20
+  },
+  {
+    "slug": "national-research-university-higher-school-of-economics",
+    "name": "National Research University – Higher School of Economics",
+    "country": "Russia",
+    "sitelinks": 30
+  },
+  {
+    "slug": "national-sun-yat-sen-university",
+    "name": "National Sun Yat-sen University",
+    "country": "Taiwan",
+    "sitelinks": 28
+  },
+  {
+    "slug": "national-taiwan-university",
+    "name": "National Taiwan University",
+    "country": "Taiwan",
+    "sitelinks": 46
+  },
+  {
+    "slug": "national-technical-university-of-athens",
+    "name": "National Technical University of Athens",
+    "country": "Greece",
+    "sitelinks": 27
+  },
+  {
+    "slug": "national-tsing-hua-university",
+    "name": "National Tsing Hua University",
+    "country": "Taiwan",
+    "sitelinks": 27
+  },
+  {
+    "slug": "national-university-of-colombia",
+    "name": "National University of Colombia",
+    "country": "Colombia",
+    "sitelinks": 25
+  },
+  {
+    "slug": "national-university-of-cordoba",
+    "name": "National University of Córdoba",
+    "country": "Argentina",
+    "sitelinks": 25
+  },
+  {
+    "slug": "national-university-of-distance-education",
+    "name": "National University of Distance Education",
+    "country": "Spain",
+    "sitelinks": 20
+  },
+  {
+    "slug": "national-university-of-ireland",
+    "name": "National University of Ireland",
+    "country": "Ireland",
+    "sitelinks": 25
+  },
+  {
+    "slug": "national-university-of-kharkiv",
+    "name": "National University of Kharkiv",
+    "country": "Ukraine",
+    "sitelinks": 39
+  },
+  {
+    "slug": "national-university-of-kyiv-mohyla-academy",
+    "name": "National University of Kyiv-Mohyla Academy",
+    "country": "Ukraine",
+    "sitelinks": 36
+  },
+  {
+    "slug": "national-university-of-la-plata",
+    "name": "National University of La Plata",
+    "country": "Argentina",
+    "sitelinks": 25
+  },
+  {
+    "slug": "national-university-of-laos",
+    "name": "National University of Laos",
+    "country": "Laos",
+    "sitelinks": 23
+  },
+  {
+    "slug": "national-university-of-lesotho",
+    "name": "National University of Lesotho",
+    "country": "Lesotho",
+    "sitelinks": 23
+  },
+  {
+    "slug": "national-university-of-malaysia",
+    "name": "National University of Malaysia",
+    "country": "Malaysia",
+    "sitelinks": 22
+  },
+  {
+    "slug": "national-university-of-mongolia",
+    "name": "National University of Mongolia",
+    "country": "Mongolia",
+    "sitelinks": 29
+  },
+  {
+    "slug": "national-university-of-ostroh-academy",
+    "name": "National University of Ostroh Academy",
+    "country": "Ukraine",
+    "sitelinks": 26
+  },
+  {
+    "slug": "national-university-of-san-marcos",
+    "name": "National University of San Marcos",
+    "country": "Peru",
+    "sitelinks": 41
+  },
+  {
+    "slug": "national-university-of-singapore",
+    "name": "National University of Singapore",
+    "country": "Singapore",
+    "sitelinks": 59
+  },
+  {
+    "slug": "national-university-of-uzbekistan-named-after-mirzo-ulugbek",
+    "name": "National University of Uzbekistan named after Mirzo Ulugbek",
+    "country": "Uzbekistan",
+    "sitelinks": 27
+  },
+  {
+    "slug": "neoma-business-school",
+    "name": "NEOMA Business School",
+    "country": "France",
+    "sitelinks": 32
+  },
+  {
+    "slug": "new-college",
+    "name": "New College",
+    "country": "United Kingdom",
+    "sitelinks": 26
+  },
+  {
+    "slug": "new-mexico-state-university",
+    "name": "New Mexico State University",
+    "country": "United States",
+    "sitelinks": 26
+  },
+  {
+    "slug": "new-york-film-academy",
+    "name": "New York Film Academy",
+    "country": "United States",
+    "sitelinks": 21
+  },
+  {
+    "slug": "new-york-university",
+    "name": "New York University",
+    "country": "United States",
+    "sitelinks": 77
+  },
+  {
+    "slug": "new-york-university-tisch-school-of-the-arts",
+    "name": "New York University Tisch School of the Arts",
+    "country": "United States",
+    "sitelinks": 24
+  },
+  {
+    "slug": "newcastle-university",
+    "name": "Newcastle University",
+    "country": "United Kingdom",
+    "sitelinks": 44
+  },
+  {
+    "slug": "newnham-college",
+    "name": "Newnham College",
+    "country": "United Kingdom",
+    "sitelinks": 21
+  },
+  {
+    "slug": "nicolaus-copernicus-university-in-torun",
+    "name": "Nicolaus Copernicus University in Toruń",
+    "country": "Poland",
+    "sitelinks": 25
+  },
+  {
+    "slug": "nihon-university",
+    "name": "Nihon University",
+    "country": "Japan",
+    "sitelinks": 25
+  },
+  {
+    "slug": "north-carolina-state-university",
+    "name": "North Carolina State University",
+    "country": "United States",
+    "sitelinks": 34
+  },
+  {
+    "slug": "north-west-university",
+    "name": "North-West University",
+    "country": "South Africa",
+    "sitelinks": 22
+  },
+  {
+    "slug": "northeastern-university",
+    "name": "Northeastern University",
+    "country": "United States",
+    "sitelinks": 35
+  },
+  {
+    "slug": "northern-arizona-university",
+    "name": "Northern Arizona University",
+    "country": "United States",
+    "sitelinks": 25
+  },
+  {
+    "slug": "northern-illinois-university",
+    "name": "Northern Illinois University",
+    "country": "United States",
+    "sitelinks": 27
+  },
+  {
+    "slug": "northumbria-university",
+    "name": "Northumbria University",
+    "country": "United Kingdom",
+    "sitelinks": 25
+  },
+  {
+    "slug": "northwestern-university",
+    "name": "Northwestern University",
+    "country": "United States",
+    "sitelinks": 56
+  },
+  {
+    "slug": "norwegian-academy-of-science-and-letters",
+    "name": "Norwegian Academy of Science and Letters",
+    "country": "Norway",
+    "sitelinks": 26
+  },
+  {
+    "slug": "norwegian-language-council",
+    "name": "Norwegian Language Council",
+    "country": "Norway",
+    "sitelinks": 22
+  },
+  {
+    "slug": "norwegian-university-of-life-sciences",
+    "name": "Norwegian University of Life Sciences",
+    "country": "Norway",
+    "sitelinks": 26
+  },
+  {
+    "slug": "norwegian-university-of-science-and-technology",
+    "name": "Norwegian University of Science and Technology",
+    "country": "Norway",
+    "sitelinks": 41
+  },
+  {
+    "slug": "nottingham-trent-university",
+    "name": "Nottingham Trent University",
+    "country": "United Kingdom",
+    "sitelinks": 20
+  },
+  {
+    "slug": "nova-university-lisbon",
+    "name": "NOVA University Lisbon",
+    "country": "Portugal",
+    "sitelinks": 23
+  },
+  {
+    "slug": "novosibirsk-state-university",
+    "name": "Novosibirsk State University",
+    "country": "Russia",
+    "sitelinks": 30
+  },
+  {
+    "slug": "oberlin-college",
+    "name": "Oberlin College",
+    "country": "United States",
+    "sitelinks": 26
+  },
+  {
+    "slug": "odesa-university",
+    "name": "Odesa University",
+    "country": "Ukraine",
+    "sitelinks": 36
+  },
+  {
+    "slug": "ohio-state-university",
+    "name": "Ohio State University",
+    "country": "United States",
+    "sitelinks": 57
+  },
+  {
+    "slug": "ohio-university",
+    "name": "Ohio University",
+    "country": "United States",
+    "sitelinks": 35
+  },
+  {
+    "slug": "ohio-wesleyan-university",
+    "name": "Ohio Wesleyan University",
+    "country": "United States",
+    "sitelinks": 42
+  },
+  {
+    "slug": "oklahoma-state-university",
+    "name": "Oklahoma State University",
+    "country": "United States",
+    "sitelinks": 24
+  },
+  {
+    "slug": "oles-honchar-dnipro-national-university",
+    "name": "Oles Honchar Dnipro National University",
+    "country": "Ukraine",
+    "sitelinks": 20
+  },
+  {
+    "slug": "open-university-of-israel",
+    "name": "Open University of Israel",
+    "country": "Israel",
+    "sitelinks": 26
+  },
+  {
+    "slug": "orebro-university",
+    "name": "Örebro University",
+    "country": "Sweden",
+    "sitelinks": 24
+  },
+  {
+    "slug": "oregon-state-university",
+    "name": "Oregon State University",
+    "country": "United States",
+    "sitelinks": 34
+  },
+  {
+    "slug": "oriel-college",
+    "name": "Oriel College",
+    "country": "United Kingdom",
+    "sitelinks": 26
+  },
+  {
+    "slug": "osmania-university",
+    "name": "Osmania University",
+    "country": "India",
+    "sitelinks": 29
+  },
+  {
+    "slug": "oxford-brookes-university",
+    "name": "Oxford Brookes University",
+    "country": "United Kingdom",
+    "sitelinks": 24
+  },
+  {
+    "slug": "pace-university",
+    "name": "Pace University",
+    "country": "United States",
+    "sitelinks": 24
+  },
+  {
+    "slug": "palacky-university-olomouc",
+    "name": "Palacký University Olomouc",
+    "country": "Czech Republic",
+    "sitelinks": 32
+  },
+  {
+    "slug": "panjab-university",
+    "name": "Panjab University",
+    "country": "India",
+    "sitelinks": 20
+  },
+  {
+    "slug": "panteion-university",
+    "name": "Panteion University",
+    "country": "Greece",
+    "sitelinks": 22
+  },
+  {
+    "slug": "pantheon-assas-university-paris",
+    "name": "Panthéon-Assas University Paris",
+    "country": "France",
+    "sitelinks": 43
+  },
+  {
+    "slug": "paris-12-university",
+    "name": "Paris 12 University",
+    "country": "France",
+    "sitelinks": 21
+  },
+  {
+    "slug": "paris-8-university",
+    "name": "Paris 8 University",
+    "country": "France",
+    "sitelinks": 26
+  },
+  {
+    "slug": "paris-cite-university",
+    "name": "Paris Cité University",
+    "country": "France",
+    "sitelinks": 34
+  },
+  {
+    "slug": "paris-dauphine-university",
+    "name": "Paris Dauphine University",
+    "country": "France",
+    "sitelinks": 42
+  },
+  {
+    "slug": "paris-descartes-university",
+    "name": "Paris Descartes University",
+    "country": "France",
+    "sitelinks": 32
+  },
+  {
+    "slug": "paris-diderot-university",
+    "name": "Paris Diderot University",
+    "country": "France",
+    "sitelinks": 31
+  },
+  {
+    "slug": "paris-nanterre-university",
+    "name": "Paris Nanterre University",
+    "country": "France",
+    "sitelinks": 34
+  },
+  {
+    "slug": "paris-north-university",
+    "name": "Paris North University",
+    "country": "France",
+    "sitelinks": 21
+  },
+  {
+    "slug": "paris-observatory-psl-university",
+    "name": "Paris Observatory, PSL University",
+    "country": "France",
+    "sitelinks": 47
+  },
+  {
+    "slug": "paris-saclay-university",
+    "name": "Paris-Saclay University",
+    "country": "France",
+    "sitelinks": 77
+  },
+  {
+    "slug": "paris-sorbonne-university-paris-iv",
+    "name": "Paris-Sorbonne University - Paris IV",
+    "country": "France",
+    "sitelinks": 34
+  },
+  {
+    "slug": "pavol-jozef-safarik-university-in-kosice",
+    "name": "Pavol Jozef Šafárik University in Košice",
+    "country": "Slovakia",
+    "sitelinks": 20
+  },
+  {
+    "slug": "peking-university",
+    "name": "Peking University",
+    "country": "People's Republic of China",
+    "sitelinks": 79
+  },
+  {
+    "slug": "pembroke-college",
+    "name": "Pembroke College",
+    "country": "United Kingdom",
+    "sitelinks": 23
+  },
+  {
+    "slug": "pennsylvania-academy-of-the-fine-arts",
+    "name": "Pennsylvania Academy of the Fine Arts",
+    "country": "United States",
+    "sitelinks": 21
+  },
+  {
+    "slug": "pennsylvania-state-university",
+    "name": "Pennsylvania State University",
+    "country": "United States",
+    "sitelinks": 44
+  },
+  {
+    "slug": "peoples-friendship-university-of-russia",
+    "name": "Peoples' Friendship University of Russia",
+    "country": "Russia",
+    "sitelinks": 43
+  },
+  {
+    "slug": "pepperdine-university",
+    "name": "Pepperdine University",
+    "country": "United States",
+    "sitelinks": 22
+  },
+  {
+    "slug": "perm-state-national-research-university",
+    "name": "Perm State National Research University",
+    "country": "Russia",
+    "sitelinks": 23
+  },
+  {
+    "slug": "peter-the-great-saint-petersburg-state-polytechnical-university",
+    "name": "Peter the Great Saint Petersburg State Polytechnical University",
+    "country": "Russia",
+    "sitelinks": 26
+  },
+  {
+    "slug": "peterhouse",
+    "name": "Peterhouse",
+    "country": "United Kingdom",
+    "sitelinks": 23
+  },
+  {
+    "slug": "pierre-and-marie-curie-university",
+    "name": "Pierre and Marie Curie University",
+    "country": "France",
+    "sitelinks": 49
+  },
+  {
+    "slug": "plekhanov-russian-economic-university",
+    "name": "Plekhanov Russian Economic University",
+    "country": "Russia",
+    "sitelinks": 26
+  },
+  {
+    "slug": "pohang-university-of-science-and-technology",
+    "name": "Pohang University of Science and Technology",
+    "country": "South Korea",
+    "sitelinks": 20
+  },
+  {
+    "slug": "polish-academy-of-sciences",
+    "name": "Polish Academy of Sciences",
+    "country": "Poland",
+    "sitelinks": 39
+  },
+  {
+    "slug": "politehnica-university-of-bucharest",
+    "name": "Politehnica University of Bucharest",
+    "country": "Romania",
+    "sitelinks": 20
+  },
+  {
+    "slug": "polytechnic-institute-of-paris",
+    "name": "Polytechnic Institute of Paris",
+    "country": "France",
+    "sitelinks": 48
+  },
+  {
+    "slug": "polytechnic-university-of-catalonia",
+    "name": "Polytechnic University of Catalonia",
+    "country": "Spain",
+    "sitelinks": 22
+  },
+  {
+    "slug": "polytechnic-university-of-milan",
+    "name": "Polytechnic University of Milan",
+    "country": "Italy",
+    "sitelinks": 36
+  },
+  {
+    "slug": "polytechnic-university-of-turin",
+    "name": "Polytechnic University of Turin",
+    "country": "Italy",
+    "sitelinks": 28
+  },
+  {
+    "slug": "pompeu-fabra-university",
+    "name": "Pompeu Fabra University",
+    "country": "Spain",
+    "sitelinks": 27
+  },
+  {
+    "slug": "pontifical-academy-for-latin",
+    "name": "Pontifical Academy for Latin",
+    "country": "Vatican City",
+    "sitelinks": 20
+  },
+  {
+    "slug": "pontifical-academy-of-sciences",
+    "name": "Pontifical Academy of Sciences",
+    "country": "Vatican City",
+    "sitelinks": 33
+  },
+  {
+    "slug": "pontifical-biblical-institute",
+    "name": "Pontifical Biblical Institute",
+    "country": "Italy",
+    "sitelinks": 24
+  },
+  {
+    "slug": "pontifical-catholic-university-of-argentina",
+    "name": "Pontifical Catholic University of Argentina",
+    "country": "Argentina",
+    "sitelinks": 21
+  },
+  {
+    "slug": "pontifical-catholic-university-of-chile",
+    "name": "Pontifical Catholic University of Chile",
+    "country": "Chile",
+    "sitelinks": 36
+  },
+  {
+    "slug": "pontifical-ecclesiastical-academy",
+    "name": "Pontifical Ecclesiastical Academy",
+    "country": "Italy",
+    "sitelinks": 22
+  },
+  {
+    "slug": "pontifical-gregorian-university",
+    "name": "Pontifical Gregorian University",
+    "country": "Italy",
+    "sitelinks": 39
+  },
+  {
+    "slug": "pontifical-lateran-university",
+    "name": "Pontifical Lateran University",
+    "country": "Vatican City",
+    "sitelinks": 26
+  },
+  {
+    "slug": "pontifical-oriental-institute",
+    "name": "Pontifical Oriental Institute",
+    "country": "Italy",
+    "sitelinks": 30
+  },
+  {
+    "slug": "pontifical-university-of-saint-thomas-aquinas",
+    "name": "Pontifical University of Saint Thomas Aquinas",
+    "country": "Vatican City",
+    "sitelinks": 33
+  },
+  {
+    "slug": "pontifical-university-of-the-holy-cross",
+    "name": "Pontifical University of the Holy Cross",
+    "country": "Italy",
+    "sitelinks": 20
+  },
+  {
+    "slug": "pontifical-urbaniana-university",
+    "name": "Pontifical Urbaniana University",
+    "country": "Italy",
+    "sitelinks": 20
+  },
+  {
+    "slug": "pontificia-universidade-catolica-de-minas-gerais",
+    "name": "Pontifícia Universidade Católica de Minas Gerais",
+    "country": "Brazil",
+    "sitelinks": 96
+  },
+  {
+    "slug": "portland-state-university",
+    "name": "Portland State University",
+    "country": "United States",
+    "sitelinks": 22
+  },
+  {
+    "slug": "prague-conservatory",
+    "name": "Prague Conservatory",
+    "country": "Czech Republic",
+    "sitelinks": 20
+  },
+  {
+    "slug": "prague-university-of-economics-and-business",
+    "name": "Prague University of Economics and Business",
+    "country": "Czech Republic",
+    "sitelinks": 24
+  },
+  {
+    "slug": "pratt-institute",
+    "name": "Pratt Institute",
+    "country": "United States",
+    "sitelinks": 20
+  },
+  {
+    "slug": "princeton-university",
+    "name": "Princeton University",
+    "country": "United States",
+    "sitelinks": 99
+  },
+  {
+    "slug": "prussian-military-academy",
+    "name": "Prussian Military Academy",
+    "country": "Kingdom of Prussia",
+    "sitelinks": 20
+  },
+  {
+    "slug": "psb-paris-school-of-business",
+    "name": "PSB Paris School of Business",
+    "country": "France",
+    "sitelinks": 32
+  },
+  {
+    "slug": "psl-research-university",
+    "name": "PSL Research University",
+    "country": "France",
+    "sitelinks": 40
+  },
+  {
+    "slug": "purdue-university",
+    "name": "Purdue University",
+    "country": "United States",
+    "sitelinks": 50
+  },
+  {
+    "slug": "pusan-national-university",
+    "name": "Pusan National University",
+    "country": "South Korea",
+    "sitelinks": 23
+  },
+  {
+    "slug": "qatar-university",
+    "name": "Qatar University",
+    "country": "Qatar",
+    "sitelinks": 26
+  },
+  {
+    "slug": "quaid-i-azam-university",
+    "name": "Quaid-i-Azam University",
+    "country": "Pakistan",
+    "sitelinks": 21
+  },
+  {
+    "slug": "queen-mary-university-of-london",
+    "name": "Queen Mary University of London",
+    "country": "United Kingdom",
+    "sitelinks": 37
+  },
+  {
+    "slug": "queen-s-university",
+    "name": "Queen's University",
+    "country": "Canada",
+    "sitelinks": 41
+  },
+  {
+    "slug": "queen-s-university-belfast",
+    "name": "Queen's University Belfast",
+    "country": "United Kingdom",
+    "sitelinks": 37
+  },
+  {
+    "slug": "queens-college",
+    "name": "Queens' College",
+    "country": "United Kingdom",
+    "sitelinks": 20
+  },
+  {
+    "slug": "queensland-university-of-technology",
+    "name": "Queensland University of Technology",
+    "country": "Australia",
+    "sitelinks": 22
+  },
+  {
+    "slug": "radboud-university",
+    "name": "Radboud University",
+    "country": "Netherlands",
+    "sitelinks": 34
+  },
+  {
+    "slug": "radcliffe-college",
+    "name": "Radcliffe College",
+    "country": "United States",
+    "sitelinks": 21
+  },
+  {
+    "slug": "renmin-university-of-china",
+    "name": "Renmin University of China",
+    "country": "People's Republic of China",
+    "sitelinks": 34
+  },
+  {
+    "slug": "rensselaer-polytechnic-institute",
+    "name": "Rensselaer Polytechnic Institute",
+    "country": "United States",
+    "sitelinks": 27
+  },
+  {
+    "slug": "republic-of-china-military-academy",
+    "name": "Republic of China Military Academy",
+    "country": "Taiwan",
+    "sitelinks": 27
+  },
+  {
+    "slug": "reshetnev-siberian-state-university-of-science-and-technology",
+    "name": "Reshetnev Siberian State University of Science and Technology",
+    "country": "Russia",
+    "sitelinks": 31
+  },
+  {
+    "slug": "reykjavik-university",
+    "name": "Reykjavík University",
+    "country": "Iceland",
+    "sitelinks": 28
+  },
+  {
+    "slug": "rhode-island-school-of-design",
+    "name": "Rhode Island School of Design",
+    "country": "United States",
+    "sitelinks": 21
+  },
+  {
+    "slug": "rhodes-university",
+    "name": "Rhodes University",
+    "country": "South Africa",
+    "sitelinks": 23
+  },
+  {
+    "slug": "rice-university",
+    "name": "Rice University",
+    "country": "United States",
+    "sitelinks": 51
+  },
+  {
+    "slug": "riga-technical-university",
+    "name": "Riga Technical University",
+    "country": "Latvia",
+    "sitelinks": 37
+  },
+  {
+    "slug": "ritsumeikan-university",
+    "name": "Ritsumeikan University",
+    "country": "Japan",
+    "sitelinks": 33
+  },
+  {
+    "slug": "rmit-university",
+    "name": "RMIT University",
+    "country": "Australia",
+    "sitelinks": 24
+  },
+  {
+    "slug": "robert-gordon-university",
+    "name": "Robert Gordon University",
+    "country": "United Kingdom",
+    "sitelinks": 21
+  },
+  {
+    "slug": "rochester-institute-of-technology",
+    "name": "Rochester Institute of Technology",
+    "country": "United States",
+    "sitelinks": 23
+  },
+  {
+    "slug": "romanian-academy",
+    "name": "Romanian Academy",
+    "country": "Romania",
+    "sitelinks": 30
+  },
+  {
+    "slug": "roskilde-university",
+    "name": "Roskilde University",
+    "country": "Denmark",
+    "sitelinks": 22
+  },
+  {
+    "slug": "royal-academy-of-arts",
+    "name": "Royal Academy of Arts",
+    "country": "United Kingdom",
+    "sitelinks": 40
+  },
+  {
+    "slug": "royal-academy-of-fine-arts",
+    "name": "Royal Academy of Fine Arts",
+    "country": "Belgium",
+    "sitelinks": 22
+  },
+  {
+    "slug": "royal-academy-of-fine-arts-of-brussels",
+    "name": "Royal Academy of Fine Arts of Brussels",
+    "country": "Belgium",
+    "sitelinks": 21
+  },
+  {
+    "slug": "royal-academy-of-fine-arts-of-san-fernando",
+    "name": "Royal Academy of Fine Arts of San Fernando",
+    "country": "Spain",
+    "sitelinks": 28
+  },
+  {
+    "slug": "royal-academy-of-history",
+    "name": "Royal Academy of History",
+    "country": "Spain",
+    "sitelinks": 22
+  },
+  {
+    "slug": "royal-academy-of-music",
+    "name": "Royal Academy of Music",
+    "country": "United Kingdom",
+    "sitelinks": 35
+  },
+  {
+    "slug": "royal-academy-of-turku",
+    "name": "Royal Academy of Turku",
+    "country": "Finland",
+    "sitelinks": 23
+  },
+  {
+    "slug": "royal-college-of-art",
+    "name": "Royal College of Art",
+    "country": "United Kingdom",
+    "sitelinks": 29
+  },
+  {
+    "slug": "royal-college-of-music",
+    "name": "Royal College of Music",
+    "country": "United Kingdom",
+    "sitelinks": 31
+  },
+  {
+    "slug": "royal-conservatory-of-brussels",
+    "name": "Royal Conservatory of Brussels",
+    "country": "Belgium",
+    "sitelinks": 20
+  },
+  {
+    "slug": "royal-danish-academy-of-fine-arts",
+    "name": "Royal Danish Academy of Fine Arts",
+    "country": "Denmark",
+    "sitelinks": 26
+  },
+  {
+    "slug": "royal-danish-academy-of-sciences-and-letters",
+    "name": "Royal Danish Academy of Sciences and Letters",
+    "country": "Denmark",
+    "sitelinks": 25
+  },
+  {
+    "slug": "royal-galician-academy",
+    "name": "Royal Galician Academy",
+    "country": "Spain",
+    "sitelinks": 21
+  },
+  {
+    "slug": "royal-geographical-society",
+    "name": "Royal Geographical Society",
+    "country": "United Kingdom",
+    "sitelinks": 41
+  },
+  {
+    "slug": "royal-holloway-university-of-london",
+    "name": "Royal Holloway, University of London",
+    "country": "United Kingdom",
+    "sitelinks": 21
+  },
+  {
+    "slug": "royal-institute-of-technology",
+    "name": "Royal Institute of Technology",
+    "country": "Sweden",
+    "sitelinks": 36
+  },
+  {
+    "slug": "royal-military-academy-sandhurst",
+    "name": "Royal Military Academy Sandhurst",
+    "country": "United Kingdom",
+    "sitelinks": 39
+  },
+  {
+    "slug": "royal-netherlands-academy-of-arts-and-sciences",
+    "name": "Royal Netherlands Academy of Arts and Sciences",
+    "country": "Netherlands",
+    "sitelinks": 29
+  },
+  {
+    "slug": "royal-prussian-academy-of-sciences",
+    "name": "Royal Prussian Academy of Sciences",
+    "country": "Germany",
+    "sitelinks": 42
+  },
+  {
+    "slug": "royal-scottish-academy",
+    "name": "Royal Scottish Academy",
+    "country": "United Kingdom",
+    "sitelinks": 21
+  },
+  {
+    "slug": "royal-society",
+    "name": "Royal Society",
+    "country": "United Kingdom",
+    "sitelinks": 89
+  },
+  {
+    "slug": "royal-society-of-canada",
+    "name": "Royal Society of Canada",
+    "country": "Canada",
+    "sitelinks": 21
+  },
+  {
+    "slug": "royal-society-of-edinburgh",
+    "name": "Royal Society of Edinburgh",
+    "country": "United Kingdom",
+    "sitelinks": 26
+  },
+  {
+    "slug": "royal-society-of-literature",
+    "name": "Royal Society of Literature",
+    "country": "United Kingdom",
+    "sitelinks": 27
+  },
+  {
+    "slug": "royal-spanish-academy",
+    "name": "Royal Spanish Academy",
+    "country": "Spain",
+    "sitelinks": 45
+  },
+  {
+    "slug": "royal-swedish-academy-of-fine-arts",
+    "name": "Royal Swedish Academy of Fine Arts",
+    "country": "Sweden",
+    "sitelinks": 27
+  },
+  {
+    "slug": "royal-swedish-academy-of-music",
+    "name": "Royal Swedish Academy of Music",
+    "country": "Sweden",
+    "sitelinks": 20
+  },
+  {
+    "slug": "royal-swedish-academy-of-sciences",
+    "name": "Royal Swedish Academy of Sciences",
+    "country": "Sweden",
+    "sitelinks": 62
+  },
+  {
+    "slug": "royal-university-of-phnom-penh",
+    "name": "Royal University of Phnom Penh",
+    "country": "Cambodia",
+    "sitelinks": 20
+  },
+  {
+    "slug": "ruhr-university-bochum",
+    "name": "Ruhr University Bochum",
+    "country": "Germany",
+    "sitelinks": 31
+  },
+  {
+    "slug": "russian-academy-of-sciences",
+    "name": "Russian Academy of Sciences",
+    "country": "Russia",
+    "sitelinks": 66
+  },
+  {
+    "slug": "russian-institute-of-theatre-arts",
+    "name": "Russian Institute of Theatre Arts",
+    "country": "Russia",
+    "sitelinks": 26
+  },
+  {
+    "slug": "russian-language-institute",
+    "name": "Russian Language Institute",
+    "country": "Russia",
+    "sitelinks": 20
+  },
+  {
+    "slug": "russian-presidential-academy-of-national-economy-and-public-administration",
+    "name": "Russian Presidential Academy of National Economy and Public Administration",
+    "country": "Russia",
+    "sitelinks": 20
+  },
+  {
+    "slug": "rutgers-university",
+    "name": "Rutgers University",
+    "country": "United States",
+    "sitelinks": 52
+  },
+  {
+    "slug": "rwth-aachen-university",
+    "name": "RWTH Aachen University",
+    "country": "Germany",
+    "sitelinks": 43
+  },
+  {
+    "slug": "saarland-university",
+    "name": "Saarland University",
+    "country": "Germany",
+    "sitelinks": 27
+  },
+  {
+    "slug": "saint-joseph-university-of-beirut",
+    "name": "Saint Joseph University of Beirut",
+    "country": "Lebanon",
+    "sitelinks": 22
+  },
+  {
+    "slug": "saint-petersburg-conservatory",
+    "name": "Saint Petersburg Conservatory",
+    "country": "Russia",
+    "sitelinks": 36
+  },
+  {
+    "slug": "saint-petersburg-state-university",
+    "name": "Saint Petersburg State University",
+    "country": "Russia",
+    "sitelinks": 72
+  },
+  {
+    "slug": "san-diego-state-university",
+    "name": "San Diego State University",
+    "country": "United States",
+    "sitelinks": 29
+  },
+  {
+    "slug": "san-francisco-state-university",
+    "name": "San Francisco State University",
+    "country": "United States",
+    "sitelinks": 28
+  },
+  {
+    "slug": "san-jose-state-university",
+    "name": "San Jose State University",
+    "country": "United States",
+    "sitelinks": 27
+  },
+  {
+    "slug": "san-sebastian-university",
+    "name": "San Sebastián University",
+    "country": "Chile",
+    "sitelinks": 26
+  },
+  {
+    "slug": "sanaa-university",
+    "name": "Sanaa University",
+    "country": "Yemen",
+    "sitelinks": 21
+  },
+  {
+    "slug": "sankore-madrasah",
+    "name": "Sankore Madrasah",
+    "country": "Mali",
+    "sitelinks": 27
+  },
+  {
+    "slug": "santa-clara-university",
+    "name": "Santa Clara University",
+    "country": "United States",
+    "sitelinks": 21
+  },
+  {
+    "slug": "sapienza-university-of-rome",
+    "name": "Sapienza University of Rome",
+    "country": "Italy",
+    "sitelinks": 70
+  },
+  {
+    "slug": "saratov-state-university",
+    "name": "Saratov State University",
+    "country": "Russia",
+    "sitelinks": 21
+  },
+  {
+    "slug": "schola-medica-salernitana",
+    "name": "Schola Medica Salernitana",
+    "country": "Italy",
+    "sitelinks": 31
+  },
+  {
+    "slug": "school-for-advanced-studies-in-the-social-sciences",
+    "name": "School for Advanced Studies in the Social Sciences",
+    "country": "France",
+    "sitelinks": 42
+  },
+  {
+    "slug": "school-of-the-air-and-space",
+    "name": "School of the Air and Space",
+    "country": "France",
+    "sitelinks": 26
+  },
+  {
+    "slug": "sciences-po",
+    "name": "Sciences Po",
+    "country": "France",
+    "sitelinks": 68
+  },
+  {
+    "slug": "scuola-normale-superiore",
+    "name": "Scuola Normale Superiore",
+    "country": "Italy",
+    "sitelinks": 22
+  },
+  {
+    "slug": "seattle-university",
+    "name": "Seattle University",
+    "country": "United States",
+    "sitelinks": 22
+  },
+  {
+    "slug": "section-d-or",
+    "name": "Section d'Or",
+    "country": "",
+    "sitelinks": 20
+  },
+  {
+    "slug": "semmelweis-university",
+    "name": "Semmelweis University",
+    "country": "Hungary",
+    "sitelinks": 20
+  },
+  {
+    "slug": "seoul-national-university",
+    "name": "Seoul National University",
+    "country": "South Korea",
+    "sitelinks": 55
+  },
+  {
+    "slug": "serbian-academy-of-sciences-and-arts",
+    "name": "Serbian Academy of Sciences and Arts",
+    "country": "Serbia",
+    "sitelinks": 35
+  },
+  {
+    "slug": "shandong-university",
+    "name": "Shandong University",
+    "country": "People's Republic of China",
+    "sitelinks": 21
+  },
+  {
+    "slug": "shanghai-jiao-tong-university",
+    "name": "Shanghai Jiao Tong University",
+    "country": "People's Republic of China",
+    "sitelinks": 42
+  },
+  {
+    "slug": "shanghai-university",
+    "name": "Shanghai University",
+    "country": "People's Republic of China",
+    "sitelinks": 23
+  },
+  {
+    "slug": "sharif-university-of-technology",
+    "name": "Sharif University of Technology",
+    "country": "Iran",
+    "sitelinks": 30
+  },
+  {
+    "slug": "shenzhen-university",
+    "name": "Shenzhen University",
+    "country": "People's Republic of China",
+    "sitelinks": 27
+  },
+  {
+    "slug": "shiraz-university",
+    "name": "Shiraz University",
+    "country": "Iran",
+    "sitelinks": 20
+  },
+  {
+    "slug": "sibelius-academy",
+    "name": "Sibelius Academy",
+    "country": "Finland",
+    "sitelinks": 31
+  },
+  {
+    "slug": "sichuan-university",
+    "name": "Sichuan University",
+    "country": "People's Republic of China",
+    "sitelinks": 21
+  },
+  {
+    "slug": "sienese-school",
+    "name": "Sienese school",
+    "country": "Italy",
+    "sitelinks": 33
+  },
+  {
+    "slug": "simon-fraser-university",
+    "name": "Simon Fraser University",
+    "country": "Canada",
+    "sitelinks": 30
+  },
+  {
+    "slug": "skema-business-school",
+    "name": "Skema Business School",
+    "country": "France",
+    "sitelinks": 31
+  },
+  {
+    "slug": "slovak-academy-of-sciences",
+    "name": "Slovak Academy of Sciences",
+    "country": "Slovakia",
+    "sitelinks": 21
+  },
+  {
+    "slug": "slovenian-academy-of-sciences-and-arts",
+    "name": "Slovenian Academy of Sciences and Arts",
+    "country": "Slovenia",
+    "sitelinks": 27
+  },
+  {
+    "slug": "smith-college",
+    "name": "Smith College",
+    "country": "United States",
+    "sitelinks": 31
+  },
+  {
+    "slug": "soas-university-of-london",
+    "name": "SOAS, University of London",
+    "country": "United Kingdom",
+    "sitelinks": 42
+  },
+  {
+    "slug": "sofia-university",
+    "name": "Sofia University",
+    "country": "Bulgaria",
+    "sitelinks": 41
+  },
+  {
+    "slug": "somerville-college",
+    "name": "Somerville College",
+    "country": "United Kingdom",
+    "sitelinks": 40
+  },
+  {
+    "slug": "sophia-university",
+    "name": "Sophia University",
+    "country": "Japan",
+    "sitelinks": 31
+  },
+  {
+    "slug": "sorbonne",
+    "name": "Sorbonne",
+    "country": "France",
+    "sitelinks": 58
+  },
+  {
+    "slug": "sorbonne-nouvelle-paris-3",
+    "name": "Sorbonne Nouvelle-Paris 3",
+    "country": "France",
+    "sitelinks": 33
+  },
+  {
+    "slug": "sorbonne-university",
+    "name": "Sorbonne University",
+    "country": "France",
+    "sitelinks": 41
+  },
+  {
+    "slug": "south-ural-state-university",
+    "name": "South Ural State University",
+    "country": "Russia",
+    "sitelinks": 23
+  },
+  {
+    "slug": "southern-federal-university",
+    "name": "Southern Federal University",
+    "country": "Russia",
+    "sitelinks": 23
+  },
+  {
+    "slug": "southern-methodist-university",
+    "name": "Southern Methodist University",
+    "country": "United States",
+    "sitelinks": 25
+  },
+  {
+    "slug": "ss-cyril-and-methodius-university-of-skopje",
+    "name": "Ss. Cyril and Methodius University of Skopje",
+    "country": "North Macedonia",
+    "sitelinks": 29
+  },
+  {
+    "slug": "st-antony-s-college",
+    "name": "St Antony's College",
+    "country": "United Kingdom",
+    "sitelinks": 21
+  },
+  {
+    "slug": "st-hugh-s-college",
+    "name": "St Hugh's College",
+    "country": "United Kingdom",
+    "sitelinks": 21
+  },
+  {
+    "slug": "st-john-s-college",
+    "name": "St John's College",
+    "country": "United Kingdom",
+    "sitelinks": 29
+  },
+  {
+    "slug": "st-john-s-university",
+    "name": "St. John's University",
+    "country": "United States",
+    "sitelinks": 21
+  },
+  {
+    "slug": "stanford-university",
+    "name": "Stanford University",
+    "country": "United States",
+    "sitelinks": 111
+  },
+  {
+    "slug": "state-university-of-feira-de-santana",
+    "name": "State University of Feira de Santana",
+    "country": "Brazil",
+    "sitelinks": 103
+  },
+  {
+    "slug": "state-university-of-minas-gerais",
+    "name": "State University of Minas Gerais",
+    "country": "Brazil",
+    "sitelinks": 102
+  },
+  {
+    "slug": "state-university-of-new-york",
+    "name": "State University of New York",
+    "country": "United States",
+    "sitelinks": 38
+  },
+  {
+    "slug": "state-university-of-trade-and-economics",
+    "name": "State University of Trade and Economics",
+    "country": "Ukraine",
+    "sitelinks": 20
+  },
+  {
+    "slug": "stellenbosch-university",
+    "name": "Stellenbosch University",
+    "country": "South Africa",
+    "sitelinks": 38
+  },
+  {
+    "slug": "stockholm-school-of-economics",
+    "name": "Stockholm School of Economics",
+    "country": "Sweden",
+    "sitelinks": 29
+  },
+  {
+    "slug": "stockholm-university",
+    "name": "Stockholm University",
+    "country": "Sweden",
+    "sitelinks": 58
+  },
+  {
+    "slug": "stony-brook-university",
+    "name": "Stony Brook University",
+    "country": "United States",
+    "sitelinks": 36
+  },
+  {
+    "slug": "suffolk-university",
+    "name": "Suffolk University",
+    "country": "United States",
+    "sitelinks": 21
+  },
+  {
+    "slug": "sultan-qaboos-university",
+    "name": "Sultan Qaboos University",
+    "country": "Oman",
+    "sitelinks": 23
+  },
+  {
+    "slug": "sun-yat-sen-university",
+    "name": "Sun Yat-sen University",
+    "country": "People's Republic of China",
+    "sitelinks": 26
+  },
+  {
+    "slug": "sungkyunkwan-university",
+    "name": "Sungkyunkwan University",
+    "country": "South Korea",
+    "sitelinks": 31
+  },
+  {
+    "slug": "sup-biotech",
+    "name": "Sup'Biotech",
+    "country": "France",
+    "sitelinks": 20
+  },
+  {
+    "slug": "supelec",
+    "name": "Supélec",
+    "country": "France",
+    "sitelinks": 24
+  },
+  {
+    "slug": "swansea-university",
+    "name": "Swansea University",
+    "country": "United Kingdom",
+    "sitelinks": 28
+  },
+  {
+    "slug": "swarthmore-college",
+    "name": "Swarthmore College",
+    "country": "United States",
+    "sitelinks": 22
+  },
+  {
+    "slug": "swedish-academy",
+    "name": "Swedish Academy",
+    "country": "Sweden",
+    "sitelinks": 52
+  },
+  {
+    "slug": "swedish-university-of-agricultural-sciences",
+    "name": "Swedish University of Agricultural Sciences",
+    "country": "Sweden",
+    "sitelinks": 26
+  },
+  {
+    "slug": "swinburne-university-of-technology",
+    "name": "Swinburne University of Technology",
+    "country": "Australia",
+    "sitelinks": 23
+  },
+  {
+    "slug": "swiss-federal-institute-of-technology-in-lausanne",
+    "name": "Swiss Federal Institute of Technology in Lausanne",
+    "country": "Switzerland",
+    "sitelinks": 43
+  },
+  {
+    "slug": "syracuse-university",
+    "name": "Syracuse University",
+    "country": "United States",
+    "sitelinks": 48
+  },
+  {
+    "slug": "tallinn-university",
+    "name": "Tallinn University",
+    "country": "Estonia",
+    "sitelinks": 44
+  },
+  {
+    "slug": "tallinn-university-of-technology",
+    "name": "Tallinn University of Technology",
+    "country": "Estonia",
+    "sitelinks": 35
+  },
+  {
+    "slug": "tampere-university",
+    "name": "Tampere University",
+    "country": "Finland",
+    "sitelinks": 21
+  },
+  {
+    "slug": "tampere-university-of-technology",
+    "name": "Tampere University of Technology",
+    "country": "Finland",
+    "sitelinks": 20
+  },
+  {
+    "slug": "taras-shevchenko-national-university-of-kyiv",
+    "name": "Taras Shevchenko National University of Kyiv",
+    "country": "Ukraine",
+    "sitelinks": 61
+  },
+  {
+    "slug": "tata-institute-of-fundamental-research",
+    "name": "Tata Institute of Fundamental Research",
+    "country": "India",
+    "sitelinks": 23
+  },
+  {
+    "slug": "tbilisi-state-university",
+    "name": "Tbilisi State University",
+    "country": "Georgia",
+    "sitelinks": 47
+  },
+  {
+    "slug": "tbs-education",
+    "name": "TBS Education",
+    "country": "Spain",
+    "sitelinks": 30
+  },
+  {
+    "slug": "technical-university-of-darmstadt",
+    "name": "Technical University of Darmstadt",
+    "country": "Germany",
+    "sitelinks": 41
+  },
+  {
+    "slug": "technical-university-of-denmark",
+    "name": "Technical University of Denmark",
+    "country": "Denmark",
+    "sitelinks": 32
+  },
+  {
+    "slug": "technical-university-of-dortmund",
+    "name": "Technical University of Dortmund",
+    "country": "Germany",
+    "sitelinks": 20
+  },
+  {
+    "slug": "technical-university-of-madrid",
+    "name": "Technical University of Madrid",
+    "country": "Spain",
+    "sitelinks": 30
+  },
+  {
+    "slug": "technical-university-of-munich",
+    "name": "Technical University of Munich",
+    "country": "Germany",
+    "sitelinks": 67
+  },
+  {
+    "slug": "technion-israel-institute-of-technology",
+    "name": "Technion – Israel Institute of Technology",
+    "country": "Israel",
+    "sitelinks": 39
+  },
+  {
+    "slug": "technische-universitat-berlin",
+    "name": "Technische Universität Berlin",
+    "country": "Germany",
+    "sitelinks": 50
+  },
+  {
+    "slug": "tel-aviv-university",
+    "name": "Tel Aviv University",
+    "country": "Israel",
+    "sitelinks": 52
+  },
+  {
+    "slug": "telecom-paris",
+    "name": "Télécom Paris",
+    "country": "France",
+    "sitelinks": 31
+  },
+  {
+    "slug": "temple-university",
+    "name": "Temple University",
+    "country": "United States",
+    "sitelinks": 35
+  },
+  {
+    "slug": "texas-a-m-university",
+    "name": "Texas A&M University",
+    "country": "United States",
+    "sitelinks": 44
+  },
+  {
+    "slug": "texas-tech-university",
+    "name": "Texas Tech University",
+    "country": "United States",
+    "sitelinks": 30
+  },
+  {
+    "slug": "thammasat-university",
+    "name": "Thammasat University",
+    "country": "Thailand",
+    "sitelinks": 34
+  },
+  {
+    "slug": "the-american-university-in-cairo",
+    "name": "The American University in Cairo",
+    "country": "Egypt",
+    "sitelinks": 27
+  },
+  {
+    "slug": "the-catholic-university-of-america",
+    "name": "The Catholic University of America",
+    "country": "United States",
+    "sitelinks": 30
+  },
+  {
+    "slug": "the-chinese-university-of-hong-kong",
+    "name": "The Chinese University of Hong Kong",
+    "country": "People's Republic of China",
+    "sitelinks": 38
+  },
+  {
+    "slug": "the-new-school",
+    "name": "The New School",
+    "country": "United States",
+    "sitelinks": 36
+  },
+  {
+    "slug": "the-open-university",
+    "name": "The Open University",
+    "country": "United Kingdom",
+    "sitelinks": 35
+  },
+  {
+    "slug": "the-queen-s-college",
+    "name": "The Queen's College",
+    "country": "United Kingdom",
+    "sitelinks": 23
+  },
+  {
+    "slug": "the-rockefeller-university",
+    "name": "The Rockefeller University",
+    "country": "United States",
+    "sitelinks": 49
+  },
+  {
+    "slug": "the-wharton-school",
+    "name": "The Wharton School",
+    "country": "United States",
+    "sitelinks": 35
+  },
+  {
+    "slug": "tilburg-university",
+    "name": "Tilburg University",
+    "country": "Netherlands",
+    "sitelinks": 33
+  },
+  {
+    "slug": "tohoku-university",
+    "name": "Tohoku University",
+    "country": "Japan",
+    "sitelinks": 44
+  },
+  {
+    "slug": "tokai-university",
+    "name": "Tokai University",
+    "country": "Japan",
+    "sitelinks": 20
+  },
+  {
+    "slug": "tokyo-institute-of-technology",
+    "name": "Tokyo Institute of Technology",
+    "country": "Japan",
+    "sitelinks": 39
+  },
+  {
+    "slug": "tokyo-university-of-foreign-studies",
+    "name": "Tokyo University of Foreign Studies",
+    "country": "Japan",
+    "sitelinks": 21
+  },
+  {
+    "slug": "tokyo-university-of-science",
+    "name": "Tokyo University of Science",
+    "country": "Japan",
+    "sitelinks": 23
+  },
+  {
+    "slug": "tokyo-university-of-the-arts",
+    "name": "Tokyo University of the Arts",
+    "country": "Japan",
+    "sitelinks": 27
+  },
+  {
+    "slug": "tomsk-state-university",
+    "name": "Tomsk State University",
+    "country": "Russia",
+    "sitelinks": 30
+  },
+  {
+    "slug": "tongji-university",
+    "name": "Tongji University",
+    "country": "People's Republic of China",
+    "sitelinks": 28
+  },
+  {
+    "slug": "tor-vergata-university-of-rome",
+    "name": "Tor Vergata University of Rome",
+    "country": "Italy",
+    "sitelinks": 25
+  },
+  {
+    "slug": "toronto-metropolitan-university",
+    "name": "Toronto Metropolitan University",
+    "country": "Canada",
+    "sitelinks": 30
+  },
+  {
+    "slug": "toulouse-capitole-university",
+    "name": "Toulouse Capitole University",
+    "country": "France",
+    "sitelinks": 26
+  },
+  {
+    "slug": "toulouse-iii-paul-sabatier-university",
+    "name": "Toulouse III - Paul Sabatier University",
+    "country": "France",
+    "sitelinks": 24
+  },
+  {
+    "slug": "toulouse-school-of-economics",
+    "name": "Toulouse School of Economics",
+    "country": "France",
+    "sitelinks": 24
+  },
+  {
+    "slug": "tribhuvan-university",
+    "name": "Tribhuvan University",
+    "country": "Nepal",
+    "sitelinks": 26
+  },
+  {
+    "slug": "trier-university",
+    "name": "Trier University",
+    "country": "Germany",
+    "sitelinks": 21
+  },
+  {
+    "slug": "trinity-college",
+    "name": "Trinity College",
+    "country": "United Kingdom",
+    "sitelinks": 48
+  },
+  {
+    "slug": "trinity-college-dublin",
+    "name": "Trinity College, Dublin",
+    "country": "Ireland",
+    "sitelinks": 45
+  },
+  {
+    "slug": "trnava-university-in-trnava",
+    "name": "Trnava University in Trnava",
+    "country": "Slovakia",
+    "sitelinks": 22
+  },
+  {
+    "slug": "tsinghua-university",
+    "name": "Tsinghua University",
+    "country": "People's Republic of China",
+    "sitelinks": 69
+  },
+  {
+    "slug": "tu-braunschweig",
+    "name": "TU Braunschweig",
+    "country": "Germany",
+    "sitelinks": 28
+  },
+  {
+    "slug": "tu-dresden",
+    "name": "TU Dresden",
+    "country": "Germany",
+    "sitelinks": 41
+  },
+  {
+    "slug": "tu-wien",
+    "name": "TU Wien",
+    "country": "Austria",
+    "sitelinks": 40
+  },
+  {
+    "slug": "tufts-university",
+    "name": "Tufts University",
+    "country": "United States",
+    "sitelinks": 43
+  },
+  {
+    "slug": "tulane-university",
+    "name": "Tulane University",
+    "country": "United States",
+    "sitelinks": 37
+  },
+  {
+    "slug": "turkish-language-association",
+    "name": "Turkish Language Association",
+    "country": "Turkey",
+    "sitelinks": 23
+  },
+  {
+    "slug": "uclouvain",
+    "name": "UCLouvain",
+    "country": "Belgium",
+    "sitelinks": 37
+  },
+  {
+    "slug": "ukrainian-national-academy-of-music",
+    "name": "Ukrainian National Academy of Music",
+    "country": "Ukraine",
+    "sitelinks": 24
+  },
+  {
+    "slug": "ulm-university",
+    "name": "Ulm University",
+    "country": "Germany",
+    "sitelinks": 24
+  },
+  {
+    "slug": "ulster-university",
+    "name": "Ulster University",
+    "country": "United Kingdom",
+    "sitelinks": 28
+  },
+  {
+    "slug": "umea-institute-of-design",
+    "name": "Umeå Institute of Design",
+    "country": "Sweden",
+    "sitelinks": 20
+  },
+  {
+    "slug": "umea-university",
+    "name": "Umeå University",
+    "country": "Sweden",
+    "sitelinks": 42
+  },
+  {
+    "slug": "umm-al-qura-university",
+    "name": "Umm al-Qura University",
+    "country": "Saudi Arabia",
+    "sitelinks": 22
+  },
+  {
+    "slug": "union-mundial-pro-interlingua",
+    "name": "Union Mundial pro Interlingua",
+    "country": "",
+    "sitelinks": 21
+  },
+  {
+    "slug": "united-nations-university",
+    "name": "United Nations University",
+    "country": "Japan",
+    "sitelinks": 38
+  },
+  {
+    "slug": "united-states-air-force-academy",
+    "name": "United States Air Force Academy",
+    "country": "United States",
+    "sitelinks": 29
+  },
+  {
+    "slug": "united-states-army-war-college",
+    "name": "United States Army War College",
+    "country": "United States",
+    "sitelinks": 21
+  },
+  {
+    "slug": "united-states-military-academy",
+    "name": "United States Military Academy",
+    "country": "United States",
+    "sitelinks": 61
+  },
+  {
+    "slug": "united-states-naval-academy",
+    "name": "United States Naval Academy",
+    "country": "United States",
+    "sitelinks": 41
+  },
+  {
+    "slug": "universidad-carlos-iii-de-madrid",
+    "name": "Universidad Carlos III de Madrid",
+    "country": "Spain",
+    "sitelinks": 23
+  },
+  {
+    "slug": "universidad-de-malaga",
+    "name": "Universidad de Málaga",
+    "country": "Spain",
+    "sitelinks": 20
+  },
+  {
+    "slug": "universidad-del-desarrollo",
+    "name": "Universidad del Desarrollo",
+    "country": "Chile",
+    "sitelinks": 20
+  },
+  {
+    "slug": "universidad-nebrija",
+    "name": "Universidad Nebrija",
+    "country": "Spain",
+    "sitelinks": 24
+  },
+  {
+    "slug": "universidade-federal-de-goias",
+    "name": "Universidade Federal de Goiás",
+    "country": "Brazil",
+    "sitelinks": 82
+  },
+  {
+    "slug": "universidade-federal-do-reconcavo-da-bahia",
+    "name": "Universidade Federal do Recôncavo da Bahia",
+    "country": "Brazil",
+    "sitelinks": 96
+  },
+  {
+    "slug": "universidade-tecnologica-federal-do-parana",
+    "name": "Universidade Tecnológica Federal do Paraná",
+    "country": "Brazil",
+    "sitelinks": 26
+  },
+  {
+    "slug": "universita-degli-studi-guglielmo-marconi",
+    "name": "Università degli Studi ''Guglielmo Marconi''",
+    "country": "Italy",
+    "sitelinks": 43
+  },
+  {
+    "slug": "universita-degli-studi-niccolo-cusano",
+    "name": "Università degli Studi Niccolò Cusano",
+    "country": "Italy",
+    "sitelinks": 134
+  },
+  {
+    "slug": "universita-degli-studi-roma-tre",
+    "name": "Università degli Studi Roma Tre",
+    "country": "Italy",
+    "sitelinks": 22
+  },
+  {
+    "slug": "universita-della-svizzera-italiana",
+    "name": "Università della Svizzera italiana",
+    "country": "Switzerland",
+    "sitelinks": 22
+  },
+  {
+    "slug": "universitas-istropolitana",
+    "name": "Universitas Istropolitana",
+    "country": "Slovakia",
+    "sitelinks": 22
+  },
+  {
+    "slug": "universitat-d-andorra",
+    "name": "Universitat d'Andorra",
+    "country": "Andorra",
+    "sitelinks": 32
+  },
+  {
+    "slug": "universite-cheikh-anta-diop",
+    "name": "Université Cheikh Anta Diop",
+    "country": "Senegal",
+    "sitelinks": 24
+  },
+  {
+    "slug": "universite-de-montreal",
+    "name": "Université de Montréal",
+    "country": "Canada",
+    "sitelinks": 42
+  },
+  {
+    "slug": "universite-de-versailles-saint-quentin-en-yvelines",
+    "name": "Université de Versailles Saint-Quentin-en-Yvelines",
+    "country": "France",
+    "sitelinks": 80
+  },
+  {
+    "slug": "universite-du-burundi",
+    "name": "Université du Burundi",
+    "country": "Burundi",
+    "sitelinks": 23
+  },
+  {
+    "slug": "universite-du-quebec-a-montreal",
+    "name": "Université du Québec à Montréal",
+    "country": "Canada",
+    "sitelinks": 28
+  },
+  {
+    "slug": "universite-libre-de-bruxelles",
+    "name": "Université libre de Bruxelles",
+    "country": "Belgium",
+    "sitelinks": 42
+  },
+  {
+    "slug": "universiti-malaya",
+    "name": "Universiti Malaya",
+    "country": "Malaysia",
+    "sitelinks": 42
+  },
+  {
+    "slug": "university-at-buffalo",
+    "name": "University at Buffalo",
+    "country": "United States",
+    "sitelinks": 35
+  },
+  {
+    "slug": "university-college-cork",
+    "name": "University College Cork",
+    "country": "Ireland",
+    "sitelinks": 25
+  },
+  {
+    "slug": "university-college-dublin",
+    "name": "University College Dublin",
+    "country": "Ireland",
+    "sitelinks": 41
+  },
+  {
+    "slug": "university-college-london",
+    "name": "University College London",
+    "country": "United Kingdom",
+    "sitelinks": 69
+  },
+  {
+    "slug": "university-college-oxford",
+    "name": "University College, Oxford",
+    "country": "United Kingdom",
+    "sitelinks": 29
+  },
+  {
+    "slug": "university-for-peace",
+    "name": "University for Peace",
+    "country": "Costa Rica",
+    "sitelinks": 34
+  },
+  {
+    "slug": "university-joseph-ki-zerbo",
+    "name": "University Joseph Ki-Zerbo",
+    "country": "Burkina Faso",
+    "sitelinks": 20
+  },
+  {
+    "slug": "university-of-a-coruna",
+    "name": "University of A Coruña",
+    "country": "Spain",
+    "sitelinks": 21
+  },
+  {
+    "slug": "university-of-aberdeen",
+    "name": "University of Aberdeen",
+    "country": "United Kingdom",
+    "sitelinks": 53
+  },
+  {
+    "slug": "university-of-adelaide",
+    "name": "University of Adelaide",
+    "country": "Australia",
+    "sitelinks": 34
+  },
+  {
+    "slug": "university-of-agder",
+    "name": "University of Agder",
+    "country": "Norway",
+    "sitelinks": 21
+  },
+  {
+    "slug": "university-of-akureyri",
+    "name": "University of Akureyri",
+    "country": "Iceland",
+    "sitelinks": 25
+  },
+  {
+    "slug": "university-of-al-qarawiyyin",
+    "name": "University of al-Qarawiyyin",
+    "country": "Morocco",
+    "sitelinks": 67
+  },
+  {
+    "slug": "university-of-alabama",
+    "name": "University of Alabama",
+    "country": "United States",
+    "sitelinks": 41
+  },
+  {
+    "slug": "university-of-alaska-fairbanks",
+    "name": "University of Alaska Fairbanks",
+    "country": "United States",
+    "sitelinks": 20
+  },
+  {
+    "slug": "university-of-alberta",
+    "name": "University of Alberta",
+    "country": "Canada",
+    "sitelinks": 50
+  },
+  {
+    "slug": "university-of-alcala",
+    "name": "University of Alcalá",
+    "country": "Spain",
+    "sitelinks": 28
+  },
+  {
+    "slug": "university-of-aleppo",
+    "name": "University of Aleppo",
+    "country": "Syria",
+    "sitelinks": 26
+  },
+  {
+    "slug": "university-of-algiers-1",
+    "name": "University of Algiers 1",
+    "country": "Algeria",
+    "sitelinks": 24
+  },
+  {
+    "slug": "university-of-alicante",
+    "name": "University of Alicante",
+    "country": "Spain",
+    "sitelinks": 21
+  },
+  {
+    "slug": "university-of-allahabad",
+    "name": "University of Allahabad",
+    "country": "India",
+    "sitelinks": 30
+  },
+  {
+    "slug": "university-of-amsterdam",
+    "name": "University of Amsterdam",
+    "country": "Netherlands",
+    "sitelinks": 65
+  },
+  {
+    "slug": "university-of-antwerp",
+    "name": "University of Antwerp",
+    "country": "Belgium",
+    "sitelinks": 32
+  },
+  {
+    "slug": "university-of-applied-arts-vienna",
+    "name": "University of Applied Arts Vienna",
+    "country": "Austria",
+    "sitelinks": 24
+  },
+  {
+    "slug": "university-of-arizona",
+    "name": "University of Arizona",
+    "country": "United States",
+    "sitelinks": 55
+  },
+  {
+    "slug": "university-of-arkansas",
+    "name": "University of Arkansas",
+    "country": "United States",
+    "sitelinks": 33
+  },
+  {
+    "slug": "university-of-arts",
+    "name": "University of Arts",
+    "country": "Albania",
+    "sitelinks": 20
+  },
+  {
+    "slug": "university-of-auckland",
+    "name": "University of Auckland",
+    "country": "New Zealand",
+    "sitelinks": 49
+  },
+  {
+    "slug": "university-of-augsburg",
+    "name": "University of Augsburg",
+    "country": "Germany",
+    "sitelinks": 25
+  },
+  {
+    "slug": "university-of-baghdad",
+    "name": "University of Baghdad",
+    "country": "Iraq",
+    "sitelinks": 43
+  },
+  {
+    "slug": "university-of-baltimore",
+    "name": "University of Baltimore",
+    "country": "United States",
+    "sitelinks": 37
+  },
+  {
+    "slug": "university-of-bamberg",
+    "name": "University of Bamberg",
+    "country": "Germany",
+    "sitelinks": 26
+  },
+  {
+    "slug": "university-of-banja-luka",
+    "name": "University of Banja Luka",
+    "country": "Bosnia and Herzegovina",
+    "sitelinks": 30
+  },
+  {
+    "slug": "university-of-barcelona",
+    "name": "University of Barcelona",
+    "country": "Spain",
+    "sitelinks": 57
+  },
+  {
+    "slug": "university-of-bari",
+    "name": "University of Bari",
+    "country": "Italy",
+    "sitelinks": 26
+  },
+  {
+    "slug": "university-of-basel",
+    "name": "University of Basel",
+    "country": "Switzerland",
+    "sitelinks": 55
+  },
+  {
+    "slug": "university-of-basrah",
+    "name": "University of Basrah",
+    "country": "Iraq",
+    "sitelinks": 20
+  },
+  {
+    "slug": "university-of-bath",
+    "name": "University of Bath",
+    "country": "United Kingdom",
+    "sitelinks": 36
+  },
+  {
+    "slug": "university-of-bayreuth",
+    "name": "University of Bayreuth",
+    "country": "Germany",
+    "sitelinks": 26
+  },
+  {
+    "slug": "university-of-belgrade",
+    "name": "University of Belgrade",
+    "country": "Serbia",
+    "sitelinks": 52
+  },
+  {
+    "slug": "university-of-bergamo",
+    "name": "University of Bergamo",
+    "country": "Italy",
+    "sitelinks": 21
+  },
+  {
+    "slug": "university-of-bergen",
+    "name": "University of Bergen",
+    "country": "Norway",
+    "sitelinks": 39
+  },
+  {
+    "slug": "university-of-bern",
+    "name": "University of Bern",
+    "country": "Switzerland",
+    "sitelinks": 44
+  },
+  {
+    "slug": "university-of-birmingham",
+    "name": "University of Birmingham",
+    "country": "United Kingdom",
+    "sitelinks": 58
+  },
+  {
+    "slug": "university-of-bologna",
+    "name": "University of Bologna",
+    "country": "Italy",
+    "sitelinks": 90
+  },
+  {
+    "slug": "university-of-bonn",
+    "name": "University of Bonn",
+    "country": "Germany",
+    "sitelinks": 62
+  },
+  {
+    "slug": "university-of-bordeaux",
+    "name": "University of Bordeaux",
+    "country": "France",
+    "sitelinks": 29
+  },
+  {
+    "slug": "university-of-bordeaux-1",
+    "name": "University of Bordeaux 1",
+    "country": "France",
+    "sitelinks": 33
+  },
+  {
+    "slug": "university-of-botswana",
+    "name": "University of Botswana",
+    "country": "Botswana",
+    "sitelinks": 27
+  },
+  {
+    "slug": "university-of-bradford",
+    "name": "University of Bradford",
+    "country": "United Kingdom",
+    "sitelinks": 27
+  },
+  {
+    "slug": "university-of-bremen",
+    "name": "University of Bremen",
+    "country": "Germany",
+    "sitelinks": 30
+  },
+  {
+    "slug": "university-of-brighton",
+    "name": "University of Brighton",
+    "country": "United Kingdom",
+    "sitelinks": 25
+  },
+  {
+    "slug": "university-of-bristol",
+    "name": "University of Bristol",
+    "country": "United Kingdom",
+    "sitelinks": 56
+  },
+  {
+    "slug": "university-of-british-columbia",
+    "name": "University of British Columbia",
+    "country": "Canada",
+    "sitelinks": 59
+  },
+  {
+    "slug": "university-of-bucharest",
+    "name": "University of Bucharest",
+    "country": "Romania",
+    "sitelinks": 49
+  },
+  {
+    "slug": "university-of-buckingham",
+    "name": "University of Buckingham",
+    "country": "United Kingdom",
+    "sitelinks": 23
+  },
+  {
+    "slug": "university-of-buenos-aires",
+    "name": "University of Buenos Aires",
+    "country": "Argentina",
+    "sitelinks": 62
+  },
+  {
+    "slug": "university-of-burgundy-europe",
+    "name": "University of Burgundy Europe",
+    "country": "France",
+    "sitelinks": 26
+  },
+  {
+    "slug": "university-of-caen-normandy",
+    "name": "University of Caen Normandy",
+    "country": "France",
+    "sitelinks": 22
+  },
+  {
+    "slug": "university-of-cagliari",
+    "name": "University of Cagliari",
+    "country": "Italy",
+    "sitelinks": 25
+  },
+  {
+    "slug": "university-of-calcutta",
+    "name": "University of Calcutta",
+    "country": "India",
+    "sitelinks": 66
+  },
+  {
+    "slug": "university-of-calgary",
+    "name": "University of Calgary",
+    "country": "Canada",
+    "sitelinks": 37
+  },
+  {
+    "slug": "university-of-california",
+    "name": "University of California",
+    "country": "United States",
+    "sitelinks": 69
+  },
+  {
+    "slug": "university-of-california-berkeley",
+    "name": "University of California, Berkeley",
+    "country": "United States",
+    "sitelinks": 87
+  },
+  {
+    "slug": "university-of-california-davis",
+    "name": "University of California, Davis",
+    "country": "United States",
+    "sitelinks": 49
+  },
+  {
+    "slug": "university-of-california-irvine",
+    "name": "University of California, Irvine",
+    "country": "United States",
+    "sitelinks": 45
+  },
+  {
+    "slug": "university-of-california-los-angeles",
+    "name": "University of California, Los Angeles",
+    "country": "United States",
+    "sitelinks": 82
+  },
+  {
+    "slug": "university-of-california-merced",
+    "name": "University of California, Merced",
+    "country": "United States",
+    "sitelinks": 30
+  },
+  {
+    "slug": "university-of-california-riverside",
+    "name": "University of California, Riverside",
+    "country": "United States",
+    "sitelinks": 35
+  },
+  {
+    "slug": "university-of-california-san-diego",
+    "name": "University of California, San Diego",
+    "country": "United States",
+    "sitelinks": 50
+  },
+  {
+    "slug": "university-of-california-san-francisco",
+    "name": "University of California, San Francisco",
+    "country": "United States",
+    "sitelinks": 43
+  },
+  {
+    "slug": "university-of-california-santa-barbara",
+    "name": "University of California, Santa Barbara",
+    "country": "United States",
+    "sitelinks": 52
+  },
+  {
+    "slug": "university-of-california-santa-cruz",
+    "name": "University of California, Santa Cruz",
+    "country": "United States",
+    "sitelinks": 39
+  },
+  {
+    "slug": "university-of-cambridge",
+    "name": "University of Cambridge",
+    "country": "United Kingdom",
+    "sitelinks": 134
+  },
+  {
+    "slug": "university-of-campinas",
+    "name": "University of Campinas",
+    "country": "Brazil",
+    "sitelinks": 20
+  },
+  {
+    "slug": "university-of-canberra",
+    "name": "University of Canberra",
+    "country": "Australia",
+    "sitelinks": 25
+  },
+  {
+    "slug": "university-of-canterbury",
+    "name": "University of Canterbury",
+    "country": "New Zealand",
+    "sitelinks": 35
+  },
+  {
+    "slug": "university-of-cape-town",
+    "name": "University of Cape Town",
+    "country": "South Africa",
+    "sitelinks": 58
+  },
+  {
+    "slug": "university-of-catania",
+    "name": "University of Catania",
+    "country": "Italy",
+    "sitelinks": 29
+  },
+  {
+    "slug": "university-of-central-florida",
+    "name": "University of Central Florida",
+    "country": "United States",
+    "sitelinks": 31
+  },
+  {
+    "slug": "university-of-chicago",
+    "name": "University of Chicago",
+    "country": "United States",
+    "sitelinks": 87
+  },
+  {
+    "slug": "university-of-chile",
+    "name": "University of Chile",
+    "country": "Chile",
+    "sitelinks": 57
+  },
+  {
+    "slug": "university-of-cincinnati",
+    "name": "University of Cincinnati",
+    "country": "United States",
+    "sitelinks": 32
+  },
+  {
+    "slug": "university-of-coimbra",
+    "name": "University of Coimbra",
+    "country": "Portugal",
+    "sitelinks": 57
+  },
+  {
+    "slug": "university-of-cologne",
+    "name": "University of Cologne",
+    "country": "Germany",
+    "sitelinks": 57
+  },
+  {
+    "slug": "university-of-colombo",
+    "name": "University of Colombo",
+    "country": "Sri Lanka",
+    "sitelinks": 21
+  },
+  {
+    "slug": "university-of-colorado",
+    "name": "University of Colorado",
+    "country": "United States",
+    "sitelinks": 27
+  },
+  {
+    "slug": "university-of-colorado-boulder",
+    "name": "University of Colorado Boulder",
+    "country": "United States",
+    "sitelinks": 39
+  },
+  {
+    "slug": "university-of-concepcion",
+    "name": "University of Concepción",
+    "country": "Chile",
+    "sitelinks": 53
+  },
+  {
+    "slug": "university-of-connecticut",
+    "name": "University of Connecticut",
+    "country": "United States",
+    "sitelinks": 38
+  },
+  {
+    "slug": "university-of-constantinople",
+    "name": "University of Constantinople",
+    "country": "Byzantine Empire",
+    "sitelinks": 34
+  },
+  {
+    "slug": "university-of-copenhagen",
+    "name": "University of Copenhagen",
+    "country": "Denmark",
+    "sitelinks": 76
+  },
+  {
+    "slug": "university-of-costa-rica",
+    "name": "University of Costa Rica",
+    "country": "Costa Rica",
+    "sitelinks": 25
+  },
+  {
+    "slug": "university-of-crete",
+    "name": "University of Crete",
+    "country": "Greece",
+    "sitelinks": 20
+  },
+  {
+    "slug": "university-of-cyprus",
+    "name": "University of Cyprus",
+    "country": "Cyprus",
+    "sitelinks": 35
+  },
+  {
+    "slug": "university-of-dar-es-salaam",
+    "name": "University of Dar es Salaam",
+    "country": "Tanzania",
+    "sitelinks": 30
+  },
+  {
+    "slug": "university-of-debrecen",
+    "name": "University of Debrecen",
+    "country": "Hungary",
+    "sitelinks": 33
+  },
+  {
+    "slug": "university-of-delaware",
+    "name": "University of Delaware",
+    "country": "United States",
+    "sitelinks": 44
+  },
+  {
+    "slug": "university-of-delhi",
+    "name": "University of Delhi",
+    "country": "India",
+    "sitelinks": 55
+  },
+  {
+    "slug": "university-of-denver",
+    "name": "University of Denver",
+    "country": "United States",
+    "sitelinks": 32
+  },
+  {
+    "slug": "university-of-deusto",
+    "name": "University of Deusto",
+    "country": "Spain",
+    "sitelinks": 23
+  },
+  {
+    "slug": "university-of-dhaka",
+    "name": "University of Dhaka",
+    "country": "Bangladesh",
+    "sitelinks": 46
+  },
+  {
+    "slug": "university-of-dublin",
+    "name": "University of Dublin",
+    "country": "Ireland",
+    "sitelinks": 39
+  },
+  {
+    "slug": "university-of-dubrovnik",
+    "name": "University of Dubrovnik",
+    "country": "Croatia",
+    "sitelinks": 21
+  },
+  {
+    "slug": "university-of-duisburg-essen",
+    "name": "University of Duisburg-Essen",
+    "country": "Germany",
+    "sitelinks": 26
+  },
+  {
+    "slug": "university-of-dundee",
+    "name": "University of Dundee",
+    "country": "United Kingdom",
+    "sitelinks": 32
+  },
+  {
+    "slug": "university-of-dusseldorf",
+    "name": "University of Düsseldorf",
+    "country": "Germany",
+    "sitelinks": 36
+  },
+  {
+    "slug": "university-of-east-anglia",
+    "name": "University of East Anglia",
+    "country": "United Kingdom",
+    "sitelinks": 38
+  },
+  {
+    "slug": "university-of-east-london",
+    "name": "University of East London",
+    "country": "United Kingdom",
+    "sitelinks": 30
+  },
+  {
+    "slug": "university-of-eastern-finland",
+    "name": "University of Eastern Finland",
+    "country": "Finland",
+    "sitelinks": 21
+  },
+  {
+    "slug": "university-of-edinburgh",
+    "name": "University of Edinburgh",
+    "country": "United Kingdom",
+    "sitelinks": 90
+  },
+  {
+    "slug": "university-of-engineering-and-technology",
+    "name": "University of Engineering and Technology",
+    "country": "Pakistan",
+    "sitelinks": 20
+  },
+  {
+    "slug": "university-of-erfurt",
+    "name": "University of Erfurt",
+    "country": "Germany",
+    "sitelinks": 29
+  },
+  {
+    "slug": "university-of-erlangen-nuremberg",
+    "name": "University of Erlangen–Nuremberg",
+    "country": "Germany",
+    "sitelinks": 37
+  },
+  {
+    "slug": "university-of-essex",
+    "name": "University of Essex",
+    "country": "United Kingdom",
+    "sitelinks": 36
+  },
+  {
+    "slug": "university-of-eswatini",
+    "name": "University of Eswatini",
+    "country": "Eswatini",
+    "sitelinks": 20
+  },
+  {
+    "slug": "university-of-exeter",
+    "name": "University of Exeter",
+    "country": "United Kingdom",
+    "sitelinks": 43
+  },
+  {
+    "slug": "university-of-ferrara",
+    "name": "University of Ferrara",
+    "country": "Italy",
+    "sitelinks": 31
+  },
+  {
+    "slug": "university-of-florence",
+    "name": "University of Florence",
+    "country": "Italy",
+    "sitelinks": 43
+  },
+  {
+    "slug": "university-of-florida",
+    "name": "University of Florida",
+    "country": "United States",
+    "sitelinks": 54
+  },
+  {
+    "slug": "university-of-fort-hare",
+    "name": "University of Fort Hare",
+    "country": "South Africa",
+    "sitelinks": 32
+  },
+  {
+    "slug": "university-of-freiburg",
+    "name": "University of Freiburg",
+    "country": "Germany",
+    "sitelinks": 56
+  },
+  {
+    "slug": "university-of-fribourg",
+    "name": "University of Fribourg",
+    "country": "Switzerland",
+    "sitelinks": 33
+  },
+  {
+    "slug": "university-of-galway",
+    "name": "University of Galway",
+    "country": "Ireland",
+    "sitelinks": 29
+  },
+  {
+    "slug": "university-of-gdansk",
+    "name": "University of Gdańsk",
+    "country": "Poland",
+    "sitelinks": 32
+  },
+  {
+    "slug": "university-of-geneva",
+    "name": "University of Geneva",
+    "country": "Switzerland",
+    "sitelinks": 76
+  },
+  {
+    "slug": "university-of-genoa",
+    "name": "University of Genoa",
+    "country": "Italy",
+    "sitelinks": 32
+  },
+  {
+    "slug": "university-of-georgia",
+    "name": "University of Georgia",
+    "country": "United States",
+    "sitelinks": 38
+  },
+  {
+    "slug": "university-of-ghana",
+    "name": "University of Ghana",
+    "country": "Ghana",
+    "sitelinks": 35
+  },
+  {
+    "slug": "university-of-giessen",
+    "name": "University of Giessen",
+    "country": "Germany",
+    "sitelinks": 34
+  },
+  {
+    "slug": "university-of-glasgow",
+    "name": "University of Glasgow",
+    "country": "United Kingdom",
+    "sitelinks": 72
+  },
+  {
+    "slug": "university-of-gothenburg",
+    "name": "University of Gothenburg",
+    "country": "Sweden",
+    "sitelinks": 43
+  },
+  {
+    "slug": "university-of-gottingen",
+    "name": "University of Göttingen",
+    "country": "Germany",
+    "sitelinks": 82
+  },
+  {
+    "slug": "university-of-granada",
+    "name": "University of Granada",
+    "country": "Spain",
+    "sitelinks": 38
+  },
+  {
+    "slug": "university-of-graz",
+    "name": "University of Graz",
+    "country": "Austria",
+    "sitelinks": 53
+  },
+  {
+    "slug": "university-of-greenland",
+    "name": "University of Greenland",
+    "country": "Greenland",
+    "sitelinks": 38
+  },
+  {
+    "slug": "university-of-greenwich",
+    "name": "University of Greenwich",
+    "country": "United Kingdom",
+    "sitelinks": 30
+  },
+  {
+    "slug": "university-of-greifswald",
+    "name": "University of Greifswald",
+    "country": "Germany",
+    "sitelinks": 38
+  },
+  {
+    "slug": "university-of-groningen",
+    "name": "University of Groningen",
+    "country": "Netherlands",
+    "sitelinks": 58
+  },
+  {
+    "slug": "university-of-guadalajara",
+    "name": "University of Guadalajara",
+    "country": "Mexico",
+    "sitelinks": 42
+  },
+  {
+    "slug": "university-of-guam",
+    "name": "University of Guam",
+    "country": "United States",
+    "sitelinks": 24
+  },
+  {
+    "slug": "university-of-guelph",
+    "name": "University of Guelph",
+    "country": "Canada",
+    "sitelinks": 23
+  },
+  {
+    "slug": "university-of-haifa",
+    "name": "University of Haifa",
+    "country": "Israel",
+    "sitelinks": 39
+  },
+  {
+    "slug": "university-of-hamburg",
+    "name": "University of Hamburg",
+    "country": "Germany",
+    "sitelinks": 59
+  },
+  {
+    "slug": "university-of-havana",
+    "name": "University of Havana",
+    "country": "Cuba",
+    "sitelinks": 41
+  },
+  {
+    "slug": "university-of-hawai-i-at-manoa",
+    "name": "University of Hawaiʻi at Mānoa",
+    "country": "United States",
+    "sitelinks": 27
+  },
+  {
+    "slug": "university-of-hawai-i-system",
+    "name": "University of Hawaiʻi System",
+    "country": "United States",
+    "sitelinks": 42
+  },
+  {
+    "slug": "university-of-helsinki",
+    "name": "University of Helsinki",
+    "country": "Finland",
+    "sitelinks": 67
+  },
+  {
+    "slug": "university-of-hohenheim",
+    "name": "University of Hohenheim",
+    "country": "Germany",
+    "sitelinks": 28
+  },
+  {
+    "slug": "university-of-hong-kong",
+    "name": "University of Hong Kong",
+    "country": "People's Republic of China",
+    "sitelinks": 53
+  },
+  {
+    "slug": "university-of-houston",
+    "name": "University of Houston",
+    "country": "United States",
+    "sitelinks": 31
+  },
+  {
+    "slug": "university-of-hull",
+    "name": "University of Hull",
+    "country": "United Kingdom",
+    "sitelinks": 31
+  },
+  {
+    "slug": "university-of-hyderabad",
+    "name": "University of Hyderabad",
+    "country": "India",
+    "sitelinks": 20
+  },
+  {
+    "slug": "university-of-ibadan",
+    "name": "University of Ibadan",
+    "country": "Nigeria",
+    "sitelinks": 28
+  },
+  {
+    "slug": "university-of-iceland",
+    "name": "University of Iceland",
+    "country": "Iceland",
+    "sitelinks": 52
+  },
+  {
+    "slug": "university-of-idaho",
+    "name": "University of Idaho",
+    "country": "United States",
+    "sitelinks": 29
+  },
+  {
+    "slug": "university-of-illinois-chicago",
+    "name": "University of Illinois Chicago",
+    "country": "United States",
+    "sitelinks": 32
+  },
+  {
+    "slug": "university-of-illinois-system",
+    "name": "University of Illinois System",
+    "country": "United States",
+    "sitelinks": 24
+  },
+  {
+    "slug": "university-of-illinois-urbana-champaign",
+    "name": "University of Illinois Urbana-Champaign",
+    "country": "United States",
+    "sitelinks": 44
+  },
+  {
+    "slug": "university-of-indonesia",
+    "name": "University of Indonesia",
+    "country": "Indonesia",
+    "sitelinks": 43
+  },
+  {
+    "slug": "university-of-innsbruck",
+    "name": "University of Innsbruck",
+    "country": "Austria",
+    "sitelinks": 43
+  },
+  {
+    "slug": "university-of-iowa",
+    "name": "University of Iowa",
+    "country": "United States",
+    "sitelinks": 43
+  },
+  {
+    "slug": "university-of-jena",
+    "name": "University of Jena",
+    "country": "Germany",
+    "sitelinks": 54
+  },
+  {
+    "slug": "university-of-johannesburg",
+    "name": "University of Johannesburg",
+    "country": "South Africa",
+    "sitelinks": 31
+  },
+  {
+    "slug": "university-of-jordan",
+    "name": "University of Jordan",
+    "country": "Jordan",
+    "sitelinks": 30
+  },
+  {
+    "slug": "university-of-juba",
+    "name": "University of Juba",
+    "country": "South Sudan",
+    "sitelinks": 31
+  },
+  {
+    "slug": "university-of-jyvaskyla",
+    "name": "University of Jyväskylä",
+    "country": "Finland",
+    "sitelinks": 31
+  },
+  {
+    "slug": "university-of-kansas",
+    "name": "University of Kansas",
+    "country": "United States",
+    "sitelinks": 43
+  },
+  {
+    "slug": "university-of-karachi",
+    "name": "University of Karachi",
+    "country": "Pakistan",
+    "sitelinks": 27
+  },
+  {
+    "slug": "university-of-kassel",
+    "name": "University of Kassel",
+    "country": "Germany",
+    "sitelinks": 21
+  },
+  {
+    "slug": "university-of-keele",
+    "name": "University of Keele",
+    "country": "United Kingdom",
+    "sitelinks": 23
+  },
+  {
+    "slug": "university-of-kent",
+    "name": "University of Kent",
+    "country": "United Kingdom",
+    "sitelinks": 36
+  },
+  {
+    "slug": "university-of-kentucky",
+    "name": "University of Kentucky",
+    "country": "United States",
+    "sitelinks": 38
+  },
+  {
+    "slug": "university-of-khartoum",
+    "name": "University of Khartoum",
+    "country": "Sudan",
+    "sitelinks": 28
+  },
+  {
+    "slug": "university-of-kinshasa",
+    "name": "University of Kinshasa",
+    "country": "Democratic Republic of the Congo",
+    "sitelinks": 26
+  },
+  {
+    "slug": "university-of-klagenfurt",
+    "name": "University of Klagenfurt",
+    "country": "Austria",
+    "sitelinks": 25
+  },
+  {
+    "slug": "university-of-konigsberg",
+    "name": "University of Königsberg",
+    "country": "Soviet Union",
+    "sitelinks": 40
+  },
+  {
+    "slug": "university-of-konstanz",
+    "name": "University of Konstanz",
+    "country": "Germany",
+    "sitelinks": 28
+  },
+  {
+    "slug": "university-of-kwazulu-natal",
+    "name": "University of KwaZulu-Natal",
+    "country": "South Africa",
+    "sitelinks": 28
+  },
+  {
+    "slug": "university-of-la-laguna",
+    "name": "University of La Laguna",
+    "country": "Spain",
+    "sitelinks": 25
+  },
+  {
+    "slug": "university-of-lagos",
+    "name": "University of Lagos",
+    "country": "Nigeria",
+    "sitelinks": 23
+  },
+  {
+    "slug": "university-of-lancashire",
+    "name": "University of Lancashire",
+    "country": "United Kingdom",
+    "sitelinks": 20
+  },
+  {
+    "slug": "university-of-lancaster",
+    "name": "University of Lancaster",
+    "country": "United Kingdom",
+    "sitelinks": 38
+  },
+  {
+    "slug": "university-of-lapland",
+    "name": "University of Lapland",
+    "country": "Finland",
+    "sitelinks": 25
+  },
+  {
+    "slug": "university-of-latvia",
+    "name": "University of Latvia",
+    "country": "Latvia",
+    "sitelinks": 50
+  },
+  {
+    "slug": "university-of-lausanne",
+    "name": "University of Lausanne",
+    "country": "Switzerland",
+    "sitelinks": 49
+  },
+  {
+    "slug": "university-of-leeds",
+    "name": "University of Leeds",
+    "country": "United Kingdom",
+    "sitelinks": 49
+  },
+  {
+    "slug": "university-of-leicester",
+    "name": "University of Leicester",
+    "country": "United Kingdom",
+    "sitelinks": 42
+  },
+  {
+    "slug": "university-of-liberia",
+    "name": "University of Liberia",
+    "country": "Liberia",
+    "sitelinks": 21
+  },
+  {
+    "slug": "university-of-liechtenstein",
+    "name": "University of Liechtenstein",
+    "country": "Liechtenstein",
+    "sitelinks": 21
+  },
+  {
+    "slug": "university-of-liege",
+    "name": "University of Liège",
+    "country": "Belgium",
+    "sitelinks": 38
+  },
+  {
+    "slug": "university-of-lille",
+    "name": "University of Lille",
+    "country": "France",
+    "sitelinks": 21
+  },
+  {
+    "slug": "university-of-limerick",
+    "name": "University of Limerick",
+    "country": "Ireland",
+    "sitelinks": 27
+  },
+  {
+    "slug": "university-of-lincoln",
+    "name": "University of Lincoln",
+    "country": "United Kingdom",
+    "sitelinks": 24
+  },
+  {
+    "slug": "university-of-lisbon",
+    "name": "University of Lisbon",
+    "country": "Portugal",
+    "sitelinks": 43
+  },
+  {
+    "slug": "university-of-liverpool",
+    "name": "University of Liverpool",
+    "country": "United Kingdom",
+    "sitelinks": 52
+  },
+  {
+    "slug": "university-of-ljubljana",
+    "name": "University of Ljubljana",
+    "country": "Slovenia",
+    "sitelinks": 51
+  },
+  {
+    "slug": "university-of-lleida",
+    "name": "University of Lleida",
+    "country": "Spain",
+    "sitelinks": 21
+  },
+  {
+    "slug": "university-of-odz",
+    "name": "University of Łódź",
+    "country": "Poland",
+    "sitelinks": 31
+  },
+  {
+    "slug": "university-of-london",
+    "name": "University of London",
+    "country": "United Kingdom",
+    "sitelinks": 87
+  },
+  {
+    "slug": "university-of-lorraine",
+    "name": "University of Lorraine",
+    "country": "France",
+    "sitelinks": 21
+  },
+  {
+    "slug": "university-of-louisville",
+    "name": "University of Louisville",
+    "country": "United States",
+    "sitelinks": 26
+  },
+  {
+    "slug": "university-of-luxembourg",
+    "name": "University of Luxembourg",
+    "country": "Luxembourg",
+    "sitelinks": 33
+  },
+  {
+    "slug": "university-of-lyon",
+    "name": "University of Lyon",
+    "country": "France",
+    "sitelinks": 34
+  },
+  {
+    "slug": "university-of-macau",
+    "name": "University of Macau",
+    "country": "People's Republic of China",
+    "sitelinks": 24
+  },
+  {
+    "slug": "university-of-macedonia",
+    "name": "University of Macedonia",
+    "country": "Greece",
+    "sitelinks": 20
+  },
+  {
+    "slug": "university-of-madras",
+    "name": "University of Madras",
+    "country": "India",
+    "sitelinks": 39
+  },
+  {
+    "slug": "university-of-maine",
+    "name": "University of Maine",
+    "country": "United States",
+    "sitelinks": 30
+  },
+  {
+    "slug": "university-of-malawi",
+    "name": "University of Malawi",
+    "country": "Malawi",
+    "sitelinks": 24
+  },
+  {
+    "slug": "university-of-malta",
+    "name": "University of Malta",
+    "country": "Malta",
+    "sitelinks": 41
+  },
+  {
+    "slug": "university-of-manchester",
+    "name": "University of Manchester",
+    "country": "United Kingdom",
+    "sitelinks": 66
+  },
+  {
+    "slug": "university-of-manitoba",
+    "name": "University of Manitoba",
+    "country": "Canada",
+    "sitelinks": 31
+  },
+  {
+    "slug": "university-of-mannheim",
+    "name": "University of Mannheim",
+    "country": "Germany",
+    "sitelinks": 36
+  },
+  {
+    "slug": "university-of-marburg",
+    "name": "University of Marburg",
+    "country": "Germany",
+    "sitelinks": 51
+  },
+  {
+    "slug": "university-of-maribor",
+    "name": "University of Maribor",
+    "country": "Slovenia",
+    "sitelinks": 28
+  },
+  {
+    "slug": "university-of-maryland",
+    "name": "University of Maryland",
+    "country": "United States",
+    "sitelinks": 47
+  },
+  {
+    "slug": "university-of-massachusetts",
+    "name": "University of Massachusetts",
+    "country": "United States",
+    "sitelinks": 24
+  },
+  {
+    "slug": "university-of-massachusetts-amherst",
+    "name": "University of Massachusetts Amherst",
+    "country": "United States",
+    "sitelinks": 29
+  },
+  {
+    "slug": "university-of-melbourne",
+    "name": "University of Melbourne",
+    "country": "Australia",
+    "sitelinks": 57
+  },
+  {
+    "slug": "university-of-memphis",
+    "name": "University of Memphis",
+    "country": "United States",
+    "sitelinks": 23
+  },
+  {
+    "slug": "university-of-messina",
+    "name": "University of Messina",
+    "country": "Italy",
+    "sitelinks": 29
+  },
+  {
+    "slug": "university-of-miami",
+    "name": "University of Miami",
+    "country": "United States",
+    "sitelinks": 37
+  },
+  {
+    "slug": "university-of-michigan",
+    "name": "University of Michigan",
+    "country": "United States",
+    "sitelinks": 81
+  },
+  {
+    "slug": "university-of-milan",
+    "name": "University of Milan",
+    "country": "Italy",
+    "sitelinks": 52
+  },
+  {
+    "slug": "university-of-minnesota",
+    "name": "University of Minnesota",
+    "country": "United States",
+    "sitelinks": 58
+  },
+  {
+    "slug": "university-of-mississippi",
+    "name": "University of Mississippi",
+    "country": "United States",
+    "sitelinks": 30
+  },
+  {
+    "slug": "university-of-missouri",
+    "name": "University of Missouri",
+    "country": "United States",
+    "sitelinks": 41
+  },
+  {
+    "slug": "university-of-modena-and-reggio-emilia",
+    "name": "University of Modena and Reggio Emilia",
+    "country": "Italy",
+    "sitelinks": 25
+  },
+  {
+    "slug": "university-of-montana",
+    "name": "University of Montana",
+    "country": "United States",
+    "sitelinks": 25
+  },
+  {
+    "slug": "university-of-montenegro",
+    "name": "University of Montenegro",
+    "country": "Montenegro",
+    "sitelinks": 29
+  },
+  {
+    "slug": "university-of-mostar",
+    "name": "University of Mostar",
+    "country": "Bosnia and Herzegovina",
+    "sitelinks": 26
+  },
+  {
+    "slug": "university-of-mumbai",
+    "name": "University of Mumbai",
+    "country": "India",
+    "sitelinks": 48
+  },
+  {
+    "slug": "university-of-munster",
+    "name": "University of Münster",
+    "country": "Germany",
+    "sitelinks": 39
+  },
+  {
+    "slug": "university-of-music-and-performing-arts-vienna",
+    "name": "University of Music and Performing Arts Vienna",
+    "country": "Austria",
+    "sitelinks": 31
+  },
+  {
+    "slug": "university-of-music-and-theatre-leipzig",
+    "name": "University of Music and Theatre Leipzig",
+    "country": "Germany",
+    "sitelinks": 27
+  },
+  {
+    "slug": "university-of-n-djamena",
+    "name": "University of N'Djaména",
+    "country": "Chad",
+    "sitelinks": 20
+  },
+  {
+    "slug": "university-of-nairobi",
+    "name": "University of Nairobi",
+    "country": "Kenya",
+    "sitelinks": 31
+  },
+  {
+    "slug": "university-of-namibia",
+    "name": "University of Namibia",
+    "country": "Namibia",
+    "sitelinks": 20
+  },
+  {
+    "slug": "university-of-naples-federico-ii",
+    "name": "University of Naples Federico II",
+    "country": "Italy",
+    "sitelinks": 42
+  },
+  {
+    "slug": "university-of-national-and-world-economy",
+    "name": "University of National and World Economy",
+    "country": "Bulgaria",
+    "sitelinks": 27
+  },
+  {
+    "slug": "university-of-navarre",
+    "name": "University of Navarre",
+    "country": "Spain",
+    "sitelinks": 29
+  },
+  {
+    "slug": "university-of-nebraska-lincoln",
+    "name": "University of Nebraska–Lincoln",
+    "country": "United States",
+    "sitelinks": 33
+  },
+  {
+    "slug": "university-of-neuchatel",
+    "name": "University of Neuchâtel",
+    "country": "Switzerland",
+    "sitelinks": 31
+  },
+  {
+    "slug": "university-of-nevada-las-vegas",
+    "name": "University of Nevada, Las Vegas",
+    "country": "United States",
+    "sitelinks": 21
+  },
+  {
+    "slug": "university-of-nevada-reno",
+    "name": "University of Nevada, Reno",
+    "country": "United States",
+    "sitelinks": 21
+  },
+  {
+    "slug": "university-of-new-brunswick",
+    "name": "University of New Brunswick",
+    "country": "Canada",
+    "sitelinks": 21
+  },
+  {
+    "slug": "university-of-new-hampshire",
+    "name": "University of New Hampshire",
+    "country": "United States",
+    "sitelinks": 25
+  },
+  {
+    "slug": "university-of-new-mexico",
+    "name": "University of New Mexico",
+    "country": "United States",
+    "sitelinks": 29
+  },
+  {
+    "slug": "university-of-new-south-wales",
+    "name": "University of New South Wales",
+    "country": "Australia",
+    "sitelinks": 43
+  },
+  {
+    "slug": "university-of-newcastle",
+    "name": "University of Newcastle",
+    "country": "Australia",
+    "sitelinks": 23
+  },
+  {
+    "slug": "university-of-nicosia",
+    "name": "University of Nicosia",
+    "country": "Cyprus",
+    "sitelinks": 23
+  },
+  {
+    "slug": "university-of-north-carolina",
+    "name": "University of North Carolina",
+    "country": "United States",
+    "sitelinks": 21
+  },
+  {
+    "slug": "university-of-north-carolina-at-chapel-hill",
+    "name": "University of North Carolina at Chapel Hill",
+    "country": "United States",
+    "sitelinks": 61
+  },
+  {
+    "slug": "university-of-north-dakota",
+    "name": "University of North Dakota",
+    "country": "United States",
+    "sitelinks": 27
+  },
+  {
+    "slug": "university-of-notre-dame",
+    "name": "University of Notre Dame",
+    "country": "United States",
+    "sitelinks": 58
+  },
+  {
+    "slug": "university-of-nottingham",
+    "name": "University of Nottingham",
+    "country": "United Kingdom",
+    "sitelinks": 49
+  },
+  {
+    "slug": "university-of-novi-sad",
+    "name": "University of Novi Sad",
+    "country": "Serbia",
+    "sitelinks": 31
+  },
+  {
+    "slug": "university-of-oklahoma",
+    "name": "University of Oklahoma",
+    "country": "United States",
+    "sitelinks": 37
+  },
+  {
+    "slug": "university-of-oldenburg",
+    "name": "University of Oldenburg",
+    "country": "Germany",
+    "sitelinks": 26
+  },
+  {
+    "slug": "university-of-oregon",
+    "name": "University of Oregon",
+    "country": "United States",
+    "sitelinks": 35
+  },
+  {
+    "slug": "university-of-orleans",
+    "name": "University of Orléans",
+    "country": "France",
+    "sitelinks": 25
+  },
+  {
+    "slug": "university-of-osaka",
+    "name": "University of Osaka",
+    "country": "Japan",
+    "sitelinks": 51
+  },
+  {
+    "slug": "university-of-osijek",
+    "name": "University of Osijek",
+    "country": "Croatia",
+    "sitelinks": 23
+  },
+  {
+    "slug": "university-of-oslo",
+    "name": "University of Oslo",
+    "country": "Norway",
+    "sitelinks": 68
+  },
+  {
+    "slug": "university-of-otago",
+    "name": "University of Otago",
+    "country": "New Zealand",
+    "sitelinks": 32
+  },
+  {
+    "slug": "university-of-ottawa",
+    "name": "University of Ottawa",
+    "country": "Canada",
+    "sitelinks": 33
+  },
+  {
+    "slug": "university-of-oulu",
+    "name": "University of Oulu",
+    "country": "Finland",
+    "sitelinks": 39
+  },
+  {
+    "slug": "university-of-oxford",
+    "name": "University of Oxford",
+    "country": "United Kingdom",
+    "sitelinks": 147
+  },
+  {
+    "slug": "university-of-padua",
+    "name": "University of Padua",
+    "country": "Italy",
+    "sitelinks": 61
+  },
+  {
+    "slug": "university-of-palermo",
+    "name": "University of Palermo",
+    "country": "Italy",
+    "sitelinks": 32
+  },
+  {
+    "slug": "university-of-paris",
+    "name": "University of Paris",
+    "country": "France",
+    "sitelinks": 86
+  },
+  {
+    "slug": "university-of-paris-1-pantheon-sorbonne",
+    "name": "University of Paris 1 Pantheon-Sorbonne",
+    "country": "France",
+    "sitelinks": 54
+  },
+  {
+    "slug": "university-of-paris-sud",
+    "name": "University of Paris-Sud",
+    "country": "France",
+    "sitelinks": 42
+  },
+  {
+    "slug": "university-of-parma",
+    "name": "University of Parma",
+    "country": "Italy",
+    "sitelinks": 27
+  },
+  {
+    "slug": "university-of-passau",
+    "name": "University of Passau",
+    "country": "Germany",
+    "sitelinks": 23
+  },
+  {
+    "slug": "university-of-pavia",
+    "name": "University of Pavia",
+    "country": "Italy",
+    "sitelinks": 40
+  },
+  {
+    "slug": "university-of-pecs",
+    "name": "University of Pécs",
+    "country": "Hungary",
+    "sitelinks": 26
+  },
+  {
+    "slug": "university-of-pennsylvania",
+    "name": "University of Pennsylvania",
+    "country": "United States",
+    "sitelinks": 85
+  },
+  {
+    "slug": "university-of-perugia",
+    "name": "University of Perugia",
+    "country": "Italy",
+    "sitelinks": 30
+  },
+  {
+    "slug": "university-of-piraeus",
+    "name": "University of Piraeus",
+    "country": "Greece",
+    "sitelinks": 21
+  },
+  {
+    "slug": "university-of-pisa",
+    "name": "University of Pisa",
+    "country": "Italy",
+    "sitelinks": 46
+  },
+  {
+    "slug": "university-of-pittsburgh",
+    "name": "University of Pittsburgh",
+    "country": "United States",
+    "sitelinks": 58
+  },
+  {
+    "slug": "university-of-plymouth",
+    "name": "University of Plymouth",
+    "country": "United Kingdom",
+    "sitelinks": 23
+  },
+  {
+    "slug": "university-of-poitiers",
+    "name": "University of Poitiers",
+    "country": "France",
+    "sitelinks": 37
+  },
+  {
+    "slug": "university-of-porto",
+    "name": "University of Porto",
+    "country": "Portugal",
+    "sitelinks": 31
+  },
+  {
+    "slug": "university-of-portsmouth",
+    "name": "University of Portsmouth",
+    "country": "United Kingdom",
+    "sitelinks": 26
+  },
+  {
+    "slug": "university-of-potsdam",
+    "name": "University of Potsdam",
+    "country": "Germany",
+    "sitelinks": 42
+  },
+  {
+    "slug": "university-of-pretoria",
+    "name": "University of Pretoria",
+    "country": "South Africa",
+    "sitelinks": 36
+  },
+  {
+    "slug": "university-of-pristina",
+    "name": "University of Pristina",
+    "country": "Kosovo",
+    "sitelinks": 36
+  },
+  {
+    "slug": "university-of-prizren",
+    "name": "University of Prizren",
+    "country": "Kosovo",
+    "sitelinks": 21
+  },
+  {
+    "slug": "university-of-pula",
+    "name": "University of Pula",
+    "country": "Croatia",
+    "sitelinks": 69
+  },
+  {
+    "slug": "university-of-queensland",
+    "name": "University of Queensland",
+    "country": "Australia",
+    "sitelinks": 46
+  },
+  {
+    "slug": "university-of-reading",
+    "name": "University of Reading",
+    "country": "United Kingdom",
+    "sitelinks": 34
+  },
+  {
+    "slug": "university-of-regensburg",
+    "name": "University of Regensburg",
+    "country": "Germany",
+    "sitelinks": 24
+  },
+  {
+    "slug": "university-of-regina",
+    "name": "University of Regina",
+    "country": "Canada",
+    "sitelinks": 20
+  },
+  {
+    "slug": "university-of-rennes-1",
+    "name": "University of Rennes 1",
+    "country": "France",
+    "sitelinks": 27
+  },
+  {
+    "slug": "university-of-rennes-2-upper-brittany",
+    "name": "University of Rennes 2 – Upper Brittany",
+    "country": "France",
+    "sitelinks": 30
+  },
+  {
+    "slug": "university-of-rhode-island",
+    "name": "University of Rhode Island",
+    "country": "United States",
+    "sitelinks": 24
+  },
+  {
+    "slug": "university-of-richmond",
+    "name": "University of Richmond",
+    "country": "United States",
+    "sitelinks": 20
+  },
+  {
+    "slug": "university-of-rijeka",
+    "name": "University of Rijeka",
+    "country": "Croatia",
+    "sitelinks": 21
+  },
+  {
+    "slug": "university-of-rochester",
+    "name": "University of Rochester",
+    "country": "United States",
+    "sitelinks": 42
+  },
+  {
+    "slug": "university-of-rostock",
+    "name": "University of Rostock",
+    "country": "Germany",
+    "sitelinks": 44
+  },
+  {
+    "slug": "university-of-salamanca",
+    "name": "University of Salamanca",
+    "country": "Spain",
+    "sitelinks": 66
+  },
+  {
+    "slug": "university-of-salford",
+    "name": "University of Salford",
+    "country": "United Kingdom",
+    "sitelinks": 21
+  },
+  {
+    "slug": "university-of-salzburg",
+    "name": "University of Salzburg",
+    "country": "Austria",
+    "sitelinks": 32
+  },
+  {
+    "slug": "university-of-san-francisco",
+    "name": "University of San Francisco",
+    "country": "United States",
+    "sitelinks": 26
+  },
+  {
+    "slug": "university-of-santiago",
+    "name": "University of Santiago",
+    "country": "Chile",
+    "sitelinks": 24
+  },
+  {
+    "slug": "university-of-santiago-de-compostela",
+    "name": "University of Santiago de Compostela",
+    "country": "Spain",
+    "sitelinks": 29
+  },
+  {
+    "slug": "university-of-santo-tomas",
+    "name": "University of Santo Tomas",
+    "country": "Philippines",
+    "sitelinks": 21
+  },
+  {
+    "slug": "university-of-sao-paulo",
+    "name": "University of São Paulo",
+    "country": "Brazil",
+    "sitelinks": 43
+  },
+  {
+    "slug": "university-of-sarajevo",
+    "name": "University of Sarajevo",
+    "country": "Bosnia and Herzegovina",
+    "sitelinks": 40
+  },
+  {
+    "slug": "university-of-saskatchewan",
+    "name": "University of Saskatchewan",
+    "country": "Canada",
+    "sitelinks": 26
+  },
+  {
+    "slug": "university-of-sassari",
+    "name": "University of Sassari",
+    "country": "Italy",
+    "sitelinks": 20
+  },
+  {
+    "slug": "university-of-science-and-technology-of-china",
+    "name": "University of Science and Technology of China",
+    "country": "People's Republic of China",
+    "sitelinks": 30
+  },
+  {
+    "slug": "university-of-seville",
+    "name": "University of Seville",
+    "country": "Spain",
+    "sitelinks": 29
+  },
+  {
+    "slug": "university-of-sheffield",
+    "name": "University of Sheffield",
+    "country": "United Kingdom",
+    "sitelinks": 47
+  },
+  {
+    "slug": "university-of-sherbrooke",
+    "name": "University of Sherbrooke",
+    "country": "Canada",
+    "sitelinks": 21
+  },
+  {
+    "slug": "university-of-siena",
+    "name": "University of Siena",
+    "country": "Italy",
+    "sitelinks": 40
+  },
+  {
+    "slug": "university-of-silesia-in-katowice",
+    "name": "University of Silesia in Katowice",
+    "country": "Poland",
+    "sitelinks": 25
+  },
+  {
+    "slug": "university-of-south-africa",
+    "name": "University of South Africa",
+    "country": "South Africa",
+    "sitelinks": 31
+  },
+  {
+    "slug": "university-of-south-australia",
+    "name": "University of South Australia",
+    "country": "Australia",
+    "sitelinks": 23
+  },
+  {
+    "slug": "university-of-south-carolina",
+    "name": "University of South Carolina",
+    "country": "United States",
+    "sitelinks": 31
+  },
+  {
+    "slug": "university-of-south-dakota",
+    "name": "University of South Dakota",
+    "country": "United States",
+    "sitelinks": 24
+  },
+  {
+    "slug": "university-of-south-florida",
+    "name": "University of South Florida",
+    "country": "United States",
+    "sitelinks": 34
+  },
+  {
+    "slug": "university-of-southampton",
+    "name": "University of Southampton",
+    "country": "United Kingdom",
+    "sitelinks": 43
+  },
+  {
+    "slug": "university-of-southern-california",
+    "name": "University of Southern California",
+    "country": "United States",
+    "sitelinks": 67
+  },
+  {
+    "slug": "university-of-southern-denmark",
+    "name": "University of Southern Denmark",
+    "country": "Denmark",
+    "sitelinks": 27
+  },
+  {
+    "slug": "university-of-split",
+    "name": "University of Split",
+    "country": "Croatia",
+    "sitelinks": 23
+  },
+  {
+    "slug": "university-of-st-andrews",
+    "name": "University of St Andrews",
+    "country": "United Kingdom",
+    "sitelinks": 64
+  },
+  {
+    "slug": "university-of-st-gallen",
+    "name": "University of St. Gallen",
+    "country": "Switzerland",
+    "sitelinks": 29
+  },
+  {
+    "slug": "university-of-stavanger",
+    "name": "University of Stavanger",
+    "country": "Norway",
+    "sitelinks": 28
+  },
+  {
+    "slug": "university-of-stirling",
+    "name": "University of Stirling",
+    "country": "United Kingdom",
+    "sitelinks": 26
+  },
+  {
+    "slug": "university-of-strasbourg",
+    "name": "University of Strasbourg",
+    "country": "France",
+    "sitelinks": 57
+  },
+  {
+    "slug": "university-of-strathclyde",
+    "name": "University of Strathclyde",
+    "country": "United Kingdom",
+    "sitelinks": 35
+  },
+  {
+    "slug": "university-of-stuttgart",
+    "name": "University of Stuttgart",
+    "country": "Germany",
+    "sitelinks": 42
+  },
+  {
+    "slug": "university-of-sunderland",
+    "name": "University of Sunderland",
+    "country": "United Kingdom",
+    "sitelinks": 20
+  },
+  {
+    "slug": "university-of-surrey",
+    "name": "University of Surrey",
+    "country": "United Kingdom",
+    "sitelinks": 33
+  },
+  {
+    "slug": "university-of-sussex",
+    "name": "University of Sussex",
+    "country": "United Kingdom",
+    "sitelinks": 47
+  },
+  {
+    "slug": "university-of-sydney",
+    "name": "University of Sydney",
+    "country": "Australia",
+    "sitelinks": 60
+  },
+  {
+    "slug": "university-of-szeged",
+    "name": "University of Szeged",
+    "country": "Hungary",
+    "sitelinks": 30
+  },
+  {
+    "slug": "university-of-tampere",
+    "name": "University of Tampere",
+    "country": "Finland",
+    "sitelinks": 26
+  },
+  {
+    "slug": "university-of-tartu",
+    "name": "University of Tartu",
+    "country": "Estonia",
+    "sitelinks": 71
+  },
+  {
+    "slug": "university-of-tasmania",
+    "name": "University of Tasmania",
+    "country": "Australia",
+    "sitelinks": 27
+  },
+  {
+    "slug": "university-of-technology-sydney",
+    "name": "University of Technology Sydney",
+    "country": "Australia",
+    "sitelinks": 28
+  },
+  {
+    "slug": "university-of-tehran",
+    "name": "University of Tehran",
+    "country": "Iran",
+    "sitelinks": 53
+  },
+  {
+    "slug": "university-of-tennessee",
+    "name": "University of Tennessee",
+    "country": "United States",
+    "sitelinks": 34
+  },
+  {
+    "slug": "university-of-texas-at-austin",
+    "name": "University of Texas at Austin",
+    "country": "United States",
+    "sitelinks": 54
+  },
+  {
+    "slug": "university-of-texas-at-el-paso",
+    "name": "University of Texas at El Paso",
+    "country": "United States",
+    "sitelinks": 20
+  },
+  {
+    "slug": "university-of-the-andes",
+    "name": "University of the Andes",
+    "country": "Venezuela",
+    "sitelinks": 25
+  },
+  {
+    "slug": "university-of-the-arts-london",
+    "name": "University of the Arts London",
+    "country": "United Kingdom",
+    "sitelinks": 23
+  },
+  {
+    "slug": "university-of-the-balearic-islands",
+    "name": "University of the Balearic Islands",
+    "country": "Spain",
+    "sitelinks": 21
+  },
+  {
+    "slug": "university-of-the-basque-country",
+    "name": "University of the Basque Country",
+    "country": "Spain",
+    "sitelinks": 30
+  },
+  {
+    "slug": "university-of-the-bio-bio",
+    "name": "University of the Bío-Bío",
+    "country": "Chile",
+    "sitelinks": 79
+  },
+  {
+    "slug": "university-of-the-faroe-islands",
+    "name": "University of the Faroe Islands",
+    "country": "Faroe Islands",
+    "sitelinks": 24
+  },
+  {
+    "slug": "university-of-the-free-state",
+    "name": "University of the Free State",
+    "country": "South Africa",
+    "sitelinks": 20
+  },
+  {
+    "slug": "university-of-the-people",
+    "name": "University of the People",
+    "country": "United States",
+    "sitelinks": 29
+  },
+  {
+    "slug": "university-of-the-philippines",
+    "name": "University of the Philippines",
+    "country": "Philippines",
+    "sitelinks": 35
+  },
+  {
+    "slug": "university-of-the-punjab",
+    "name": "University of the Punjab",
+    "country": "Pakistan",
+    "sitelinks": 28
+  },
+  {
+    "slug": "university-of-the-republic",
+    "name": "University of the Republic",
+    "country": "Uruguay",
+    "sitelinks": 30
+  },
+  {
+    "slug": "university-of-the-republic-of-san-marino",
+    "name": "University of the Republic of San Marino",
+    "country": "San Marino",
+    "sitelinks": 21
+  },
+  {
+    "slug": "university-of-the-south-pacific",
+    "name": "University of the South Pacific",
+    "country": "Tuvalu",
+    "sitelinks": 30
+  },
+  {
+    "slug": "university-of-the-west-indies",
+    "name": "University of the West Indies",
+    "country": "Barbados",
+    "sitelinks": 32
+  },
+  {
+    "slug": "university-of-the-western-cape",
+    "name": "University of the Western Cape",
+    "country": "South Africa",
+    "sitelinks": 20
+  },
+  {
+    "slug": "university-of-the-witwatersrand",
+    "name": "University of the Witwatersrand",
+    "country": "South Africa",
+    "sitelinks": 44
+  },
+  {
+    "slug": "university-of-tirana",
+    "name": "University of Tirana",
+    "country": "Albania",
+    "sitelinks": 49
+  },
+  {
+    "slug": "university-of-tokyo",
+    "name": "University of Tokyo",
+    "country": "Japan",
+    "sitelinks": 84
+  },
+  {
+    "slug": "university-of-toronto",
+    "name": "University of Toronto",
+    "country": "Canada",
+    "sitelinks": 82
+  },
+  {
+    "slug": "university-of-toulouse",
+    "name": "University of Toulouse",
+    "country": "France",
+    "sitelinks": 22
+  },
+  {
+    "slug": "university-of-trento",
+    "name": "University of Trento",
+    "country": "Italy",
+    "sitelinks": 23
+  },
+  {
+    "slug": "university-of-trieste",
+    "name": "University of Trieste",
+    "country": "Italy",
+    "sitelinks": 29
+  },
+  {
+    "slug": "university-of-tripoli",
+    "name": "University of Tripoli",
+    "country": "Libya",
+    "sitelinks": 21
+  },
+  {
+    "slug": "university-of-troms-the-arctic-university-of-norway",
+    "name": "University of Tromsø – The Arctic University of Norway",
+    "country": "Norway",
+    "sitelinks": 32
+  },
+  {
+    "slug": "university-of-tsukuba",
+    "name": "University of Tsukuba",
+    "country": "Japan",
+    "sitelinks": 32
+  },
+  {
+    "slug": "university-of-tubingen",
+    "name": "University of Tübingen",
+    "country": "Germany",
+    "sitelinks": 86
+  },
+  {
+    "slug": "university-of-turin",
+    "name": "University of Turin",
+    "country": "Italy",
+    "sitelinks": 50
+  },
+  {
+    "slug": "university-of-turku",
+    "name": "University of Turku",
+    "country": "Finland",
+    "sitelinks": 41
+  },
+  {
+    "slug": "university-of-twente",
+    "name": "University of Twente",
+    "country": "Netherlands",
+    "sitelinks": 29
+  },
+  {
+    "slug": "university-of-urbino",
+    "name": "University of Urbino",
+    "country": "Italy",
+    "sitelinks": 20
+  },
+  {
+    "slug": "university-of-utah",
+    "name": "University of Utah",
+    "country": "United States",
+    "sitelinks": 47
+  },
+  {
+    "slug": "university-of-valencia",
+    "name": "University of Valencia",
+    "country": "Spain",
+    "sitelinks": 29
+  },
+  {
+    "slug": "university-of-valladolid",
+    "name": "University of Valladolid",
+    "country": "Spain",
+    "sitelinks": 27
+  },
+  {
+    "slug": "university-of-vermont",
+    "name": "University of Vermont",
+    "country": "United States",
+    "sitelinks": 34
+  },
+  {
+    "slug": "university-of-verona",
+    "name": "University of Verona",
+    "country": "Italy",
+    "sitelinks": 21
+  },
+  {
+    "slug": "university-of-victoria",
+    "name": "University of Victoria",
+    "country": "Canada",
+    "sitelinks": 23
+  },
+  {
+    "slug": "university-of-vienna",
+    "name": "University of Vienna",
+    "country": "Austria",
+    "sitelinks": 88
+  },
+  {
+    "slug": "university-of-virginia",
+    "name": "University of Virginia",
+    "country": "United States",
+    "sitelinks": 66
+  },
+  {
+    "slug": "university-of-waikato",
+    "name": "University of Waikato",
+    "country": "New Zealand",
+    "sitelinks": 23
+  },
+  {
+    "slug": "university-of-wales",
+    "name": "University of Wales",
+    "country": "United Kingdom",
+    "sitelinks": 26
+  },
+  {
+    "slug": "university-of-warsaw",
+    "name": "University of Warsaw",
+    "country": "Poland",
+    "sitelinks": 63
+  },
+  {
+    "slug": "university-of-warwick",
+    "name": "University of Warwick",
+    "country": "United Kingdom",
+    "sitelinks": 43
+  },
+  {
+    "slug": "university-of-washington",
+    "name": "University of Washington",
+    "country": "United States",
+    "sitelinks": 79
+  },
+  {
+    "slug": "university-of-waterloo",
+    "name": "University of Waterloo",
+    "country": "Canada",
+    "sitelinks": 36
+  },
+  {
+    "slug": "university-of-western-australia",
+    "name": "University of Western Australia",
+    "country": "Australia",
+    "sitelinks": 41
+  },
+  {
+    "slug": "university-of-western-ontario",
+    "name": "University of Western Ontario",
+    "country": "Canada",
+    "sitelinks": 29
+  },
+  {
+    "slug": "university-of-westminster",
+    "name": "University of Westminster",
+    "country": "United Kingdom",
+    "sitelinks": 35
+  },
+  {
+    "slug": "university-of-windsor",
+    "name": "University of Windsor",
+    "country": "Canada",
+    "sitelinks": 26
+  },
+  {
+    "slug": "university-of-wisconsin-madison",
+    "name": "University of Wisconsin–Madison",
+    "country": "United States",
+    "sitelinks": 59
+  },
+  {
+    "slug": "university-of-wisconsin-milwaukee",
+    "name": "University of Wisconsin–Milwaukee",
+    "country": "United States",
+    "sitelinks": 20
+  },
+  {
+    "slug": "university-of-wollongong",
+    "name": "University of Wollongong",
+    "country": "Australia",
+    "sitelinks": 32
+  },
+  {
+    "slug": "university-of-wroc-aw",
+    "name": "University of Wrocław",
+    "country": "Poland",
+    "sitelinks": 44
+  },
+  {
+    "slug": "university-of-wurzburg",
+    "name": "University of Würzburg",
+    "country": "Germany",
+    "sitelinks": 44
+  },
+  {
+    "slug": "university-of-wyoming",
+    "name": "University of Wyoming",
+    "country": "United States",
+    "sitelinks": 29
+  },
+  {
+    "slug": "university-of-yangon",
+    "name": "University of Yangon",
+    "country": "Myanmar",
+    "sitelinks": 26
+  },
+  {
+    "slug": "university-of-york",
+    "name": "University of York",
+    "country": "Canada",
+    "sitelinks": 44
+  },
+  {
+    "slug": "university-of-zadar",
+    "name": "University of Zadar",
+    "country": "Croatia",
+    "sitelinks": 26
+  },
+  {
+    "slug": "university-of-zagreb",
+    "name": "University of Zagreb",
+    "country": "Croatia",
+    "sitelinks": 50
+  },
+  {
+    "slug": "university-of-zambia",
+    "name": "University of Zambia",
+    "country": "Zambia",
+    "sitelinks": 29
+  },
+  {
+    "slug": "university-of-zaragoza",
+    "name": "University of Zaragoza",
+    "country": "Spain",
+    "sitelinks": 28
+  },
+  {
+    "slug": "university-of-zimbabwe",
+    "name": "University of Zimbabwe",
+    "country": "Zimbabwe",
+    "sitelinks": 27
+  },
+  {
+    "slug": "university-of-zurich",
+    "name": "University of Zurich",
+    "country": "Switzerland",
+    "sitelinks": 64
+  },
+  {
+    "slug": "university-toulouse-jean-jaures",
+    "name": "University Toulouse - Jean Jaurès",
+    "country": "France",
+    "sitelinks": 25
+  },
+  {
+    "slug": "uppsala-university",
+    "name": "Uppsala University",
+    "country": "Sweden",
+    "sitelinks": 74
+  },
+  {
+    "slug": "ural-federal-university",
+    "name": "Ural Federal University",
+    "country": "Russia",
+    "sitelinks": 32
+  },
+  {
+    "slug": "utah-state-university",
+    "name": "Utah State University",
+    "country": "United States",
+    "sitelinks": 27
+  },
+  {
+    "slug": "utah-valley-university",
+    "name": "Utah Valley University",
+    "country": "United States",
+    "sitelinks": 26
+  },
+  {
+    "slug": "utrecht-university",
+    "name": "Utrecht University",
+    "country": "Netherlands",
+    "sitelinks": 58
+  },
+  {
+    "slug": "vaganova-academy-of-russian-ballet",
+    "name": "Vaganova Academy of Russian Ballet",
+    "country": "Russia",
+    "sitelinks": 24
+  },
+  {
+    "slug": "vanderbilt-university",
+    "name": "Vanderbilt University",
+    "country": "United States",
+    "sitelinks": 44
+  },
+  {
+    "slug": "vassar-college",
+    "name": "Vassar College",
+    "country": "United States",
+    "sitelinks": 31
+  },
+  {
+    "slug": "veliko-tarnovo-university",
+    "name": "Veliko Tarnovo University",
+    "country": "Bulgaria",
+    "sitelinks": 20
+  },
+  {
+    "slug": "venetian-school",
+    "name": "Venetian school",
+    "country": "",
+    "sitelinks": 36
+  },
+  {
+    "slug": "victoria-university-of-wellington",
+    "name": "Victoria University of Wellington",
+    "country": "New Zealand",
+    "sitelinks": 30
+  },
+  {
+    "slug": "vienna-university-of-economics-and-business",
+    "name": "Vienna University of Economics and Business",
+    "country": "Austria",
+    "sitelinks": 22
+  },
+  {
+    "slug": "vietnam-national-university",
+    "name": "Vietnam National University",
+    "country": "Vietnam",
+    "sitelinks": 33
+  },
+  {
+    "slug": "vikramasila-university",
+    "name": "Vikramaśīla University",
+    "country": "India",
+    "sitelinks": 28
+  },
+  {
+    "slug": "villanova-university",
+    "name": "Villanova University",
+    "country": "United States",
+    "sitelinks": 31
+  },
+  {
+    "slug": "vilnius-university",
+    "name": "Vilnius University",
+    "country": "Lithuania",
+    "sitelinks": 54
+  },
+  {
+    "slug": "virginia-commonwealth-university",
+    "name": "Virginia Commonwealth University",
+    "country": "United States",
+    "sitelinks": 24
+  },
+  {
+    "slug": "virginia-tech",
+    "name": "Virginia Tech",
+    "country": "United States",
+    "sitelinks": 41
+  },
+  {
+    "slug": "visva-bharati-university",
+    "name": "Visva-Bharati University",
+    "country": "India",
+    "sitelinks": 30
+  },
+  {
+    "slug": "vkhutemas",
+    "name": "Vkhutemas",
+    "country": "Soviet Union",
+    "sitelinks": 24
+  },
+  {
+    "slug": "vrije-universiteit-amsterdam",
+    "name": "Vrije Universiteit Amsterdam",
+    "country": "Netherlands",
+    "sitelinks": 37
+  },
+  {
+    "slug": "vrije-universiteit-brussel",
+    "name": "Vrije Universiteit Brussel",
+    "country": "Belgium",
+    "sitelinks": 39
+  },
+  {
+    "slug": "vytautas-magnus-university",
+    "name": "Vytautas Magnus University",
+    "country": "Lithuania",
+    "sitelinks": 33
+  },
+  {
+    "slug": "wadham-college",
+    "name": "Wadham College",
+    "country": "United Kingdom",
+    "sitelinks": 21
+  },
+  {
+    "slug": "wageningen-university-research",
+    "name": "Wageningen University & Research",
+    "country": "Netherlands",
+    "sitelinks": 30
+  },
+  {
+    "slug": "wake-forest-university",
+    "name": "Wake Forest University",
+    "country": "United States",
+    "sitelinks": 26
+  },
+  {
+    "slug": "warsaw-university-of-technology",
+    "name": "Warsaw University of Technology",
+    "country": "Poland",
+    "sitelinks": 29
+  },
+  {
+    "slug": "waseda-university",
+    "name": "Waseda University",
+    "country": "Japan",
+    "sitelinks": 55
+  },
+  {
+    "slug": "washington-state-university",
+    "name": "Washington State University",
+    "country": "United States",
+    "sitelinks": 29
+  },
+  {
+    "slug": "washington-university-in-st-louis",
+    "name": "Washington University in St. Louis",
+    "country": "United States",
+    "sitelinks": 43
+  },
+  {
+    "slug": "wayne-state-university",
+    "name": "Wayne State University",
+    "country": "United States",
+    "sitelinks": 31
+  },
+  {
+    "slug": "wellesley-college",
+    "name": "Wellesley College",
+    "country": "United States",
+    "sitelinks": 34
+  },
+  {
+    "slug": "wesleyan-university",
+    "name": "Wesleyan University",
+    "country": "United States",
+    "sitelinks": 39
+  },
+  {
+    "slug": "west-virginia-university",
+    "name": "West Virginia University",
+    "country": "United States",
+    "sitelinks": 28
+  },
+  {
+    "slug": "western-sydney-university",
+    "name": "Western Sydney University",
+    "country": "Australia",
+    "sitelinks": 28
+  },
+  {
+    "slug": "williams-college",
+    "name": "Williams College",
+    "country": "United States",
+    "sitelinks": 24
+  },
+  {
+    "slug": "worcester-college",
+    "name": "Worcester College",
+    "country": "United Kingdom",
+    "sitelinks": 21
+  },
+  {
+    "slug": "wroc-aw-university-of-science-and-technology",
+    "name": "Wrocław University of Science and Technology",
+    "country": "Poland",
+    "sitelinks": 20
+  },
+  {
+    "slug": "wuhan-university",
+    "name": "Wuhan University",
+    "country": "People's Republic of China",
+    "sitelinks": 36
+  },
+  {
+    "slug": "xiamen-university",
+    "name": "Xiamen University",
+    "country": "People's Republic of China",
+    "sitelinks": 25
+  },
+  {
+    "slug": "yale-law-school",
+    "name": "Yale Law School",
+    "country": "United States",
+    "sitelinks": 29
+  },
+  {
+    "slug": "yale-university",
+    "name": "Yale University",
+    "country": "United States",
+    "sitelinks": 106
+  },
+  {
+    "slug": "yerevan-state-university",
+    "name": "Yerevan State University",
+    "country": "Armenia",
+    "sitelinks": 46
+  },
+  {
+    "slug": "yeshiva-university",
+    "name": "Yeshiva University",
+    "country": "United States",
+    "sitelinks": 28
+  },
+  {
+    "slug": "y-ld-z-technical-university",
+    "name": "Yıldız Technical University",
+    "country": "Turkey",
+    "sitelinks": 26
+  },
+  {
+    "slug": "yonsei-university",
+    "name": "Yonsei University",
+    "country": "South Korea",
+    "sitelinks": 39
+  },
+  {
+    "slug": "york-university",
+    "name": "York University",
+    "country": "Canada",
+    "sitelinks": 106
+  },
+  {
+    "slug": "zhejiang-university",
+    "name": "Zhejiang University",
+    "country": "People's Republic of China",
+    "sitelinks": 47
+  },
+  {
+    "slug": "zoological-society-of-london",
+    "name": "Zoological Society of London",
+    "country": "United Kingdom",
+    "sitelinks": 26
+  }
+]

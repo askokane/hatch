@@ -12,7 +12,9 @@
 import { PrismaClient, TagKind, TagRelation, IntentKind, ProjectStage, ProjectVisibility, Commitment, RoleStatus, ContextType, RequestStatus } from "@prisma/client";
 import bcrypt from "bcryptjs";
 // Relative, not "@/..." — tsx runs this file without tsconfig path resolution.
+import { readFileSync } from "node:fs";
 import { catalogSlug } from "../src/lib/catalog-slug";
+import { CATALOG_TAGS } from "./data/catalog-tags";
 
 const prisma = new PrismaClient();
 
@@ -1102,6 +1104,12 @@ async function main() {
   await wipe();
 
   // --- Tags ---
+  // TAGS below is the tech-oriented set the seeded demo profiles actually
+  // reference by slug, so it stays here rather than moving wholesale into
+  // prisma/data/. CATALOG_TAGS is the curated expansion (art, music, finance,
+  // business, soft skills) shared with scripts/import-catalog.ts — one source of
+  // truth, so a fresh database, the e2e schema and production all end up with
+  // the same catalog.
   const tagId = new Map<string, string>();
   for (const t of TAGS) {
     const row = await prisma.tag.create({
@@ -1109,7 +1117,21 @@ async function main() {
     });
     tagId.set(t.slug, row.id);
   }
-  console.log(`[HATCH seed] created ${TAGS.length} tags`);
+
+  // The curated set is inserted second and skips anything TAGS already claimed,
+  // so a slug present in both keeps the demo-referenced row.
+  const seededSlugs = new Set(TAGS.map((t) => t.slug));
+  const expansion = CATALOG_TAGS.filter((t) => !seededSlugs.has(t.slug));
+  await prisma.tag.createMany({
+    data: expansion.map((t) => ({
+      slug: t.slug,
+      label: t.label,
+      kind: t.kind as TagKind,
+      aliases: t.aliases,
+    })),
+    skipDuplicates: true,
+  });
+  console.log(`[HATCH seed] created ${TAGS.length + expansion.length} tags`);
 
   // --- School catalog ---
   // Every school the seeded profiles attend, so a fresh signup gets a working
@@ -1119,7 +1141,24 @@ async function main() {
   for (const name of schoolNames) {
     await prisma.school.create({ data: { slug: catalogSlug(name), name } });
   }
-  console.log(`[HATCH seed] created ${schoolNames.length} schools`);
+
+  // Plus the ~1,350 major universities from Wikidata (see
+  // scripts/fetch-universities.mjs). Chunked because one createMany of that size
+  // is a single very large statement over a pooled connection.
+  const seededSchoolSlugs = new Set(schoolNames.map((n) => catalogSlug(n)));
+  const universities: { slug: string; name: string }[] = JSON.parse(
+    readFileSync("prisma/data/universities.json", "utf8")
+  );
+  const newSchools = universities.filter((u) => !seededSchoolSlugs.has(u.slug));
+  for (let i = 0; i < newSchools.length; i += 250) {
+    await prisma.school.createMany({
+      data: newSchools.slice(i, i + 250).map((u) => ({ slug: u.slug, name: u.name })),
+      skipDuplicates: true,
+    });
+  }
+  console.log(
+    `[HATCH seed] created ${schoolNames.length + newSchools.length} schools`
+  );
 
   // --- Users + profiles ---
   const passwordHash = await bcrypt.hash(PASSWORD, BCRYPT_COST);
