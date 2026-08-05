@@ -1,8 +1,11 @@
 # HATCH — Version History
 
-Every commit on `main`, numbered `v0.0` upward in chronological order. The repo
-carries no git tags and no GitHub issues or PRs, so the "issues resolved"
-sections below are drawn from what each commit states it fixed.
+Every commit on `main`, numbered `v0.0` upward in chronological order. There are
+no GitHub issues or PRs, so the "issues resolved" sections below are drawn from
+what each commit states it fixed.
+
+Annotated tags exist for `v0.0`–`v0.6`. `v0.7` onward are not tagged yet — the
+numbering here is the source of truth either way.
 
 | Version | Commit | Date | Title |
 | --- | --- | --- | --- |
@@ -13,6 +16,13 @@ sections below are drawn from what each commit states it fixed.
 | [v0.4](#v04--messaging-depth-and-safety) | `c8de011` | 2026-07-29 | Fix six reported bugs; add typing, receipts and relationship sync |
 | [v0.5](#v05--feed-nav-and-connection-pooling) | `017dbd8` | 2026-08-02 | Add feed, restructure nav, and fix database pooling |
 | [v0.6](#v06--handles-and-user-grown-catalogs) | `709d651` | 2026-08-02 | Underscore handles, user-grown school/skill catalogs, based-in field |
+| [v0.7](#v07--this-changelog) | `74b8809` | 2026-08-05 | Add CHANGELOG documenting v0.0 through v0.6 |
+| [v0.8](#v08--profile-pictures-and-the-postgrest-lockdown) | `8bafa99` | 2026-08-05 | Add profile picture uploads; close the PostgREST hole in the database |
+| [v0.9](#v09--university-catalog-import) | `09e9f2b` | 2026-08-05 | Add university/tag catalog import and accent-folded slugs |
+| [v0.10](#v010--avatar-size-cap-ordering) | `d168860` | 2026-08-05 | Check the avatar size cap against the resized copy, not the original |
+| [v0.11](#v011--security-and-image-documentation) | `6fe6de8` | 2026-08-05 | Document the EXIF stripping, the USAGE revoke, and the RLS-on-new-tables rule |
+| [v0.12](#v012--e2e-port-guard) | `4b426f6` | 2026-08-05 | Reclaim an orphaned e2e server instead of refusing to run |
+| [v0.13](#v013--migrations-run-from-the-build) | `11bdce9` | 2026-08-06 | Apply migrations from the build, on production deploys only |
 
 ---
 
@@ -281,3 +291,208 @@ handle, appending a numeric suffix on the collisions that creates (handles are
 unique, so `a-b` and `a_b` may both already exist), and backfills the school
 catalog from schools already typed into profiles using the SQL twin of
 `catalogSlug()`.
+
+---
+
+## v0.7 — This changelog
+
+**Commit** `74b8809` · 2026-08-05 · 1 file, +283
+
+Documentation only. Numbers every commit on `main` to that point and adds
+annotated tags `v0.0`–`v0.6`. Versions are assigned retroactively; `package.json`
+still declares `1.0.0` and is untouched.
+
+---
+
+## v0.8 — Profile pictures and the PostgREST lockdown
+
+**Commit** `8bafa99` · 2026-08-05 · 46 files, +1,896 −76
+
+### Features
+
+- **Uploaded profile pictures.** `Profile.avatarAssetId` overrides the
+  deterministic identicon every profile has carried since creation. It is a
+  scalar FK rather than a join because an avatar is drawn on every people card,
+  feed item, thread row and nav bar, so the listing queries have to pick it up in
+  the same `select` as the handle. Null means "render the identicon", which is
+  why every existing row was already correct with no backfill. The seed is never
+  cleared, so removing a picture restores the pattern the profile started with.
+- **The bytes are a `MediaAsset`**, reusing the post-media upload validation,
+  storage and serving route unchanged. `MediaAsset.isAvatar` separates the two:
+  both kinds are `postId`-null, but an avatar is permanently so. Upload is a
+  route handler because a photo exceeds the 1 MB Server Action body cap; removal
+  is an action, because it carries no body.
+- **EXIF is stripped server-side on every image upload.** `lib/image-metadata.ts`
+  removes EXIF/XMP/comment segments from JPEG, PNG and WebP with no new
+  dependency. Every parser is bounds-checked and bails to the original file
+  rather than emit something corrupt.
+- **The client downscales to 256 px** through a canvas before uploading, turning
+  a multi-megabyte camera photo into tens of kilobytes. That is the bandwidth
+  fix; it is skippable by posting to the route directly, which is why the server
+  strip above is what the privacy guarantee rests on.
+- **`npm run audit:db`** — a read-only report on the database's RLS and grant
+  posture that exits non-zero on a regression.
+
+### Bugs fixed
+
+- **Posting anything would have deleted your own profile picture.** The
+  abandoned-upload sweep in `createPostAction` deletes every `postId`-null asset
+  belonging to the author, which an avatar is by design. `isAvatar` exempts it.
+- **A profile picture could be claimed as a post attachment.** The same asset is
+  owned by the caller and is `postId`-null — exactly the claim predicate — and
+  its id is the `src` of the caller's own `<img>`. A crafted call attached it to
+  a post, and deleting that post then cascaded the avatar out from under the
+  profile. The claim predicate now carries `isAvatar: false`, making the
+  invariant total rather than half-held.
+
+### Security
+
+- **The database was readable and writable through Supabase's REST API.**
+  PostgREST fronts the `public` schema and grants `anon`/`authenticated` full DML
+  on every table; nothing here had RLS, because nothing here uses RLS. Anyone
+  holding the project's anon key — a publishable value, displayed in the
+  dashboard, not a secret — could have read every password hash and every
+  `Session.tokenHash` (enough to mint a valid cookie), or issued `DELETE` and
+  `TRUNCATE`, without touching a line of application code.
+
+### Migration
+
+`20260805120000_profile_avatar_upload` adds `Profile.avatarAssetId` (nullable,
+unique, `ON DELETE SET NULL`) and `MediaAsset.isAvatar`. Additive; no backfill.
+
+`20260805130000_lock_down_public_api_grants` enables RLS on every table with no
+policies, revokes the `anon`/`authenticated` table, sequence and function grants,
+and revokes the **default privileges** that would otherwise re-grant every future
+table — without which the next migration to add a table would silently re-open
+the schema. The app is unaffected because `postgres` owns these tables and has
+`rolbypassrls`.
+
+### Tests
+
+Spec 12 covers the upload round trip, the sweep regression, replacement,
+removal, the claim guard and EXIF stripping end to end. Spec 13 unit-tests the
+metadata parser, asserting byte-for-byte equality against clean files — which
+catches a parser that drops the right segment and a stray byte with it.
+
+---
+
+## v0.9 — University catalog import
+
+**Commit** `09e9f2b` · 2026-08-05 · 10 files, +8,910 −12
+
+Not authored as part of the profile-picture work; committed separately so the two
+features have distinct histories. Described from the diff rather than from
+review.
+
+### Features
+
+- **~1,350-university catalog** in `prisma/data/`, with
+  `scripts/fetch-universities.mjs`, `import-catalog.ts` and `verify-catalog.ts`
+  as the fetch/import/verify path.
+- **`catalogSlug()` folds accents.** Previously every non-`[a-z0-9]` run
+  collapsed to `-`, so a university's accented and unaccented spellings produced
+  different slugs and therefore duplicate rows — survivable at nine hand-typed
+  schools, not across 142 countries of mostly accented names.
+
+### Bugs fixed
+
+- **`TAG_ALIAS_SCAN_MAX` raised from 500 to 2000.** The alias scan cannot run in
+  the database (`aliases` is a Json array), so curated rows are filtered in
+  memory. The catalog expansion took that set from 99 rows to 326; past the old
+  bound, alias lookups outside the window stop resolving with no error.
+
+### Migration
+
+`20260805140000_fold_accents_in_catalog_slugs` re-slugs existing rows. Measured
+against the live catalog before running: 1 `School` row changes, 0 collisions,
+so it carries no merge logic.
+
+---
+
+## v0.10 — Avatar size cap ordering
+
+**Commit** `d168860` · 2026-08-05 · 2 files, +30 −13
+
+### Bugs fixed
+
+- **An ordinary phone photo was rejected for being too large**, despite
+  downscaling to roughly fifty kilobytes. The cap applies to what gets uploaded —
+  the 256 px re-encode — but was being checked against the file the user picked.
+  Type is still checked up front, since that answer cannot change; size moved to
+  after the downscale, where it only trips when resizing genuinely could not
+  help. The hint text no longer quotes a byte limit, because the limit no longer
+  applies to anything the user can see.
+
+---
+
+## v0.11 — Security and image documentation
+
+**Commit** `6fe6de8` · 2026-08-05 · 2 files, +48 −10
+
+Documentation only, but one paragraph was wrong rather than merely stale: the
+README described the lockdown as leaving two residuals, one of which had since
+been closed. Also records the rule the migration cannot enforce for itself —
+a new table needs its own `ENABLE ROW LEVEL SECURITY`, because automating that
+needs superuser — and which half of the image pipeline is the guard.
+
+### Migration
+
+`20260805150000_revoke_public_schema_usage` revokes schema `USAGE` from the
+pseudo-role `PUBLIC`, which every role inherits and which a per-role revoke
+therefore could not reach. It re-grants `CURRENT_USER` explicitly so the
+migration is also safe on a plain Postgres, where the application would otherwise
+have been relying on that same inherited grant. Defence in depth: `USAGE` alone
+confers no data access, since reading a row also needs a table privilege.
+
+---
+
+## v0.12 — e2e port guard
+
+**Commit** `4b426f6` · 2026-08-05 · 2 files, +29 −7
+
+### Bugs fixed
+
+- **An interrupted test run blocked every subsequent run.** The guard on port
+  3100 exists to stop the suite testing a stale build, and that reasoning stands
+  — but it treated both ways of reaching an occupied port as the same situation.
+  A PID file is left behind only when a run was interrupted before teardown, and
+  it names a process the harness itself spawned; that case is now reclaimed. With
+  no PID file the occupant is something else, quite possibly a developer's own
+  dev server, so that case still refuses. This cost three full suite runs in one
+  session to rediscover.
+- The PID file is now gitignored. A committed one would carry a PID from another
+  machine, which the new branch above would act on.
+
+---
+
+## v0.13 — Migrations run from the build
+
+**Commit** `11bdce9` · 2026-08-06 · 3 files, +192 −2
+
+### Features
+
+- **`npm run build` applies pending migrations**, via
+  `scripts/migrate-then-build.mjs`. Migrations were previously a manual step
+  separate from deploying, so code and schema were two independent actions that
+  could be done in either order, or one without the other — this project spent a
+  day with a database three migrations ahead of the code running against it.
+- **Builds first, migrates second.** A compile error is far likelier than a
+  migration failure, and migrating first means a broken build has already mutated
+  the database. Nothing is lost by waiting: the deploy goes live only once the
+  whole command exits 0, so migrations still land before traffic reaches the new
+  code.
+- **Production deploys only**, guarded on `VERCEL_ENV`. There is one database, so
+  preview builds point at the same Postgres production does; without the guard,
+  opening a pull request would migrate the live database before anyone had read
+  the migration.
+- Fails closed, resolves the connection string before building so a
+  misconfiguration costs a second rather than a full compile, and refuses to
+  migrate over a transaction pooler (port 6543 / `pgbouncer=true`), which does
+  not preserve session state.
+
+### Consequence to keep in mind
+
+Migrations now run while the **previous** release is still serving, so every
+migration must be backward-compatible with the release before it. Add columns;
+do not rename or drop them in the same deploy that stops using them. Widen now,
+narrow in a later deploy once nothing reads the old shape.
