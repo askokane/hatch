@@ -5,7 +5,7 @@
   "scripts": {
     "postinstall": "prisma generate",
     "dev": "next dev",
-    "build": "next build",
+    "build": "node scripts/migrate-then-build.mjs",
     "start": "next start",
     "lint": "next lint",
     "seed": "tsx prisma/seed.ts",

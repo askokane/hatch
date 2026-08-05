@@ -71,7 +71,7 @@ real provider would gate on later.
 | Script | What it does |
 | --- | --- |
 | `npm run dev` | Start the dev server on :3000 |
-| `npm run build` | Production build |
+| `npm run build` | Production build. On a Vercel **production** deploy it also applies pending migrations, after the build succeeds (see Deploys) — locally and on previews it only builds. |
 | `npm run start` | Start the production server (after `build`) |
 | `npm run seed` | Seed the database with the demo dataset |
 | `npm run db:migrate` | `prisma migrate dev` |
@@ -133,6 +133,34 @@ The suite runs on its own server on port **3100**. It covers:
 - **The upload is a route handler, not a Server Action.** Server Actions carry a default 1 MB request body cap, and raising it is a global setting that would apply to every action in the app. `POST /api/media` takes the file, validates it, and returns an id; the post is then created with ids only. The per-file cap is 4 MB because that is where the limit is *real* — a serverless function rejects a larger body before our handler runs, so a bigger limit would work on a laptop and fail in production.
 - **Media is validated by allowlist and served back from that same allowlist.** The stored MIME is re-checked against `ALLOWED_IMAGE_MIME`/`ALLOWED_VIDEO_MIME` on the way out and sent with `X-Content-Type-Options: nosniff`, so a row can never cause an arbitrary content type to be served. `GET /api/media/[id]` requires a session (media is not public), supports HTTP `Range` so `<video>` seeking works, and is cached `private, immutable` since an asset id never changes content.
 - **An upload is attached, not trusted.** The composer uploads first and posts ids second, so between those two steps an asset exists with no post. `createPostAction` attaches only assets that the caller owns *and* that are still unattached, re-derived from the DB — a borrowed or already-used id is refused rather than silently dropped. Assets stranded by an abandoned composer are capped per profile and swept when that profile's next post lands.
+
+## Deploys
+
+`npm run build` runs `scripts/migrate-then-build.mjs`, which compiles and then
+applies pending migrations. Two details in that sentence are the whole design:
+
+**"Then", not "first".** The obvious arrangement is migrate-then-build, and it is
+the wrong one — a compile error is far likelier than a migration failure, and
+migrating first means a broken build has already mutated the database. Building
+first keeps the common failure away from Postgres entirely. Nothing is lost: the
+deploy only goes live once the whole command exits 0, so migrations still land
+before any traffic reaches the new code.
+
+**Production deploys only.** This project has one database, so a preview build is
+pointed at the same Postgres production is. Without a `VERCEL_ENV` guard, opening
+a pull request would migrate the live database before anyone had read the
+migration. Previews and local builds skip it.
+
+The script fails closed: a failed migration aborts the deploy and the previous
+release keeps serving. It also resolves the connection string before building, so
+a misconfiguration costs a second rather than a full compile — and it refuses to
+migrate over a transaction pooler (port 6543 / `pgbouncer=true`), which does not
+preserve session state.
+
+**The rule this creates:** migrations run while the *previous* release is still
+serving, so every migration must be backward-compatible with the release before
+it. Add columns; do not rename or drop them in the same deploy that stops using
+them. Widen now, narrow later, once nothing reads the old shape.
 
 ## Database exposure
 
