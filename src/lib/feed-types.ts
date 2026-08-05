@@ -13,6 +13,8 @@ export type FeedAuthor = {
   handle: string;
   name: string;
   avatarSeed: string;
+  /** Uploaded profile picture, or null for the identicon. */
+  avatarAssetId: string | null;
 };
 
 export type FeedMedia = {

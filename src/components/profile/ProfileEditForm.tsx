@@ -10,6 +10,7 @@ import { TagPicker } from "@/components/ui/TagPicker";
 import { Button } from "@/components/ui/Button";
 import { useToast } from "@/components/ui/ToastProvider";
 import { SchoolPicker } from "@/components/profile/SchoolPicker";
+import { AvatarPicker } from "@/components/profile/AvatarPicker";
 import type { TagDTO } from "@/actions/tags";
 import { BASED_IN_MAX, INTENT_KINDS, INTENT_LABELS } from "@/lib/constants";
 import { HANDLE_HINT, normalizeHandleInput } from "@/lib/handle";
@@ -19,6 +20,9 @@ const YEARS = Array.from({ length: 8 }, (_, i) => 2025 + i);
 export type ProfileEditInitial = {
   name: string;
   handle: string;
+  /** Identicon fallback — always present, used when there is no uploaded photo. */
+  avatarSeed: string;
+  avatarAssetId: string | null;
   school: string;
   gradYear: number;
   basedIn: string;
@@ -98,6 +102,10 @@ export function ProfileEditForm({
           {error}
         </p>
       )}
+
+      {/* First, because it is the field a visitor reads before any of the text
+          ones. It manages its own persistence — see the note in AvatarPicker. */}
+      <AvatarPicker seed={initial.avatarSeed} initialAssetId={initial.avatarAssetId} />
 
       <div className="grid gap-4 sm:grid-cols-2">
         <Input label="Name" value={name} onChange={(e) => setName(e.target.value)} />

@@ -39,7 +39,11 @@ export default async function ThreadPage({ params }: { params: Promise<{ threadI
       include: {
         members: {
           where: { profileId: { not: profileId } },
-          include: { profile: { select: { id: true, handle: true, name: true, avatarSeed: true } } },
+          include: {
+            profile: {
+              select: { id: true, handle: true, name: true, avatarSeed: true, avatarAssetId: true },
+            },
+          },
         },
       },
     }),
@@ -91,7 +95,9 @@ export default async function ThreadPage({ params }: { params: Promise<{ threadI
       {/* Pinned originating context */}
       <div className="mt-3 flex items-center justify-between gap-3 border border-hairline bg-white p-3">
         <div className="flex items-center gap-3">
-          {counterpart && <Avatar seed={counterpart.avatarSeed} size={36} />}
+          {counterpart && (
+            <Avatar seed={counterpart.avatarSeed} assetId={counterpart.avatarAssetId} size={36} />
+          )}
           <div>
             <p className="text-sm font-600">{counterpart?.name ?? "Unknown"}</p>
             <p className="mono text-2xs text-pine">{contextLabel}</p>

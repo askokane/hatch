@@ -72,7 +72,7 @@ export function RoleFeedCard({
 
       <div className="mt-4 flex items-center justify-between border-t border-hairline pt-3">
         <Link href={`/u/${owner.handle}`} className="flex items-center gap-2 hover:underline">
-          <Avatar seed={owner.avatarSeed} size={24} />
+          <Avatar seed={owner.avatarSeed} assetId={owner.avatarAssetId} size={24} />
           <span className="mono text-2xs text-ink-muted">
             {owner.name} · {owner.school}
           </span>

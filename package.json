@@ -12,6 +12,10 @@
     "db:migrate": "prisma migrate dev",
     "db:reset": "prisma migrate reset --force",
     "db:studio": "prisma studio",
+    "audit:db": "tsx scripts/audit-db-security.ts",
+    "catalog:verify": "tsx scripts/verify-catalog.ts",
+    "catalog:fetch": "node scripts/fetch-universities.mjs",
+    "catalog:import": "tsx scripts/import-catalog.ts",
     "test:e2e": "node scripts/with-e2e-db.mjs playwright test",
     "test:e2e:install": "playwright install chromium",
     "pretest:e2e": "node scripts/with-e2e-db.mjs prisma migrate deploy && node scripts/with-e2e-db.mjs tsx prisma/seed.ts && cross-env NODE_ENV=production next build"

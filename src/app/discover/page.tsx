@@ -169,6 +169,7 @@ async function PeopleTab({
                 basedIn: p.basedIn,
                 bio: p.bio,
                 avatarSeed: p.avatarSeed,
+                avatarAssetId: p.avatarAssetId,
                 tags: p.tags.map((t) => ({ relation: t.relation, tag: t.tag })),
                 intents: p.intents,
               }}

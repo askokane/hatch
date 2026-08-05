@@ -29,7 +29,7 @@ export function ProjectUpdateCard({ item }: { item: ProjectUpdateFeedItem }) {
 
       <div className="mt-4 flex items-center justify-between border-t border-hairline pt-3">
         <Link href={`/u/${author.handle}`} className="flex items-center gap-2 hover:underline">
-          <Avatar seed={author.avatarSeed} size={24} />
+          <Avatar seed={author.avatarSeed} assetId={author.avatarAssetId} size={24} />
           <span className="mono text-2xs text-ink-muted">
             {author.name} · @{author.handle}
           </span>

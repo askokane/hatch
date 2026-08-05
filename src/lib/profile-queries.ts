@@ -34,6 +34,7 @@ type ProfileWithRelations = {
   basedIn: string;
   bio: string;
   avatarSeed: string;
+  avatarAssetId: string | null;
   links: unknown;
   isDiscoverable: boolean;
   tags: { relation: string; tag: { id: string; label: string } }[];
@@ -49,6 +50,7 @@ function toViewData(p: ProfileWithRelations): ProfileViewData {
     basedIn: p.basedIn,
     bio: p.bio,
     avatarSeed: p.avatarSeed,
+    avatarAssetId: p.avatarAssetId,
     links: Array.isArray(p.links) ? (p.links as { label: string; url: string }[]) : [],
     isDiscoverable: p.isDiscoverable,
     skills: p.tags.filter((t) => t.relation === "HAS").map((t) => t.tag),

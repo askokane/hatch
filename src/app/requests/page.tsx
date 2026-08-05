@@ -22,7 +22,7 @@ export default async function RequestsPage({
     db.introRequest.findMany({
       where: { toProfileId: profileId },
       include: {
-        fromProfile: { select: { handle: true, name: true, avatarSeed: true } },
+        fromProfile: { select: { handle: true, name: true, avatarSeed: true, avatarAssetId: true } },
         thread: { select: { id: true } },
       },
       orderBy: { createdAt: "desc" },
@@ -30,7 +30,7 @@ export default async function RequestsPage({
     db.introRequest.findMany({
       where: { fromProfileId: profileId },
       include: {
-        toProfile: { select: { handle: true, name: true, avatarSeed: true } },
+        toProfile: { select: { handle: true, name: true, avatarSeed: true, avatarAssetId: true } },
         thread: { select: { id: true } },
       },
       orderBy: { createdAt: "desc" },

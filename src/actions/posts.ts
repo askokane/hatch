@@ -67,9 +67,20 @@ export async function createPostAction(input: {
       // the asset was missing, owned by someone else, or already attached —
       // indistinguishable to the caller on purpose, since telling them which would
       // confirm the existence of another profile's upload.
+      //
+      // `isAvatar: false` closes the other half of the avatar/composer overlap.
+      // The sweep below already refuses to DELETE a profile picture, but without
+      // this the picture was still CLAIMABLE: it is owned by the caller and is
+      // postId-null, which is exactly the predicate. Its asset id is not secret
+      // either — it is the `src` of the avatar <img> on the caller's own page —
+      // so posting it as an attachment took nothing more than reading the DOM.
+      // The result was an avatar quietly attached to a post, and then deleted
+      // out from under the profile when that post was (the cascade on postId
+      // fires, and Profile.avatarAssetId falls to NULL). One predicate makes
+      // "an avatar is never a post attachment" total rather than half-held.
       for (const [position, id] of mediaIds.entries()) {
         const claimed = await tx.mediaAsset.updateMany({
-          where: { id, ownerProfileId: profileId, postId: null },
+          where: { id, ownerProfileId: profileId, postId: null, isAvatar: false },
           data: { postId: post.id, position },
         });
         if (claimed.count !== 1) throw new MediaUnavailableError();
@@ -78,7 +89,15 @@ export async function createPostAction(input: {
       // Abandoned-upload sweep. Anything still unattached for this profile was
       // chosen in a composer that was never submitted — the assets just claimed
       // above now carry a postId, so they are not in this set.
-      await tx.mediaAsset.deleteMany({ where: { ownerProfileId: profileId, postId: null } });
+      //
+      // The profile picture is unattached forever by design and must be excluded,
+      // or posting anything would silently delete your own avatar. `isAvatar` is
+      // set in the INSERT that creates it, so this is not a race with an upload
+      // in flight: the row is either an avatar from the moment it exists, or it
+      // never becomes one.
+      await tx.mediaAsset.deleteMany({
+        where: { ownerProfileId: profileId, postId: null, isAvatar: false },
+      });
 
       return post.id;
     });

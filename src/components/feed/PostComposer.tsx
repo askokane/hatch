@@ -131,7 +131,13 @@ function uploadFile(
 // the first line is now revealed on focus, which is the arrangement X, Facebook
 // and Instagram all arrived at: the feed is what the page is for, and the
 // composer should cost one line of it until someone actually wants to write.
-export function PostComposer({ avatarSeed }: { avatarSeed: string }) {
+export function PostComposer({
+  avatarSeed,
+  avatarAssetId,
+}: {
+  avatarSeed: string;
+  avatarAssetId: string | null;
+}) {
   const router = useRouter();
   const { notify } = useToast();
   const fileInputId = useId();
@@ -283,7 +289,7 @@ export function PostComposer({ avatarSeed }: { avatarSeed: string }) {
       onSubmit={onSubmit}
     >
       <div className="flex gap-3">
-        <Avatar seed={avatarSeed} size={36} className="mt-0.5 shrink-0" />
+        <Avatar seed={avatarSeed} assetId={avatarAssetId} size={36} className="mt-0.5 shrink-0" />
 
         {/* One wrapping flex row, not a stack of conditional blocks. Collapsed,
             the text field and the media button are the only items and sit side

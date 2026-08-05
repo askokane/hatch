@@ -158,6 +158,7 @@ export type BlockedProfile = {
   handle: string;
   name: string;
   avatarSeed: string;
+  avatarAssetId: string | null;
   blockedAt: Date;
 };
 
@@ -165,7 +166,11 @@ export type BlockedProfile = {
 export async function getBlockedProfiles(viewerProfileId: string): Promise<BlockedProfile[]> {
   const rows = await db.block.findMany({
     where: { blockerProfileId: viewerProfileId },
-    include: { blocked: { select: { id: true, handle: true, name: true, avatarSeed: true } } },
+    include: {
+      blocked: {
+        select: { id: true, handle: true, name: true, avatarSeed: true, avatarAssetId: true },
+      },
+    },
     orderBy: { createdAt: "desc" },
   });
   return rows.map((r) => ({
@@ -173,6 +178,7 @@ export async function getBlockedProfiles(viewerProfileId: string): Promise<Block
     handle: r.blocked.handle,
     name: r.blocked.name,
     avatarSeed: r.blocked.avatarSeed,
+    avatarAssetId: r.blocked.avatarAssetId,
     blockedAt: r.createdAt,
   }));
 }

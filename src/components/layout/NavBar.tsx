@@ -24,6 +24,7 @@ export function NavBar({
   name,
   handle,
   avatarSeed,
+  avatarAssetId,
 }: {
   isAuthed: boolean;
   hasProfile: boolean;
@@ -31,6 +32,7 @@ export function NavBar({
   name: string | null;
   handle: string | null;
   avatarSeed: string | null;
+  avatarAssetId: string | null;
 }) {
   const pathname = usePathname();
   const { unreadMessages, pendingRequests } = useNavCounts(isAuthed && hasProfile);
@@ -104,6 +106,7 @@ export function NavBar({
               name={name ?? handle}
               handle={handle}
               avatarSeed={avatarSeed}
+              avatarAssetId={avatarAssetId}
               isAdmin={isAdmin}
             />
           ) : isAuthed ? (

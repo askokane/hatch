@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { db } from "@/lib/db";
 import { requireSession, requireProfile } from "@/lib/session";
 import { ensureSchool } from "@/lib/school-catalog";
+import { revalidateAvatarSurfaces } from "@/lib/avatar-surfaces";
 import { updateProfileSchema } from "@/lib/validation/profile.schema";
 import { HANDLE_IMMUTABLE_DAYS } from "@/lib/constants";
 import { ok, fail, type ActionResult } from "@/lib/action-result";
@@ -99,6 +100,43 @@ export async function updateProfileAction(
   revalidatePath("/profile");
   revalidatePath(`/u/${data.handle}`);
   return ok({ handle: data.handle });
+}
+
+// Clears the caller's profile picture, restoring the identicon.
+//
+// Removal is an action while upload is a route handler, and the split is not an
+// inconsistency: the route exists solely because a photo exceeds the 1 MB Server
+// Action body cap. Removal carries no body, so it belongs on the same path as
+// every other mutation in the app.
+//
+// The asset row is deleted, not just unlinked. Nothing can reach a removed
+// avatar — there is no history — so keeping the bytes would only accumulate
+// them.
+export async function removeAvatarAction(): Promise<ActionResult> {
+  const session = await requireSession();
+  const profileId = await requireProfile(session);
+
+  const profile = await db.profile.findUnique({
+    where: { id: profileId },
+    select: { handle: true, avatarAssetId: true },
+  });
+  if (!profile) return fail("Profile not found.");
+  // Already on the identicon. Reported as success: the caller asked for a state,
+  // and the state holds.
+  if (!profile.avatarAssetId) return ok(undefined);
+
+  const assetId = profile.avatarAssetId;
+  await db.$transaction([
+    db.profile.update({ where: { id: profileId }, data: { avatarAssetId: null } }),
+    // `deleteMany`, not `delete`: two removals racing each other (or a removal
+    // racing a replacement) would otherwise have the loser throw P2025 on a row
+    // the winner already took, turning "it is already gone" into a 500. The
+    // no-op is the correct outcome — the requested state holds either way.
+    db.mediaAsset.deleteMany({ where: { id: assetId } }),
+  ]);
+
+  revalidateAvatarSurfaces(profile.handle);
+  return ok(undefined);
 }
 
 // Toggles discoverability on the caller's own profile.

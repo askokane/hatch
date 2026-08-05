@@ -31,6 +31,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             name={session?.name ?? null}
             handle={session?.handle ?? null}
             avatarSeed={session?.avatarSeed ?? null}
+            avatarAssetId={session?.avatarAssetId ?? null}
           />
           <main id="main" className="mx-auto w-full max-w-5xl px-4 py-8 sm:px-6">
             {children}

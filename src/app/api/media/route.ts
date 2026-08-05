@@ -1,12 +1,8 @@
 import { getSession } from "@/lib/session";
 import { db } from "@/lib/db";
-import {
-  ALLOWED_IMAGE_MIME,
-  ALLOWED_VIDEO_MIME,
-  IMAGE_BYTES_MAX,
-  VIDEO_BYTES_MAX,
-  PENDING_UPLOAD_MAX,
-} from "@/lib/constants";
+import { IMAGE_BYTES_MAX, VIDEO_BYTES_MAX, PENDING_UPLOAD_MAX } from "@/lib/constants";
+import { humanMB, mimeKind, safeFileName } from "@/lib/upload";
+import { stripImageMetadata } from "@/lib/image-metadata";
 
 // POST /api/media   (multipart/form-data, field: `file`)
 //
@@ -21,33 +17,6 @@ import {
 // The upload is deliberately separate from post creation. The composer needs to
 // show a preview and a working delete before the post exists, and a failed
 // multi-megabyte upload should not also discard the caption the user typed.
-
-const MAX_FILENAME_LEN = 120;
-
-function mimeKind(mime: string): "IMAGE" | "VIDEO" | null {
-  if ((ALLOWED_IMAGE_MIME as readonly string[]).includes(mime)) return "IMAGE";
-  if ((ALLOWED_VIDEO_MIME as readonly string[]).includes(mime)) return "VIDEO";
-  return null;
-}
-
-function humanMB(bytes: number): string {
-  return `${Math.round((bytes / (1024 * 1024)) * 10) / 10} MB`;
-}
-
-// Display-only. The stored name is never used to build a path or a URL — the
-// asset is addressed by its cuid — but it is still reduced to a bare basename so
-// nothing downstream can be tempted to treat it as one.
-function safeFileName(raw: string): string {
-  const base = raw.split(/[/\\]/).pop() ?? "";
-  // Drop C0 control characters (NUL, newlines, and friends). They have no place in
-  // a display name and would otherwise ride verbatim into markup or logs. Filtered
-  // by codepoint rather than by a regex holding literal control characters, which
-  // are invisible and easy to corrupt in an edit.
-  const printable = Array.from(base)
-    .filter((ch) => ch.codePointAt(0)! >= 0x20 && ch.codePointAt(0)! !== 0x7f)
-    .join("");
-  return printable.trim().slice(0, MAX_FILENAME_LEN);
-}
 
 export async function POST(req: Request) {
   const session = await getSession();
@@ -89,7 +58,11 @@ export async function POST(req: Request) {
     return Response.json({ error: "That file is empty." }, { status: 400 });
   }
 
-  const pending = await db.mediaAsset.count({ where: { ownerProfileId: profileId, postId: null } });
+  // `isAvatar: false` matters: a profile picture is permanently postId-null, so
+  // without it every user with an avatar would start one over quota.
+  const pending = await db.mediaAsset.count({
+    where: { ownerProfileId: profileId, postId: null, isAvatar: false },
+  });
   if (pending >= PENDING_UPLOAD_MAX) {
     return Response.json(
       { error: "You have too many uploads waiting to be posted. Post or discard them first." },
@@ -97,12 +70,18 @@ export async function POST(req: Request) {
     );
   }
 
-  const bytes = Buffer.from(await file.arrayBuffer());
+  const raw = Buffer.from(await file.arrayBuffer());
   // The multipart part could disagree with the declared size; the stored length is
   // the one that was actually read, and it is re-checked against the cap.
-  if (bytes.byteLength > limit) {
+  if (raw.byteLength > limit) {
     return Response.json({ error: "That file is larger than the limit." }, { status: 400 });
   }
+
+  // Photos posted to the feed carry the same EXIF as any other phone photo — GPS
+  // included — and the feed is where the most photos are. Video is passed
+  // through: its container metadata is a different parsing problem, and this
+  // helper does not pretend to handle it.
+  const bytes = kind === "IMAGE" ? stripImageMetadata(raw, file.type) : raw;
 
   const asset = await db.mediaAsset.create({
     data: {

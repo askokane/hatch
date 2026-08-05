@@ -150,7 +150,18 @@ model Profile {
   basedIn          String         @default("")
   bio              String         @default("")
   links            Json           @default("[]")
+  // Fallback identity: the deterministic identicon every profile has from the
+  // moment it is created (lib/avatar.ts). It is never cleared, so removing an
+  // uploaded picture restores the same identicon the profile started with.
   avatarSeed       String
+  // The uploaded profile picture, when there is one. Null means "render the
+  // identicon". It is a scalar FK rather than a join because an avatar is drawn
+  // on every people card, feed item, thread row and nav bar — the listing
+  // queries have to be able to pick it up in the same `select` as the handle.
+  // ON DELETE SET NULL: if the asset ever goes away the profile falls back to
+  // its identicon rather than pointing at a missing row.
+  avatarAssetId    String?        @unique
+  avatarAsset      MediaAsset?    @relation("ProfileAvatar", fields: [avatarAssetId], references: [id], onDelete: SetNull)
   isDiscoverable   Boolean        @default(true)
   handleChangedAt  DateTime       @default(now())
   onboardedAt      DateTime?
@@ -170,7 +181,7 @@ model Profile {
   blocksReceived   Block[]        @relation("Blocked")
   reportsFiled     Report[]
   posts            Post[]
-  mediaAssets      MediaAsset[]
+  mediaAssets      MediaAsset[]   @relation("MediaOwner")
 
   @@index([school])
   @@index([isDiscoverable])
@@ -444,6 +455,14 @@ model MediaAsset {
   id             String    @id @default(cuid())
   ownerProfileId String
   postId         String?
+  // Lifecycle discriminator, NOT a duplicate of Profile.avatarAssetId. A profile
+  // picture is an asset that legitimately has no post and never will, which is
+  // indistinguishable from composer litter by `postId: null` alone — it would be
+  // counted against the pending-upload quota and deleted by the abandoned-upload
+  // sweep. The flag is written in the same INSERT that creates the asset, so
+  // there is no window in which a fresh avatar looks sweepable; the FK on Profile
+  // is the pointer, this is the exemption.
+  isAvatar       Boolean   @default(false)
   kind           MediaKind
   mimeType       String
   data           Bytes
@@ -453,8 +472,11 @@ model MediaAsset {
   fileName       String    @default("")
   position       Int       @default(0)
   createdAt      DateTime  @default(now())
-  owner          Profile   @relation(fields: [ownerProfileId], references: [id], onDelete: Cascade)
+  owner          Profile   @relation("MediaOwner", fields: [ownerProfileId], references: [id], onDelete: Cascade)
   post           Post?     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  // Back-reference for Profile.avatarAssetId. Present so the relation is
+  // well-formed; nothing reads through it.
+  avatarOf       Profile?  @relation("ProfileAvatar")
 
   @@index([postId])
   // Serves the pending-upload quota check (postId null for one owner).

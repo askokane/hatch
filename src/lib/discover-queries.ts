@@ -57,7 +57,14 @@ export type RoleFeedItem = {
   project: { slug: string; name: string; stage: string };
   // `id` is carried so callers can resolve the viewer's relationship with the
   // owner (see lib/relationship.ts) without a second lookup per card.
-  owner: { id: string; handle: string; name: string; school: string; avatarSeed: string };
+  owner: {
+    id: string;
+    handle: string;
+    name: string;
+    school: string;
+    avatarSeed: string;
+    avatarAssetId: string | null;
+  };
   score: RoleScoreBreakdown;
 };
 
@@ -118,6 +125,7 @@ export async function getRankedRoleFeed(viewer: {
                 name: true,
                 school: true,
                 avatarSeed: true,
+                avatarAssetId: true,
                 bio: true,
                 onboardedAt: true,
               },
@@ -201,6 +209,7 @@ export async function getRankedRoleFeed(viewer: {
         name: owner.name,
         school: owner.school,
         avatarSeed: owner.avatarSeed,
+        avatarAssetId: owner.avatarAssetId,
       },
       score: s,
     };

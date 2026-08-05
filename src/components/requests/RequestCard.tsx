@@ -14,7 +14,7 @@ export type RequestCardData = {
   status: string;
   contextLabel: string;
   createdAt: string;
-  counterpart: { handle: string; name: string; avatarSeed: string };
+  counterpart: { handle: string; name: string; avatarSeed: string; avatarAssetId: string | null };
   threadId?: string | null;
 };
 
@@ -57,7 +57,7 @@ export function RequestCard({
     <article className="border border-hairline bg-white p-4">
       <div className="flex items-start justify-between gap-3">
         <Link href={`/u/${data.counterpart.handle}`} className="flex items-center gap-2 hover:underline">
-          <Avatar seed={data.counterpart.avatarSeed} size={32} />
+          <Avatar seed={data.counterpart.avatarSeed} assetId={data.counterpart.avatarAssetId} size={32} />
           <span className="text-sm font-600">
             {data.counterpart.name}
             <span className="mono block text-2xs text-ink-muted">@{data.counterpart.handle}</span>

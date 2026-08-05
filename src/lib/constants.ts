@@ -140,6 +140,13 @@ export const FEED_SOURCE_CANDIDATES = 40;
 export const IMAGE_BYTES_MAX = 4 * 1024 * 1024; // 4 MB
 export const VIDEO_BYTES_MAX = 4 * 1024 * 1024; // 4 MB
 
+// Profile pictures are held to a tighter cap than post photos, and not to save
+// storage. An avatar is displayed at 24–72 px and is fetched on nearly every
+// screen — a people search renders twenty of them — so its bytes are paid
+// repeatedly in a way a post photo's are not. 1 MB is well above what any
+// reasonable photo needs at that size and still keeps a list of avatars cheap.
+export const AVATAR_BYTES_MAX = 1024 * 1024; // 1 MB
+
 // MIME allowlist. An allowlist rather than a blocklist, and the served
 // Content-Type is echoed from this list rather than from the upload, so a file
 // cannot be stored as one type and served as another (e.g. text/html).

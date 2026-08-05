@@ -75,7 +75,10 @@ export default async function FeedPage({
       <div className="mt-4">
         {/* avatarSeed is non-null for any session that got past the profileId
             guard above; the fallback only keeps the type honest. */}
-        <PostComposer avatarSeed={session.avatarSeed ?? session.profileId} />
+        <PostComposer
+          avatarSeed={session.avatarSeed ?? session.profileId}
+          avatarAssetId={session.avatarAssetId}
+        />
       </div>
 
       <div className="mt-5">

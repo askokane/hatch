@@ -80,7 +80,7 @@ export function PostCard({ item }: { item: PostFeedItem }) {
           href={`/u/${item.author.handle}`}
           className="flex items-center gap-2 hover:underline"
         >
-          <Avatar seed={item.author.avatarSeed} size={32} />
+          <Avatar seed={item.author.avatarSeed} assetId={item.author.avatarAssetId} size={32} />
           <span>
             <span className="block text-xs font-600">{item.author.name}</span>
             <span className="mono block text-2xs text-ink-muted">@{item.author.handle}</span>

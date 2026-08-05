@@ -11,6 +11,8 @@ export type ProfileViewData = {
   basedIn: string;
   bio: string;
   avatarSeed: string;
+  /** Uploaded profile picture, or null for the identicon. */
+  avatarAssetId: string | null;
   links: { label: string; url: string }[];
   skills: { id: string; label: string }[];
   learning: { id: string; label: string }[];
@@ -40,7 +42,7 @@ export function ProfileView({
     <div>
       <div className="flex items-start justify-between gap-4">
         <div className="flex items-start gap-4">
-          <Avatar seed={data.avatarSeed} size={72} />
+          <Avatar seed={data.avatarSeed} assetId={data.avatarAssetId} size={72} />
           <div>
             <h1 className="text-xl font-600">{data.name}</h1>
             <p className="mono text-xs text-ink-muted">@{data.handle}</p>

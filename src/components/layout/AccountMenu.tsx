@@ -18,11 +18,13 @@ export function AccountMenu({
   name,
   handle,
   avatarSeed,
+  avatarAssetId,
   isAdmin,
 }: {
   name: string;
   handle: string;
   avatarSeed: string;
+  avatarAssetId: string | null;
   isAdmin: boolean;
 }) {
   const pathname = usePathname();
@@ -118,7 +120,7 @@ export function AccountMenu({
           open ? "border-ink" : "border-transparent hover:border-hairline"
         }`}
       >
-        <Avatar seed={avatarSeed} size={28} />
+        <Avatar seed={avatarSeed} assetId={avatarAssetId} size={28} />
         <span aria-hidden="true" className="mono text-2xs text-ink-muted">
           ▾
         </span>

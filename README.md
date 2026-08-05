@@ -77,6 +77,7 @@ real provider would gate on later.
 | `npm run db:migrate` | `prisma migrate dev` |
 | `npm run db:reset` | Reset the dev DB and re-seed (destructive — dev only) |
 | `npm run db:studio` | Open Prisma Studio |
+| `npm run audit:db` | Read-only check of the database's RLS/grant posture (see Database exposure) |
 | `npm run test:e2e:install` | Install the Playwright browser (run once) |
 | `npm run test:e2e` | Reset+seed a separate `e2e-test.db`, build, and run the Playwright suite |
 
@@ -124,13 +125,63 @@ The suite runs on its own server on port **3100**. It covers:
 - **Handles are `[a-z0-9_]`.** An allowlist, not a list of banned symbols, so everything platforms typically reject in a handle (`.`, `@`, `#`, spaces, quotes, emoji, non-ASCII) is excluded by construction. The hyphen is out deliberately: handles share URL space with project and tag slugs, which *do* use hyphens, and one separator meaning two things made `/u/…` ambiguous to read. `src/lib/handle.ts` holds the one definition the zod schema and the client-side wizard check both import. Migration `20260802113000` rewrote every issued handle (`-` → `_`, numeric suffix on the collisions that creates, since `handle` is unique).
 - **Messaging** polls `GET /api/threads/[threadId]/messages?after=<cursor>` every 3s while the tab is visible (paused when hidden, with an immediate catch-up tick on refocus), and typing/read presence rides along on that same response rather than adding a second poll. Every nav badge is fed by one `GET /api/nav-counts`, polled every 10s under the same visibility rules. No websockets — a comment marks where an SSE upgrade would slot in. User text renders as plain text (React-escaped; no `dangerouslySetInnerHTML` in the message path).
 - **Transcripts are paged.** Opening a thread renders the newest `MESSAGE_PAGE_SIZE` messages; `?before=<cursor>` walks backwards behind a "load earlier messages" control. The whole history is reachable, it is just not re-serialized into the page payload on every visit.
-- **Avatars** are deterministic inline SVG identicons generated from a seed (`src/lib/avatar.ts`) — no uploads, no external images, no faces.
+- **Avatars are an uploaded picture over an identicon floor.** Every profile gets a deterministic inline SVG identicon from a seed at creation (`src/lib/avatar.ts`); `Profile.avatarAssetId` overrides it with an uploaded photo when there is one. The seed is never cleared, so removing a picture restores the same pattern the profile started with rather than leaving a hole. One `Avatar` component renders both branches into an identically sized box, which is why call sites pass both and no layout depends on which one is in play. No external image hosts — an uploaded avatar is a `MediaAsset` served by the same session-gated route as post media.
+- **The profile picture is a `MediaAsset` with one extra bit.** It reuses the post-media upload validation, byte storage and serving path unchanged; `MediaAsset.isAvatar` is what separates it from a composer upload. Both kinds are `postId`-null, but an avatar is *permanently* so — without the flag it would count against the pending-upload quota and be deleted by the abandoned-upload sweep the first time its owner posted anything. `POST /api/avatar` writes the row and links it in one transaction, so the flag is true from the instant the row exists and there is no window where a fresh picture looks sweepable. Removal is a Server Action (`removeAvatarAction`) rather than a route, because only the *upload* needs a body larger than an action can carry.
 - **The feed merges three sources rather than materializing a fourth.** `/feed` shows profile posts, project updates, and open roles interleaved newest-first. Updates and roles are *read* from the tables that already own them (`Update`, `OpenRole`) instead of being copied into a feed table on write, so a project update cannot go stale or diverge from what the project room shows — there is one row, read from two places. `getFeedPage` (`src/lib/feed-queries.ts`) queries the selected sources in one `Promise.all`, each bounded and ordered on `createdAt`, then merges and slices to a page. A single timestamp works as a cursor across all three precisely because all three are ordered on that same field.
 - **Feed visibility is a query concern, not a UI one**, exactly as in discovery. Updates and roles belonging to `UNLISTED` projects never enter the result set, and blocked profiles are excluded in both directions via the same `blockedProfileIds` helper discovery uses — one implementation, so a block cannot mean one thing on `/discover` and another on `/feed`.
 - **Posts carry optional media, and the bytes live in Postgres** (`MediaAsset.data`, a `bytea`). This is a deliberate consequence of the app's standing constraints rather than a default: no paid services and no API keys rules out object storage, and the hosted target has no writable persistent filesystem, so the database is the only durable store available. `MediaAsset` is written so the upgrade is local — nothing but the serving route reads `data`, so swapping in a storage key changes two functions and no callers.
 - **The upload is a route handler, not a Server Action.** Server Actions carry a default 1 MB request body cap, and raising it is a global setting that would apply to every action in the app. `POST /api/media` takes the file, validates it, and returns an id; the post is then created with ids only. The per-file cap is 4 MB because that is where the limit is *real* — a serverless function rejects a larger body before our handler runs, so a bigger limit would work on a laptop and fail in production.
 - **Media is validated by allowlist and served back from that same allowlist.** The stored MIME is re-checked against `ALLOWED_IMAGE_MIME`/`ALLOWED_VIDEO_MIME` on the way out and sent with `X-Content-Type-Options: nosniff`, so a row can never cause an arbitrary content type to be served. `GET /api/media/[id]` requires a session (media is not public), supports HTTP `Range` so `<video>` seeking works, and is cached `private, immutable` since an asset id never changes content.
 - **An upload is attached, not trusted.** The composer uploads first and posts ids second, so between those two steps an asset exists with no post. `createPostAction` attaches only assets that the caller owns *and* that are still unattached, re-derived from the DB — a borrowed or already-used id is refused rather than silently dropped. Assets stranded by an abandoned composer are capped per profile and swept when that profile's next post lands.
+
+## Database exposure
+
+The app reaches Postgres directly through Prisma as the `postgres` role and does
+all authorization in the application layer. That is a coherent design, but it sits
+badly with a Supabase default, and the two combined into a live hole that the app
+itself could not see:
+
+- Supabase fronts the `public` schema with an auto-generated REST API (PostgREST)
+  and grants `anon` and `authenticated` full DML on every table in it.
+- Nothing here had row-level security enabled, because nothing here uses RLS.
+
+So anyone holding the project's **anon key** — a *publishable* value, shown in the
+dashboard, not a secret — could have called `/rest/v1/User?select=*` and read every
+password hash, every `Session.tokenHash` (enough to mint a valid cookie), every
+private message and every uploaded file, and could have issued `DELETE` or
+`TRUNCATE` against any table. None of it would have touched a line of application
+code.
+
+Migration `20260805130000_lock_down_public_api_grants` closes it: RLS on with no
+policies (no policy + no bypass = no rows), the `anon`/`authenticated` table,
+sequence and function grants revoked, and — the part that is easy to miss — the
+**default privileges granted by `postgres`** revoked too, so the next Prisma
+migration that adds a table does not silently hand it back. The app is unaffected
+because `postgres` owns these tables and has `rolbypassrls`, which
+`npm run audit:db` prints first so the claim is checkable rather than asserted.
+The line that actually settles it is `anon_can_select` on `User`, `Session`,
+`PasswordResetToken`, `Message` and `MediaAsset` — all false.
+
+Two residuals, both known, both verified harmless. The migration's own header is
+more confident than this about the second one; trust this paragraph:
+
+- **Schema `USAGE` is still effectively held** by `anon`. Postgres grants USAGE on
+  `public` to the pseudo-role `PUBLIC`, which every role inherits, so the targeted
+  `REVOKE ... FROM anon` is a silent no-op; closing it means
+  `REVOKE USAGE ON SCHEMA public FROM PUBLIC`, which reaches well beyond these two
+  roles. It confers no data access on its own — reading a row also needs a table
+  privilege, and those are gone.
+- **`supabase_admin`'s default privileges** on `public` still name `anon`. Clearing
+  them needs membership in that role, which `postgres` does not have, so the
+  migration's handler logs and carries on. It governs only objects created *by*
+  `supabase_admin`; Prisma migrates as `postgres`, whose defaults are clean.
+
+Two things this deliberately does **not** touch: the `storage` and `realtime`
+schemas, which are Supabase's own and carry their own RLS; and the `service_role`
+grants, which are the equivalent of the database password and secret by design.
+
+If this project ever does adopt the Supabase client libraries, re-grant per-table
+alongside real RLS policies — not wholesale back to the default.
 
 ## Load characteristics
 

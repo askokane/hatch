@@ -43,13 +43,25 @@ const MEDIA_SELECT = {
 } as const;
 
 const AUTHOR_SELECT = {
-  select: { id: true, handle: true, name: true, avatarSeed: true },
+  select: { id: true, handle: true, name: true, avatarSeed: true, avatarAssetId: true },
 } as const;
 
-type AuthorRow = { id: string; handle: string; name: string; avatarSeed: string };
+type AuthorRow = {
+  id: string;
+  handle: string;
+  name: string;
+  avatarSeed: string;
+  avatarAssetId: string | null;
+};
 
 function toAuthor(p: AuthorRow) {
-  return { profileId: p.id, handle: p.handle, name: p.name, avatarSeed: p.avatarSeed };
+  return {
+    profileId: p.id,
+    handle: p.handle,
+    name: p.name,
+    avatarSeed: p.avatarSeed,
+    avatarAssetId: p.avatarAssetId,
+  };
 }
 
 /** Which sources a filter draws from. An author scope forces posts-only. */

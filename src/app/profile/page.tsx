@@ -49,6 +49,7 @@ export default async function OwnProfilePage() {
     basedIn: profile.basedIn,
     bio: profile.bio,
     avatarSeed: profile.avatarSeed,
+    avatarAssetId: profile.avatarAssetId,
     links,
     skills: skills.map((s) => ({ id: s.id, label: s.label })),
     learning: learning.map((s) => ({ id: s.id, label: s.label })),
@@ -62,6 +63,8 @@ export default async function OwnProfilePage() {
   const editInitial: ProfileEditInitial = {
     name: profile.name,
     handle: profile.handle,
+    avatarSeed: profile.avatarSeed,
+    avatarAssetId: profile.avatarAssetId,
     school: profile.school,
     gradYear: profile.gradYear,
     basedIn: profile.basedIn,
@@ -81,7 +84,7 @@ export default async function OwnProfilePage() {
         editInitial={editInitial}
         postsSlot={
           <>
-            <PostComposer avatarSeed={profile.avatarSeed} />
+            <PostComposer avatarSeed={profile.avatarSeed} avatarAssetId={profile.avatarAssetId} />
             <div className="mt-6">
               <FeedList
                 initialPage={postsPage}

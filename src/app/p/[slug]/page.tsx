@@ -27,11 +27,17 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
     include: {
       tags: { include: { tag: { select: { id: true, label: true } } } },
       memberships: {
-        include: { profile: { select: { id: true, handle: true, name: true, avatarSeed: true } } },
+        include: {
+          profile: {
+            select: { id: true, handle: true, name: true, avatarSeed: true, avatarAssetId: true },
+          },
+        },
         orderBy: { isOwner: "desc" },
       },
       updates: {
-        include: { author: { select: { handle: true, name: true, avatarSeed: true } } },
+        include: {
+          author: { select: { handle: true, name: true, avatarSeed: true, avatarAssetId: true } },
+        },
         orderBy: { createdAt: "desc" },
       },
       openRoles: {
@@ -188,7 +194,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
             {project.memberships.map((m) => (
               <li key={m.profile.id}>
                 <Link href={`/u/${m.profile.handle}`} className="flex items-center gap-2 hover:underline">
-                  <Avatar seed={m.profile.avatarSeed} size={28} />
+                  <Avatar seed={m.profile.avatarSeed} assetId={m.profile.avatarAssetId} size={28} />
                   <span className="text-xs">
                     {m.profile.name}
                     <span className="mono block text-2xs text-ink-muted">

@@ -16,7 +16,7 @@ export function BlockedList({ blocked }: { blocked: BlockedProfile[] }) {
       {blocked.map((b) => (
         <li key={b.profileId} className="flex items-center justify-between gap-3 p-3">
           <Link href={`/u/${b.handle}`} className="flex items-center gap-2 hover:underline">
-            <Avatar seed={b.avatarSeed} size={28} />
+            <Avatar seed={b.avatarSeed} assetId={b.avatarAssetId} size={28} />
             <span className="text-xs">
               {b.name}
               <span className="mono block text-2xs text-ink-muted">@{b.handle}</span>

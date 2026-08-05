@@ -18,7 +18,11 @@ export default async function MessagesPage() {
         include: {
           members: {
             where: { profileId: { not: profileId } },
-            include: { profile: { select: { handle: true, name: true, avatarSeed: true } } },
+            include: {
+              profile: {
+                select: { handle: true, name: true, avatarSeed: true, avatarAssetId: true },
+              },
+            },
           },
           messages: { orderBy: { createdAt: "desc" }, take: 1 },
         },
@@ -40,7 +44,12 @@ export default async function MessagesPage() {
 
   const items = threads.map((t) => ({
     id: t.id,
-    counterpart: t.members[0]?.profile ?? { handle: "unknown", name: "Unknown", avatarSeed: "x" },
+    counterpart: t.members[0]?.profile ?? {
+      handle: "unknown",
+      name: "Unknown",
+      avatarSeed: "x",
+      avatarAssetId: null,
+    },
     contextLabel: labels.get(contextLabelKey(t)) ?? "Context",
     lastMessage: t.messages[0]?.body ?? null,
   }));
@@ -66,7 +75,7 @@ export default async function MessagesPage() {
             {items.map((t) => (
               <li key={t.id}>
                 <Link href={`/messages/${t.id}`} className="flex items-center gap-3 p-3 hover:bg-pine-soft/40">
-                  <Avatar seed={t.counterpart.avatarSeed} size={36} />
+                  <Avatar seed={t.counterpart.avatarSeed} assetId={t.counterpart.avatarAssetId} size={36} />
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center justify-between gap-2">
                       <span className="text-sm font-600">{t.counterpart.name}</span>

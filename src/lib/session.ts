@@ -18,6 +18,8 @@ export type SessionUser = {
   name: string | null;
   handle: string | null;
   avatarSeed: string | null;
+  /** Uploaded profile picture, or null for the identicon. */
+  avatarAssetId: string | null;
 };
 
 function hashToken(token: string): string {
@@ -56,7 +58,11 @@ async function loadSession(): Promise<SessionUser | null> {
     // session query was already joining.
     include: {
       user: {
-        include: { profile: { select: { id: true, name: true, handle: true, avatarSeed: true } } },
+        include: {
+          profile: {
+            select: { id: true, name: true, handle: true, avatarSeed: true, avatarAssetId: true },
+          },
+        },
       },
     },
   });
@@ -86,6 +92,7 @@ async function loadSession(): Promise<SessionUser | null> {
     name: session.user.profile?.name ?? null,
     handle: session.user.profile?.handle ?? null,
     avatarSeed: session.user.profile?.avatarSeed ?? null,
+    avatarAssetId: session.user.profile?.avatarAssetId ?? null,
   };
 }
 

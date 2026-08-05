@@ -17,6 +17,7 @@ export function PeopleCard({
     basedIn: string;
     bio: string;
     avatarSeed: string;
+    avatarAssetId: string | null;
     tags: { relation: string; tag: { id: string; label: string } }[];
     intents: { kind: string }[];
   };
@@ -26,7 +27,7 @@ export function PeopleCard({
   return (
     <article className="border border-hairline bg-white p-4">
       <Link href={`/u/${person.handle}`} className="flex items-start gap-3 hover:opacity-90">
-        <Avatar seed={person.avatarSeed} size={40} />
+        <Avatar seed={person.avatarSeed} assetId={person.avatarAssetId} size={40} />
         <div className="min-w-0">
           <h3 className="text-base font-600">{person.name}</h3>
           <p className="mono text-2xs text-ink-muted">
