@@ -7,6 +7,7 @@ import {
   getPeople,
   getProjects,
   getDiscoverableSchools,
+  PEOPLE_RESULT_MAX,
 } from "@/lib/discover-queries";
 import { getRelationships, noRelationship } from "@/lib/relationship";
 import { Tabs } from "@/components/ui/Tabs";
@@ -14,7 +15,11 @@ import { EmptyState } from "@/components/ui/EmptyState";
 import { RoleFeedCard } from "@/components/discover/RoleFeedCard";
 import { PeopleCard } from "@/components/discover/PeopleCard";
 import { ProjectCard } from "@/components/discover/ProjectCard";
-import { PeopleFilterBar, ProjectFilterBar } from "@/components/discover/FilterBar";
+import {
+  PeopleSearch,
+  ClearPeopleFiltersButton,
+  ProjectFilterBar,
+} from "@/components/discover/FilterBar";
 import Link from "next/link";
 
 export default async function DiscoverPage({
@@ -129,8 +134,8 @@ async function PeopleTab({
   viewerId: string;
   filters: Record<string, string | undefined>;
 }) {
-  // Resolved here rather than in the page: only this tab renders the dropdown, so
-  // the roles and projects tabs no longer pay for the DISTINCT.
+  // Resolved here rather than in the page: only this tab renders the school
+  // typeahead, so the roles and projects tabs no longer pay for the DISTINCT.
   const [people, schools] = await Promise.all([
     getPeople(
       { profileId: viewerId },
@@ -147,13 +152,26 @@ async function PeopleTab({
     viewerId,
     people.map((p) => p.id)
   );
+
+  const hasFilters = Boolean(
+    filters.q || filters.school || filters.gradYear || filters.intent
+  );
+
   return (
-    <div className="flex flex-col gap-4">
-      <PeopleFilterBar schools={schools} />
+    <PeopleSearch
+      schools={schools}
+      resultCount={people.length}
+      truncated={people.length === PEOPLE_RESULT_MAX}
+    >
       {people.length === 0 ? (
         <EmptyState
-          title="No people match those filters"
-          body="Try clearing a filter or searching a different skill or interest in bios."
+          title={filters.q ? `No people match "${filters.q}"` : "No people match those filters"}
+          body={
+            hasFilters
+              ? "Search runs over names, handles, skills, schools and bios — try a shorter word, or drop a filter."
+              : "Nobody is discoverable here yet. Check back as more builders finish their profiles."
+          }
+          action={hasFilters ? <ClearPeopleFiltersButton /> : undefined}
         />
       ) : (
         <div className="grid gap-3 sm:grid-cols-2">
@@ -177,7 +195,7 @@ async function PeopleTab({
           ))}
         </div>
       )}
-    </div>
+    </PeopleSearch>
   );
 }
 

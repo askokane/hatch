@@ -246,19 +246,78 @@ export type PeopleFilters = {
   intent?: string;
 };
 
+// How many people a search returns, and how many rows a text search may pull
+// before ranking. Same shape as the role feed above: a bounded candidate pass
+// feeds an in-process ranking, so the cap never silently decides the answer.
+export const PEOPLE_RESULT_MAX = 60;
+const PEOPLE_CANDIDATE_LIMIT = 240;
+
+// Which columns a text query searches.
+//
+// It used to be `bio` alone, which meant the first thing anyone types — a name —
+// reliably returned nothing. A person is findable by any of the things someone
+// would plausibly remember about them: what they are called, their handle, where
+// they study, where they are, what they wrote, and what they can do.
+function textMatch(q: string): Prisma.ProfileWhereInput {
+  const contains = { contains: q, mode: "insensitive" as const };
+  return {
+    OR: [
+      { name: contains },
+      { handle: contains },
+      { school: contains },
+      { basedIn: contains },
+      { bio: contains },
+      { tags: { some: { tag: { label: contains } } } },
+    ],
+  };
+}
+
+// Relevance for a text query, highest first.
+//
+// The database returns matches in `updatedAt` order, which is the right default
+// for browsing and the wrong one for searching: typing a name and finding that
+// person third — behind two people who merely mention them in a bio — is the
+// specific failure this exists to prevent. A name someone is actively looking
+// for outranks an incidental mention of the same string anywhere else.
+function relevance(
+  person: { name: string; handle: string; school: string; basedIn: string; bio: string; tags: { tag: { label: string } }[] },
+  q: string
+): number {
+  const needle = q.toLowerCase();
+  const hit = (haystack: string, exact: number, prefix: number, inner: number) => {
+    const h = haystack.toLowerCase();
+    if (!h.includes(needle)) return 0;
+    if (h === needle) return exact;
+    // A prefix match on any word: "chen" should rank on "Priya Chen", not just
+    // on names that literally start with it.
+    if (h.startsWith(needle) || h.includes(` ${needle}`)) return prefix;
+    return inner;
+  };
+
+  return Math.max(
+    hit(person.name, 100, 90, 70),
+    hit(person.handle, 85, 80, 60),
+    ...person.tags.map((t) => hit(t.tag.label, 65, 55, 40)),
+    hit(person.school, 30, 28, 25),
+    hit(person.basedIn, 20, 18, 15),
+    hit(person.bio, 10, 10, 10)
+  );
+}
+
 export async function getPeople(
   viewer: { profileId: string },
   filters: PeopleFilters
 ) {
   const blocked = await blockedProfileIds(viewer.profileId);
+  const q = filters.q?.trim() ?? "";
 
-  return db.profile.findMany({
+  const rows = await db.profile.findMany({
     where: {
       isDiscoverable: true,
       id: { notIn: [...blocked, viewer.profileId] },
       ...(filters.school ? { school: { contains: filters.school, mode: "insensitive" as const } } : {}),
       ...(filters.gradYear ? { gradYear: filters.gradYear } : {}),
-      ...(filters.q ? { bio: { contains: filters.q, mode: "insensitive" as const } } : {}),
+      ...(q ? textMatch(q) : {}),
       ...(filters.skillTagId
         ? { tags: { some: { tagId: filters.skillTagId, relation: "HAS" } } }
         : {}),
@@ -269,8 +328,20 @@ export async function getPeople(
       intents: { select: { kind: true } },
     },
     orderBy: { updatedAt: "desc" },
-    take: 60,
+    // A plain browse needs no ranking, so it pulls exactly one page. A text
+    // search pulls a wider candidate set and lets relevance pick the page.
+    take: q ? PEOPLE_CANDIDATE_LIMIT : PEOPLE_RESULT_MAX,
   });
+
+  if (!q) return rows;
+
+  // Sort by relevance, falling back to the database's recency order so the
+  // result is stable rather than reshuffling between identical searches.
+  return rows
+    .map((p, i) => ({ p, i, score: relevance(p, q) }))
+    .sort((a, b) => b.score - a.score || a.i - b.i)
+    .slice(0, PEOPLE_RESULT_MAX)
+    .map((r) => r.p);
 }
 
 export type ProjectFilters = { stage?: string; tagId?: string };
