@@ -27,6 +27,8 @@ which is why the newest commit on `main` is briefly absent from the table.
 | [v0.14](#v014--changelog-through-v013) | `6993e31` | 2026-08-06 | Document v0.7 through v0.13 in the CHANGELOG |
 | [v0.15](#v015--build-log-honesty) | `02847d0` | 2026-08-06 | Stop the build log claiming migrations it did not apply; tag v0.7-v0.14 |
 | [v0.16](#v016--people-search) | `076c617` | 2026-08-24 | Find people by name and skill, not just bio; fold the filters away |
+| [v0.17](#v017--changelog-through-v016) | `3c13be4` | 2026-08-25 | Document v0.15 and v0.16 in the CHANGELOG; tag both |
+| [v0.18](#v018--share-cards-in-threads) | `a69dfff` | 2026-08-25 | Share a profile or project into a thread as a card, not a link |
 
 ---
 
@@ -598,3 +600,125 @@ sentence — `v0.0`–`v0.6` were tagged by it.
 `e2e/11-people-search.spec.ts` covers the four properties this rests on: finds a
 person by name as you type, matches handles, skills and schools, does not pile
 up history entries, and folds the filters without hiding one that is applied.
+
+---
+
+## v0.17 — Changelog through v0.16
+
+**Commit** `3c13be4` · 2026-08-25 · 1 file, +88
+
+Documentation only. Numbers the two commits that were outstanding, and creates
+their annotated tags.
+
+Two rather than one: `02847d0` was still sitting in the gap this file's header
+describes, and its own message says "this commit will be v0.15". Numbering the
+people-search work v0.15 would have skipped it, so that commit took v0.15 and
+the search work became v0.16.
+
+---
+
+## v0.18 — Share cards in threads
+
+**Commit** `a69dfff` · 2026-08-25 · 20 files, +1,063 −95
+
+### Features
+
+- **A shared profile or project arrives as a card, not a URL.** Passing someone
+  on used to mean pasting a link into a message, which lands as a line of grey
+  text saying nothing about who is on the other end — the recipient has to click
+  it to find out whether it was worth clicking. A share now carries a name, a
+  handle or a stage, a one-line blurb and an avatar, and the whole card is the
+  link. A Share control sits on every profile, on your own profile, and on every
+  project page for every viewer rather than only its owner.
+- **The share sheet lists conversations, not users.** Every row is someone whose
+  intro request was accepted, or who accepted one, so there is no "search
+  everyone" step and a share cannot become a way to reach someone who has not
+  already agreed to be reachable. Rows send independently and each reports its
+  own outcome: sharing to three people is three taps with three confirmations,
+  rather than a multi-select whose failure mode is "two of them worked". The
+  search field appears only above five conversations, since a search box over
+  four rows is furniture.
+- **Projects get a mark of their own.** They have no picture, so a card borrows
+  the identicon generator seeded on the slug — deterministic, stable for the
+  life of the project, and in the same visual language as every avatar on the
+  platform.
+
+### Data model
+
+- **A share IS a message** — three nullable columns on `Message` (`shareKind`,
+  `shareTargetId`, `shareSnapshot`) rather than a side table. It holds its place
+  in the transcript, carries a read receipt and counts towards unread exactly as
+  any other message does. A second ordered source would have forced every reader
+  — the 3s poll, the history backfill, the unread count — to learn about it; the
+  existing `[threadId, createdAt, authorProfileId]` index still serves paging
+  untouched.
+- **`shareTargetId` is deliberately not a foreign key.** It points at either a
+  Profile or a Project so it could not be one anyway, but the deciding reason is
+  deletion: a sent message is a record of what was sent. `CASCADE` would erase
+  messages out of someone else's transcript and `SET NULL` would leave a card
+  with nothing behind it — both rewrite history to satisfy referential tidiness
+  nobody asked for.
+- **The card renders from a snapshot taken at send time.** So the transcript
+  keeps saying what was actually shared when a project is later renamed, and a
+  thread holding fifty cards still costs one query to page. The snapshot is
+  parsed on read rather than cast, because Prisma types JSON as `unknown` and a
+  row that fails to parse should cost one card, not the whole transcript.
+
+### Safety
+
+- **Sharing is gated by the same function as typing.** `sendMessageCore`'s
+  membership and block checks are extracted to `threadPostingRefusal` and shared,
+  so a thread that is read-only for text is read-only for cards. A block cannot
+  close one door and leave the other open.
+- **A blocked counterpart is withheld from the share sheet in both directions.**
+  This discloses nothing the sender does not already know: that thread's composer
+  is already closed for them, so its absence tells them only what the thread
+  itself did.
+- **"Does not exist" and "blocked you" are one refusal.** A profile that is gone
+  and a profile whose owner blocked the sharer collapse into a single
+  indistinguishable message, collapsed inside the snapshot builder rather than at
+  the call site where one of them might grow its own wording. Telling those apart
+  is exactly what a block exists to prevent.
+- **The client sends a kind and an id and nothing else.** Everything the card
+  *says* is composed server-side from the target's own row — which is what stops
+  a share from being a way to put arbitrary text into someone's thread under
+  someone else's name and face.
+
+### Bugs fixed
+
+- **The transcript opened on its OLDEST message.** `scrollIntoView({behavior:
+  "smooth"})` is a request the browser may decline, and declining it means no
+  scroll at all rather than an instant one — in a Chrome where smooth scrolling
+  is unavailable it did nothing whatever. Every reader had to scroll down to find
+  what they came for, and a message arriving while they watched did not bring
+  itself into view. Assigning `scrollTop` is not a request, so it cannot be
+  declined. This predates the share work and was confirmed against the
+  unmodified component; it is listed here because it is what buried the cards.
+- **The thread list rendered a share as a blank preview line**, since a share
+  message has an empty body. It now describes what was shared, in the right voice
+  for who sent it — "You shared @maya" against "Shared @maya".
+- **The card's blurb was cut after about four words.** The server caps it at 140
+  characters, but a single truncated line at the card's width fits barely a third
+  of that, so a project description told the recipient nothing. Two lines now,
+  and the card is wide enough that a profile's "@handle · School · 'YY" line
+  survives intact rather than losing the school mid-word.
+- **Card width was measured against the viewport** (`85vw`) rather than against
+  its parent. The viewport is not what bounds this card: in a narrow column on a
+  wide screen it would have overflowed its own transcript while `85vw` still read
+  as plenty of room.
+
+### Refactor
+
+- The three places that independently built a `MessageDTO` — the send action,
+  the poll route and the server-rendered thread page — are now one
+  `toMessageDTO` over one shared select. They were already drifting-prone, and
+  growing the row by three fields would have made it worse.
+
+### Tests
+
+`e2e/14-share-cards.spec.ts` drives both kinds through two real browser contexts:
+composed by the sender, delivered to the recipient, described in the thread list,
+opening on the newest message, and following through to the page it names. The
+scroll assertion reads the container's offset rather than visibility, because a
+card further up the transcript is still "visible" to Playwright while a reader
+would have to go looking for it.
