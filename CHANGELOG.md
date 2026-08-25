@@ -25,6 +25,8 @@ which is why the newest commit on `main` is briefly absent from the table.
 | [v0.12](#v012--e2e-port-guard) | `4b426f6` | 2026-08-05 | Reclaim an orphaned e2e server instead of refusing to run |
 | [v0.13](#v013--migrations-run-from-the-build) | `11bdce9` | 2026-08-06 | Apply migrations from the build, on production deploys only |
 | [v0.14](#v014--changelog-through-v013) | `6993e31` | 2026-08-06 | Document v0.7 through v0.13 in the CHANGELOG |
+| [v0.15](#v015--build-log-honesty) | `02847d0` | 2026-08-06 | Stop the build log claiming migrations it did not apply; tag v0.7-v0.14 |
+| [v0.16](#v016--people-search) | `076c617` | 2026-08-24 | Find people by name and skill, not just bio; fold the filters away |
 
 ---
 
@@ -510,3 +512,89 @@ Documentation only. Numbers the seven commits since `v0.7`.
 Corrects a claim in this file's own header while there: it stated the repo
 carried no git tags, which stopped being true in the very commit that wrote the
 sentence — `v0.0`–`v0.6` were tagged by it.
+
+---
+
+## v0.15 — Build log honesty
+
+**Commit** `02847d0` · 2026-08-06 · 2 files, +23 −3
+
+### Bugs fixed
+
+- **The build log claimed migrations it had not applied.** The migrate step
+  printed "[build] migrations applied." unconditionally, so a deploy with
+  nothing pending logged that line directly beneath Prisma's own "No pending
+  migrations to apply." A log that contradicts itself is worst exactly when
+  someone is reading it to find out what happened, which is the only time anyone
+  reads one. It now reports that the step finished and leaves Prisma's output
+  above it to say what was actually done.
+
+### Repository
+
+- **Tags `v0.7` through `v0.14`**, generated from the table above rather than
+  typed, so a tag cannot point somewhere this document does not claim. All 15
+  were verified against the table.
+- The header's note on tags is replaced. It said v0.7 onward were untagged,
+  which this commit made false; it now states the rule that actually holds.
+
+---
+
+## v0.16 — People search
+
+**Commit** `076c617` · 2026-08-24 · 4 files, +597 −81
+
+### Bugs fixed
+
+- **Searching for a person by name found nobody.** The People search queried
+  `bio` and nothing else, so the first thing anyone types — a name — reliably
+  returned "no people match", because a person's name is not in their own bio.
+  Search now covers name, handle, school, based-in, bio and tag labels.
+- **Matches came back in the wrong order.** The database returns rows by
+  `updatedAt`, which is right for browsing and wrong for searching: the person
+  you named ranked behind two people who merely mentioned them. Matches are now
+  ranked — a name outranks a handle, which outranks a skill, which outranks an
+  incidental mention in someone else's bio. A text search pulls a bounded
+  candidate set of 240 and lets relevance pick the page of 60, mirroring the
+  two-pass shape the ranked role feed already uses, so the cap never silently
+  decides the answer.
+- **The three controls disagreed about when they applied.** Text needed a submit
+  button, the school dropdown fired on change, and grad year fired on blur — an
+  invisible rule nobody could have guessed. People typed, saw nothing happen,
+  and concluded the search was broken.
+
+### Features
+
+- **One interaction model: change a control, the results follow.** No submit
+  step. Text fields debounce 300ms so a word costs one query rather than six;
+  chips and the typeahead apply instantly.
+- **Navigation is `replace`, not `push`.** Refining a search no longer buries
+  the page you arrived from under a history entry per keystroke-batch — leaving
+  takes one Back press.
+- **Stale results dim instead of blanking.** The whole thing runs inside a
+  transition, with a live result count beside the filter chips.
+- **Active filters are visible and removable**, as chips with an × and a "clear
+  all". Nothing on screen used to say that a filter set three navigations ago
+  was still narrowing the results.
+- **Inputs are controlled and synced from the URL**, so back/forward and chip
+  removal update the fields. The `defaultValue` inputs they replaced went on
+  displaying a filter that had already been cleared.
+- **The narrowing filters fold behind a toggle**, since most searches are a name
+  or a skill and three unasked-for controls made the surface read as a form to
+  fill in rather than a box to type in. Folding them is only safe while an
+  applied filter stays legible, so the toggle carries a count and a filtered URL
+  arrives open — which is what a shared or bookmarked link looks like.
+- School became a free-text datalist typeahead. It is a `contains` match
+  server-side, so a partial name works and a campus missing from the list is not
+  a dead end; a `<select>` of every school was neither. "Looking for" became five
+  toggle chips, sized to match the fields beside them.
+- Grad year holds a partial entry back from the URL. "20" is a valid number that
+  matches nobody, so committing it emptied the page between the second and
+  fourth keystroke.
+- `/` focuses the search box, Escape clears it, Enter flushes the debounce, and
+  the field is 16px so mobile does not zoom on focus.
+
+### Tests
+
+`e2e/11-people-search.spec.ts` covers the four properties this rests on: finds a
+person by name as you type, matches handles, skills and schools, does not pile
+up history entries, and folds the filters without hiding one that is applied.
