@@ -12,6 +12,7 @@ import { IntroRequestDialog } from "@/components/requests/IntroRequestDialog";
 import { BlockButton } from "@/components/safety/BlockButton";
 import { UnblockButton } from "@/components/safety/UnblockButton";
 import { ReportDialog } from "@/components/safety/ReportDialog";
+import { ShareButton } from "@/components/share/ShareButton";
 import type { Relationship } from "@/lib/relationship";
 
 export type IntroContextOption = { id: string; label: string };
@@ -48,6 +49,10 @@ export function ProfileActions({
   return (
     <div className="flex flex-col items-end gap-2">
       <div className="flex gap-2">
+        {/* Available on every non-blocked branch, including while a request is
+            pending: passing someone on to a third person is unrelated to whether
+            you have reached them yourself yet. */}
+        <ShareButton kind="PROFILE" targetId={targetProfileId} targetLabel={targetName} />
         {relationship.connection === "CONNECTED" && relationship.threadId ? (
           <Link
             href={`/messages/${relationship.threadId}`}

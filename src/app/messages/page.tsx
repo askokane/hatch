@@ -3,8 +3,23 @@ import { redirect } from "next/navigation";
 import { requireSession } from "@/lib/session";
 import { db } from "@/lib/db";
 import { resolveContextLabels, contextLabelKey } from "@/lib/context-label";
+import { parseShareSnapshot } from "@/lib/validation/share.schema";
+import { shareSummary } from "@/lib/share-display";
 import { Avatar } from "@/components/ui/Avatar";
 import { EmptyState } from "@/components/ui/EmptyState";
+
+// The newest message, as one line of preview text. A share card has no body of
+// its own, so it is described instead — "You shared @maya" rather than a row that
+// looks like the conversation went quiet.
+function previewOf(
+  newest: { body: string; authorProfileId: string; shareSnapshot: unknown } | undefined,
+  viewerProfileId: string
+): string | null {
+  if (!newest) return null;
+  const share = parseShareSnapshot(newest.shareSnapshot);
+  if (share) return shareSummary(share, newest.authorProfileId === viewerProfileId);
+  return newest.body || null;
+}
 
 export default async function MessagesPage() {
   const session = await requireSession("/messages");
@@ -24,7 +39,20 @@ export default async function MessagesPage() {
               },
             },
           },
-          messages: { orderBy: { createdAt: "desc" }, take: 1 },
+          messages: {
+            orderBy: { createdAt: "desc" },
+            take: 1,
+            // The share columns ride along because a share message has an EMPTY
+            // body — without them the newest message in a thread would render as
+            // a blank preview line rather than as what it is.
+            select: {
+              // createdAt is what the thread ordering below reads.
+              createdAt: true,
+              body: true,
+              authorProfileId: true,
+              shareSnapshot: true,
+            },
+          },
         },
       },
     },
@@ -51,7 +79,7 @@ export default async function MessagesPage() {
       avatarAssetId: null,
     },
     contextLabel: labels.get(contextLabelKey(t)) ?? "Context",
-    lastMessage: t.messages[0]?.body ?? null,
+    lastMessage: previewOf(t.messages[0], profileId),
   }));
 
   return (

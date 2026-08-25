@@ -3,7 +3,7 @@ import { notFound, redirect } from "next/navigation";
 import { requireSession } from "@/lib/session";
 import { db } from "@/lib/db";
 import { assertThreadMember, getBlockState, ForbiddenError } from "@/lib/authz";
-import { getThreadPresence } from "@/lib/messages-core";
+import { MESSAGE_DTO_SELECT, getThreadPresence, toMessageDTO } from "@/lib/messages-core";
 import { resolveContextLabel } from "@/lib/context-label";
 import { Avatar } from "@/components/ui/Avatar";
 import { ThreadView, type ComposerState } from "@/components/messages/ThreadView";
@@ -51,7 +51,7 @@ export default async function ThreadPage({ params }: { params: Promise<{ threadI
       where: { threadId },
       orderBy: { createdAt: "desc" },
       take: MESSAGE_PAGE_SIZE + 1,
-      include: { author: { select: { handle: true, name: true } } },
+      select: MESSAGE_DTO_SELECT,
     }),
   ]);
   if (!thread) notFound();
@@ -77,14 +77,7 @@ export default async function ThreadPage({ params }: { params: Promise<{ threadI
       ? { kind: "CLOSED" }
       : { kind: "OPEN" };
 
-  const initialMessages: MessageDTO[] = page.map((m) => ({
-    id: m.id,
-    body: m.body,
-    createdAt: m.createdAt.toISOString(),
-    authorProfileId: m.authorProfileId,
-    authorHandle: m.author.handle,
-    authorName: m.author.name,
-  }));
+  const initialMessages: MessageDTO[] = page.map(toMessageDTO);
 
   return (
     <div className="mx-auto max-w-2xl">

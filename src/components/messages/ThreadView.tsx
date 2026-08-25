@@ -5,6 +5,7 @@ import { sendMessageAction, markThreadReadAction } from "@/actions/messages";
 import type { MessageDTO, ThreadPresence } from "@/actions/messages";
 import { useThreadPolling } from "./useThreadPolling";
 import { TypingIndicator } from "./TypingIndicator";
+import { ShareCard } from "@/components/share/ShareCard";
 import { Button } from "@/components/ui/Button";
 import { useToast } from "@/components/ui/ToastProvider";
 import { MESSAGE_MAX } from "@/lib/constants";
@@ -44,7 +45,7 @@ export function ThreadView({
     useThreadPolling(threadId, initialMessages, initialPresence, initialHasOlder);
   const [body, setBody] = useState("");
   const [busy, setBusy] = useState(false);
-  const endRef = useRef<HTMLDivElement>(null);
+  const listRef = useRef<HTMLDivElement>(null);
 
   // Both effects below key off the NEWEST message id rather than the array length,
   // because "load earlier" grows the array at the front. Keyed on length, loading
@@ -59,8 +60,22 @@ export function ThreadView({
     markThreadReadAction(threadId).catch(() => {});
   }, [threadId, newestId]);
 
+  // Pin the transcript to its newest message.
+  //
+  // This assigns scrollTop rather than calling
+  // endRef.scrollIntoView({ behavior: "smooth" }), which is what it used to do
+  // and which silently did NOTHING in a browser where smooth scrolling is
+  // unavailable — Chrome treats the request as declinable, and declining it means
+  // no scroll at all rather than an instant one. The symptom was a thread that
+  // opened on its OLDEST message: every reader had to scroll down to find what
+  // they came for, and a message arriving while they watched did not bring itself
+  // into view. Setting the offset is not a request, so it cannot be declined.
+  //
+  // Keyed on the newest id, not the array length: "load earlier" grows the array
+  // at the front, and this must not yank the reader back down when it does.
   useEffect(() => {
-    endRef.current?.scrollIntoView({ behavior: "smooth" });
+    const list = listRef.current;
+    if (list) list.scrollTop = list.scrollHeight;
   }, [newestId, presence.otherTyping]);
 
   // Receipts belong on the newest own message only — a column of "seen" beside
@@ -102,7 +117,12 @@ export function ThreadView({
   return (
     <div className="flex h-[60vh] flex-col border border-hairline bg-white">
       {/* Message list with aria-live so new arrivals are announced. */}
-      <div className="flex-1 overflow-y-auto p-4" aria-live="polite" aria-relevant="additions">
+      <div
+        ref={listRef}
+        className="flex-1 overflow-y-auto p-4"
+        aria-live="polite"
+        aria-relevant="additions"
+      >
         {/* Only the newest page is server-rendered; the rest of the history is a
             click away rather than absent. */}
         {hasOlder && (
@@ -127,14 +147,22 @@ export function ThreadView({
               const mine = m.authorProfileId === myProfileId;
               return (
                 <li key={m.id} className={`flex flex-col ${mine ? "items-end" : "items-start"}`}>
-                  <div
-                    className={`max-w-[80%] border px-3 py-2 text-sm ${
-                      mine ? "border-pine bg-pine-soft" : "border-hairline bg-paper"
-                    }`}
-                  >
-                    {/* Plain text only — React escapes; no HTML/markdown rendering. */}
-                    <p className="whitespace-pre-wrap break-words">{m.body}</p>
-                  </div>
+                  {m.share ? (
+                    // A shared profile/project takes the bubble's place rather
+                    // than sitting inside one: the card has its own frame, and
+                    // nesting it in a second one made it read as an attachment
+                    // to a message that was not there.
+                    <ShareCard share={m.share} mine={mine} />
+                  ) : (
+                    <div
+                      className={`max-w-[80%] border px-3 py-2 text-sm ${
+                        mine ? "border-pine bg-pine-soft" : "border-hairline bg-paper"
+                      }`}
+                    >
+                      {/* Plain text only — React escapes; no HTML/markdown rendering. */}
+                      <p className="whitespace-pre-wrap break-words">{m.body}</p>
+                    </div>
+                  )}
                   <span className="mono mt-0.5 text-2xs text-ink-muted">
                     {mine ? "you" : m.authorName} · {timeOf(m.createdAt)}
                     {i === lastOwnIndex && (
@@ -152,7 +180,6 @@ export function ThreadView({
             {presence.otherTyping && <TypingIndicator name={counterpartName} />}
           </ul>
         )}
-        <div ref={endRef} />
       </div>
 
       {/* Composer */}

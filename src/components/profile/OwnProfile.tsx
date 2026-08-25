@@ -4,6 +4,7 @@ import { useState } from "react";
 import { ProfileView, type ProfileViewData } from "./ProfileView";
 import { ProfileEditForm, type ProfileEditInitial } from "./ProfileEditForm";
 import { Button } from "@/components/ui/Button";
+import { ShareButton } from "@/components/share/ShareButton";
 
 // Own profile: view by default, inline edit on toggle.
 //
@@ -13,10 +14,13 @@ import { Button } from "@/components/ui/Button";
 // page to browse your own posts from.
 export function OwnProfile({
   data,
+  profileId,
   editInitial,
   postsSlot,
 }: {
   data: ProfileViewData;
+  /** Own profile id — the share sheet addresses a profile by id, not by handle. */
+  profileId: string;
   editInitial: ProfileEditInitial;
   postsSlot?: React.ReactNode;
 }) {
@@ -39,9 +43,14 @@ export function OwnProfile({
       isOwn
       postsSlot={postsSlot}
       actionSlot={
-        <Button variant="secondary" onClick={() => setEditing(true)}>
-          Edit profile
-        </Button>
+        <div className="flex gap-2">
+          {/* Sharing your own profile is the case the feature was named after —
+              handing someone your account rather than a URL. */}
+          <ShareButton kind="PROFILE" targetId={profileId} targetLabel="your profile" />
+          <Button variant="secondary" onClick={() => setEditing(true)}>
+            Edit profile
+          </Button>
+        </div>
       }
     />
   );

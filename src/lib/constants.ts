@@ -77,6 +77,18 @@ export const MESSAGE_MIN = 1;
 export const MESSAGE_MAX = 2000;
 export const MAX_PENDING_OUTBOUND = 5;
 
+// Share cards (a profile or project passed into a thread). The blurb is the one
+// free-text line on the card; it is truncated to this rather than wrapped, so a
+// card is always the same height whatever it points at and a column of them
+// stays scannable.
+export const SHARE_BLURB_MAX = 140;
+// Skills shown on a shared profile card before the line is truncated.
+export const SHARE_CARD_TAGS = 3;
+// Threads offered in the share sheet. Everyone you can share with is someone you
+// already have an accepted intro with, so this is a small list by construction —
+// the cap is a guard against a power user's sheet, not a pager.
+export const SHARE_TARGET_LIMIT = 50;
+
 // Profile constraints
 export const HANDLE_IMMUTABLE_DAYS = 7;
 export const BIO_MAX = 600;

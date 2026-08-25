@@ -81,6 +81,7 @@ export default async function OwnProfilePage() {
     <div className="py-2">
       <OwnProfile
         data={data}
+        profileId={profile.id}
         editInitial={editInitial}
         postsSlot={
           <>

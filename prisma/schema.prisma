@@ -81,6 +81,15 @@ enum MediaKind {
   VIDEO
 }
 
+// What a shared message points at. Deliberately narrower than SubjectType: that
+// enum names everything a report can be filed against, which includes things
+// (MESSAGE, THREAD) that have no meaning as a shareable card. Kept separate so
+// widening the report surface never silently widens the share surface.
+enum ShareKind {
+  PROFILE
+  PROJECT
+}
+
 // Accounts are usable the moment they are created. `emailVerifiedAt` is stamped
 // at signup and kept as an audit field / hook for a future real mail provider —
 // nothing gates on it, so there is no on-platform verification step.
@@ -401,13 +410,33 @@ model ThreadMember {
 }
 
 model Message {
-  id              String   @id @default(cuid())
+  id              String     @id @default(cuid())
   threadId        String
   authorProfileId String
+  // Empty ONLY when the message carries a share attachment, so a message is
+  // never entirely blank. Enforced in lib/share-core.ts and lib/messages-core.ts
+  // rather than by a CHECK constraint, matching how Post.body handles the same
+  // "empty is legal only with an attachment" rule.
   body            String
-  createdAt       DateTime @default(now())
-  thread          Thread   @relation(fields: [threadId], references: [id], onDelete: Cascade)
-  author          Profile  @relation(fields: [authorProfileId], references: [id], onDelete: Cascade)
+  createdAt       DateTime   @default(now())
+  // --- Share attachment (all three set together, or all three null) ---
+  // A profile or project passed into this thread from its own page, rendered as
+  // a card instead of a link. See lib/share-core.ts.
+  shareKind       ShareKind?
+  // Profile.id or Project.id depending on shareKind. Intentionally NOT a foreign
+  // key: the row it points at can be deleted, and a share is a record of what
+  // was sent, not a live handle on it. The snapshot below is what renders, so a
+  // deleted target degrades to a card that no longer opens rather than to a
+  // failed transcript read or a cascade that rewrites history.
+  shareTargetId   String?
+  // The display fields captured at send time — name, handle, blurb, avatar. The
+  // card renders from this and never re-queries, so the transcript keeps saying
+  // what was actually shared, and a thread with fifty cards in it still costs
+  // exactly one query to page. Validated on read (validation/share.schema.ts)
+  // because Prisma types Json as `unknown`.
+  shareSnapshot   Json?
+  thread          Thread     @relation(fields: [threadId], references: [id], onDelete: Cascade)
+  author          Profile    @relation(fields: [authorProfileId], references: [id], onDelete: Cascade)
 
   // Supersedes a plain [threadId, createdAt]: that prefix still serves transcript
   // paging identically, and carrying authorProfileId makes the unread-count query

@@ -11,6 +11,7 @@ import { UpdateComposer } from "@/components/project/UpdateComposer";
 import { RoleComposer } from "@/components/project/RoleComposer";
 import { MemberManager } from "@/components/project/MemberManager";
 import { ProjectRoleCard } from "@/components/project/ProjectRoleCard";
+import { ShareButton } from "@/components/share/ShareButton";
 
 function formatDate(d: Date): string {
   return d.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
@@ -82,14 +83,19 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
           </div>
           <h1 className="mt-1 text-2xl font-600">{project.name}</h1>
         </div>
-        {isOwner && (
-          <Link
-            href={`/p/${project.slug}/edit`}
-            className="mono border border-hairline px-3 py-1.5 text-xs hover:border-ink"
-          >
-            Edit project
-          </Link>
-        )}
+        <div className="flex shrink-0 gap-2">
+          {/* Every viewer, not just the owner: passing a project to someone who
+              should see it is the most common thing anyone does with one. */}
+          <ShareButton kind="PROJECT" targetId={project.id} targetLabel={project.name} />
+          {isOwner && (
+            <Link
+              href={`/p/${project.slug}/edit`}
+              className="mono flex items-center border border-hairline px-3 py-1.5 text-xs hover:border-ink"
+            >
+              Edit project
+            </Link>
+          )}
+        </div>
       </div>
 
       <p className="mt-4 max-w-2xl text-sm leading-relaxed">{project.description}</p>

@@ -1,29 +1,13 @@
 import { getSession } from "@/lib/session";
 import { db } from "@/lib/db";
 import { assertThreadMember, ForbiddenError } from "@/lib/authz";
-import { sendMessageCore, getThreadPresence } from "@/lib/messages-core";
+import {
+  MESSAGE_DTO_SELECT,
+  getThreadPresence,
+  sendMessageCore,
+  toMessageDTO,
+} from "@/lib/messages-core";
 import { MESSAGE_PAGE_SIZE, MESSAGE_TAIL_MAX } from "@/lib/constants";
-
-const AUTHOR_SELECT = { author: { select: { handle: true, name: true } } } as const;
-
-type MessageRow = {
-  id: string;
-  body: string;
-  createdAt: Date;
-  authorProfileId: string;
-  author: { handle: string; name: string };
-};
-
-function toDTO(m: MessageRow) {
-  return {
-    id: m.id,
-    body: m.body,
-    createdAt: m.createdAt.toISOString(),
-    authorProfileId: m.authorProfileId,
-    authorHandle: m.author.handle,
-    authorName: m.author.name,
-  };
-}
 
 // Rejects garbage cursors instead of letting `new Date("...")` produce an Invalid
 // Date, which Prisma would send to Postgres as a null and silently widen the query
@@ -69,12 +53,12 @@ export async function GET(req: Request, { params }: { params: Promise<{ threadId
       where: { threadId, createdAt: { lt: before } },
       orderBy: { createdAt: "desc" },
       take: MESSAGE_PAGE_SIZE + 1,
-      include: AUTHOR_SELECT,
+      select: MESSAGE_DTO_SELECT,
     });
     const hasMore = rows.length > MESSAGE_PAGE_SIZE;
     const page = hasMore ? rows.slice(0, MESSAGE_PAGE_SIZE) : rows;
     // Selected newest-first to honour the limit; the client renders oldest-first.
-    return Response.json({ messages: page.reverse().map(toDTO), hasMore });
+    return Response.json({ messages: page.reverse().map(toMessageDTO), hasMore });
   }
 
   const after = parseCursor(url.searchParams.get("after"));
@@ -85,7 +69,7 @@ export async function GET(req: Request, { params }: { params: Promise<{ threadId
             where: { threadId, createdAt: { gt: after } },
             orderBy: { createdAt: "asc" },
             take: MESSAGE_TAIL_MAX,
-            include: AUTHOR_SELECT,
+            select: MESSAGE_DTO_SELECT,
           })
           .then((rows) => ({ rows, hasMore: false }))
       : // No cursor — the caller holds nothing yet, so this is a cold read, not a
@@ -99,7 +83,7 @@ export async function GET(req: Request, { params }: { params: Promise<{ threadId
             where: { threadId },
             orderBy: { createdAt: "desc" },
             take: MESSAGE_PAGE_SIZE + 1,
-            include: AUTHOR_SELECT,
+            select: MESSAGE_DTO_SELECT,
           })
           .then((rows) => {
             const hasMore = rows.length > MESSAGE_PAGE_SIZE;
@@ -110,7 +94,7 @@ export async function GET(req: Request, { params }: { params: Promise<{ threadId
   ]);
 
   return Response.json({
-    messages: tail.rows.map(toDTO),
+    messages: tail.rows.map(toMessageDTO),
     hasMore: tail.hasMore,
     ...presence,
   });
