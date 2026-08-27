@@ -42,6 +42,19 @@ const MEDIA_SELECT = {
   orderBy: { position: "asc" },
 } as const;
 
+// The post's mentions, with each named profile's CURRENT handle alongside the
+// one the body actually contains. Both are needed and they are not the same
+// question: the stored handle is what the text says and is how the renderer
+// finds the token, the current handle is where the link has to point. See the
+// PostMention model.
+const MENTION_SELECT = {
+  select: {
+    handle: true,
+    profileId: true,
+    profile: { select: { handle: true, name: true } },
+  },
+} as const;
+
 const AUTHOR_SELECT = {
   select: { id: true, handle: true, name: true, avatarSeed: true, avatarAssetId: true },
 } as const;
@@ -113,6 +126,7 @@ export async function getFeedPage(args: {
             authorProfileId: true,
             author: AUTHOR_SELECT,
             media: MEDIA_SELECT,
+            mentions: MENTION_SELECT,
           },
           orderBy: { createdAt: "desc" },
           take: FEED_SOURCE_CANDIDATES,
@@ -199,6 +213,12 @@ export async function getFeedPage(args: {
         kind: m.kind,
         mimeType: m.mimeType,
         fileName: m.fileName,
+      })),
+      mentions: p.mentions.map((m) => ({
+        handle: m.handle,
+        currentHandle: m.profile.handle,
+        name: m.profile.name,
+        profileId: m.profileId,
       })),
       isOwn: p.authorProfileId === viewerProfileId,
     };

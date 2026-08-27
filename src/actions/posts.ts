@@ -5,6 +5,12 @@ import { db } from "@/lib/db";
 import { requireSession, requireProfile } from "@/lib/session";
 import { ForbiddenError } from "@/lib/authz";
 import { createPostSchema } from "@/lib/validation/post.schema";
+import {
+  listMentionCandidates,
+  resolveMentionsForBody,
+  type MentionCandidate,
+} from "@/lib/mention-core";
+import { POST_MENTION_MAX } from "@/lib/constants";
 import { ok, fail, type ActionResult } from "@/lib/action-result";
 
 // Thrown inside the create transaction when an asset fails the ownership guard at
@@ -53,6 +59,16 @@ export async function createPostAction(input: {
   });
   if (!profile) return fail("Finish setting up your profile first.");
 
+  // Mentions are derived from the body, never sent by the client — see
+  // lib/mention-core.ts for why that is the whole authorization story. Resolved
+  // out here rather than inside the transaction because it is a pure read, and
+  // holding a transaction open across it would buy nothing: a connection cannot
+  // be withdrawn (only blocked), so there is no state to pin.
+  const mentions = await resolveMentionsForBody(profileId, body);
+  if (mentions.length > POST_MENTION_MAX) {
+    return fail(`You can mention up to ${POST_MENTION_MAX} people in a post.`);
+  }
+
   let postId: string;
   try {
     postId = await db.$transaction(async (tx) => {
@@ -86,6 +102,19 @@ export async function createPostAction(input: {
         if (claimed.count !== 1) throw new MediaUnavailableError();
       }
 
+      // The mentions go in with the post, not after it: a post that rendered
+      // its "@alice" as plain text on first paint and as a link a moment later
+      // would be showing two different bodies for the same row.
+      if (mentions.length > 0) {
+        await tx.postMention.createMany({
+          data: mentions.map((m) => ({
+            postId: post.id,
+            profileId: m.profileId,
+            handle: m.handle,
+          })),
+        });
+      }
+
       // Abandoned-upload sweep. Anything still unattached for this profile was
       // chosen in a composer that was never submitted — the assets just claimed
       // above now carry a postId, so they are not in this set.
@@ -110,6 +139,24 @@ export async function createPostAction(input: {
 
   revalidateAuthorSurfaces(profile.handle);
   return ok({ postId });
+}
+
+// The composer's "@" suggestion list.
+//
+// A read, and a server action rather than a route, for the same reason
+// listShareTargetsAction is one: it is only ever fetched by a UI affordance
+// opening, so it does not need a URL of its own, and requireSession answers
+// "who is asking" the same way everything else here does.
+//
+// This is a convenience, not a gate. Whatever it returns, the write path
+// re-derives the same connection rule from the session — so a caller who skips
+// the list entirely and types a handle by hand gets exactly the same answer.
+export async function searchMentionCandidatesAction(
+  query: string
+): Promise<ActionResult<MentionCandidate[]>> {
+  const session = await requireSession();
+  const profileId = await requireProfile(session);
+  return ok(await listMentionCandidates(profileId, query));
 }
 
 // Delete own post. Authorship is re-derived from the DB; a non-author who forges a

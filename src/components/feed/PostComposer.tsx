@@ -6,6 +6,7 @@ import { createPostAction } from "@/actions/posts";
 import { Avatar } from "@/components/ui/Avatar";
 import { Button } from "@/components/ui/Button";
 import { useToast } from "@/components/ui/ToastProvider";
+import { MentionSuggestions, useMentionAutocomplete } from "./MentionAutocomplete";
 import {
   ALLOWED_IMAGE_MIME,
   ALLOWED_VIDEO_MIME,
@@ -154,6 +155,13 @@ export function PostComposer({
   // textarea, so a blur-collapse would race the click that submits.
   const [expanded, setExpanded] = useState(false);
 
+  // "@" suggestions. The hook owns the caret token, the debounced lookup and the
+  // list's keyboard model; the composer owns the text. It is handed setBody
+  // rather than its own state so an insertion is the same kind of edit as typing
+  // — the character counter, the auto-grow and the post-enabled check all see it
+  // without knowing mentions exist.
+  const mention = useMentionAutocomplete({ value: body, setValue: setBody, textareaRef });
+
   // Object URLs are held by the browser until explicitly revoked; a composer
   // opened and abandoned would otherwise pin every file the user previewed for
   // the life of the tab. A ref mirrors the state so the unmount cleanup can run
@@ -236,6 +244,7 @@ export function PostComposer({
     for (const s of stagedRef.current) URL.revokeObjectURL(s.previewUrl);
     setStaged([]);
     setBody("");
+    mention.reset();
     setError(null);
     setExpanded(false);
     if (fileInputRef.current) fileInputRef.current.value = "";
@@ -277,6 +286,10 @@ export function PostComposer({
   // Ctrl/Cmd+Enter submits from inside the textarea — the shortcut every one of
   // these composers honours, and the only way to post without leaving the keys.
   function onKeyDown(e: React.KeyboardEvent<HTMLTextAreaElement>) {
+    // The suggestion list gets first refusal: while it is open, Enter picks a
+    // person rather than posting, and the arrow keys move through it rather than
+    // through the draft. It declines everything when closed.
+    if (mention.onKeyDown(e)) return;
     if ((e.metaKey || e.ctrlKey) && e.key === "Enter") {
       e.preventDefault();
       void submit();
@@ -313,8 +326,15 @@ export function PostComposer({
             onChange={(e) => {
               setBody(e.target.value);
               setExpanded(true);
+              mention.syncToken();
             }}
             onFocus={() => setExpanded(true)}
+            // The caret can move without the text changing — a click into the
+            // middle of a draft, an arrow key, a selection — and the "@word" the
+            // list is offering completions for is defined by where the caret IS,
+            // not by what was last typed. onSelect is the one event that fires
+            // for all of those.
+            onSelect={mention.syncToken}
             onKeyDown={onKeyDown}
             rows={1}
             // Short enough to stay on one line at 390px. The longer prompt this
@@ -329,7 +349,17 @@ export function PostComposer({
             className={`resize-none border-0 bg-transparent p-0 py-1 text-base leading-relaxed placeholder:text-ink-muted focus:outline-none ${
               expanded ? "w-full shrink-0" : "min-w-0 flex-1"
             }`}
+            {...mention.textareaProps}
           />
+
+          {mention.open && (
+            <MentionSuggestions
+              items={mention.items}
+              active={mention.active}
+              onPick={mention.insert}
+              onHover={mention.setActive}
+            />
+          )}
 
           {staged.length > 0 && (
             <ul className="grid w-full shrink-0 grid-cols-2 gap-2 sm:grid-cols-4">

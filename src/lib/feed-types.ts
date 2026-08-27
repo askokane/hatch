@@ -8,6 +8,13 @@
 // timestamps are ISO strings rather than Date objects — a Date survives the
 // server-component boundary but not `JSON.parse`, and the feed crosses both.
 
+// Re-exported so a client component can render a post body from feed-types
+// alone. The parsing rules live in lib/mentions.ts, which is pure string work
+// and safe to pull into a client bundle — unlike lib/mention-core.ts, which is
+// the same feature's database half and must never cross that line.
+import type { ResolvedMention } from "./mentions";
+export type { ResolvedMention };
+
 export type FeedAuthor = {
   profileId: string;
   handle: string;
@@ -40,6 +47,13 @@ export type PostFeedItem = {
   author: FeedAuthor;
   body: string;
   media: FeedMedia[];
+  /**
+   * The people this post names, as resolved and authorized when it was written.
+   * A renderer links exactly these and nothing else — an "@word" in `body` with
+   * no entry here was never a mention, so it stays text. Empty for every post
+   * written before the feature existed, which is the same thing.
+   */
+  mentions: ResolvedMention[];
   /** True when the viewer authored it — gates the delete control. */
   isOwn: boolean;
 };

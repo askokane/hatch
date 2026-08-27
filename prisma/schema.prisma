@@ -190,6 +190,7 @@ model Profile {
   blocksReceived   Block[]        @relation("Blocked")
   reportsFiled     Report[]
   posts            Post[]
+  mentionedIn      PostMention[]  @relation("MentionedProfile")
   mediaAssets      MediaAsset[]   @relation("MediaOwner")
 
   @@index([school])
@@ -450,18 +451,47 @@ model Message {
 // updates and open roles the feed also carries. Body may be empty ONLY when the
 // post carries media, so a post is never entirely blank (enforced in the action).
 model Post {
-  id              String       @id @default(cuid())
+  id              String        @id @default(cuid())
   authorProfileId String
   body            String
-  createdAt       DateTime     @default(now())
-  author          Profile      @relation(fields: [authorProfileId], references: [id], onDelete: Cascade)
+  createdAt       DateTime      @default(now())
+  author          Profile       @relation(fields: [authorProfileId], references: [id], onDelete: Cascade)
   media           MediaAsset[]
+  mentions        PostMention[]
 
   // The profile tab pages one author's posts newest-first.
   @@index([authorProfileId, createdAt])
   // The global feed pages every post newest-first; it is one of three sources
   // merged on createdAt, so each source must be independently ordered cheaply.
   @@index([createdAt])
+}
+
+// A person named in a post with "@handle".
+//
+// The row is the authorization record, not a convenience index: a handle only
+// becomes a row here if, at the moment of posting, the author was CONNECTED to
+// that profile (an accepted intro request, i.e. a shared thread). Rendering
+// links only what is stored, so an "@someone" typed at a stranger stays literal
+// text forever — it cannot become a link later by them connecting.
+//
+// `handle` is the handle AS WRITTEN, kept alongside the profile id because the
+// two answer different questions. The body still reads "@alice" after Alice
+// renames herself, so matching the text needs the old string; the link has to
+// go somewhere that resolves today, so it is built from the profile's current
+// handle. Storing only the id would silently unlink every mention on a rename.
+model PostMention {
+  postId    String
+  profileId String
+  handle    String
+  createdAt DateTime @default(now())
+  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  profile   Profile  @relation("MentionedProfile", fields: [profileId], references: [id], onDelete: Cascade)
+
+  // One mention per person per post: a body naming someone three times is one
+  // relationship, and the row says "this post names this person".
+  @@id([postId, profileId])
+  // Serves "posts that mention me" — the read a mentions inbox would page.
+  @@index([profileId, createdAt])
 }
 
 // Uploaded photo/video bytes, stored in Postgres as `bytea` and served by

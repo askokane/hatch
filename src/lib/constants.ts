@@ -140,6 +140,19 @@ export const PAGE_SIZE = 20;
 export const POST_BODY_MAX = 1000;
 export const POST_MEDIA_MAX = 4;
 
+// Mentions on posts ("@handle").
+//
+// POST_MENTION_MAX bounds how many people ONE post may name. It is not a
+// performance guard — resolution is a single indexed lookup whatever the count —
+// it is the ceiling that keeps a post from being a broadcast. You can only
+// mention people who accepted an intro from you, so the abuse case is narrow to
+// begin with; ten is comfortably past what a real post does and well short of
+// "notify everyone I have ever spoken to".
+export const POST_MENTION_MAX = 10;
+// Rows in the composer's "@" suggestion list. The list is a scan-and-pick, not a
+// browser: past about this many the user is faster typing another letter.
+export const MENTION_SUGGESTION_LIMIT = 8;
+
 // The feed merges three sources (posts, project updates, open roles) on
 // createdAt. Each source is read with its own bounded query and the merged
 // result is sliced to FEED_PAGE_SIZE, so one prolific source cannot starve the

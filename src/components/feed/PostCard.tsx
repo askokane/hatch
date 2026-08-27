@@ -8,6 +8,7 @@ import { Avatar } from "@/components/ui/Avatar";
 import { useToast } from "@/components/ui/ToastProvider";
 import { ReportDialog } from "@/components/safety/ReportDialog";
 import { MediaGallery } from "./MediaGallery";
+import { PostBody } from "./PostBody";
 import type { PostFeedItem } from "@/lib/feed-types";
 
 // Shared by all three feed cards. It lives here because the post is the feed's
@@ -52,8 +53,9 @@ export function FeedTimestamp({ iso }: { iso: string }) {
   );
 }
 
-// A profile post. Body renders as plain text — React escapes it, and nothing in
-// this feature uses dangerouslySetInnerHTML.
+// A profile post. The body is plain text apart from mentions, which PostBody
+// turns into links from the rows the server authorized — React escapes all of
+// it, and nothing in this feature uses dangerouslySetInnerHTML.
 export function PostCard({ item }: { item: PostFeedItem }) {
   const router = useRouter();
   const { notify } = useToast();
@@ -138,9 +140,7 @@ export function PostCard({ item }: { item: PostFeedItem }) {
         </div>
       </div>
 
-      {item.body && (
-        <p className="mt-3 whitespace-pre-wrap text-sm leading-relaxed">{item.body}</p>
-      )}
+      <PostBody body={item.body} mentions={item.mentions} className="mt-3" />
 
       <MediaGallery media={item.media} />
     </article>
