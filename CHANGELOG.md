@@ -29,6 +29,8 @@ which is why the newest commit on `main` is briefly absent from the table.
 | [v0.16](#v016--people-search) | `076c617` | 2026-08-24 | Find people by name and skill, not just bio; fold the filters away |
 | [v0.17](#v017--changelog-through-v016) | `3c13be4` | 2026-08-25 | Document v0.15 and v0.16 in the CHANGELOG; tag both |
 | [v0.18](#v018--share-cards-in-threads) | `a69dfff` | 2026-08-25 | Share a profile or project into a thread as a card, not a link |
+| [v0.19](#v019--changelog-through-v018) | `fe5c73d` | 2026-08-25 | Document v0.17 and v0.18 in the CHANGELOG; tag both |
+| [v0.20](#v020--mentions-on-posts) | `a934bfd` | 2026-08-26 | Mention people you are connected to in a post |
 
 ---
 
@@ -722,3 +724,111 @@ opening on the newest message, and following through to the page it names. The
 scroll assertion reads the container's offset rather than visibility, because a
 card further up the transcript is still "visible" to Playwright while a reader
 would have to go looking for it.
+
+---
+
+## v0.19 — Changelog through v0.18
+
+**Commit** `fe5c73d` · 2026-08-25 · 1 file, +124
+
+Documentation only. Numbers the two commits outstanding at the time — the
+previous changelog update and the share-card work — and creates their annotated
+tags.
+
+---
+
+## v0.20 — Mentions on posts
+
+**Commit** `a934bfd` · 2026-08-26 · 13 files, +1,012 −8
+
+### Features
+
+- **You can name someone in a post, if you are connected to them.** Typing "@"
+  in the composer opens a list of the people whose intro request you accepted or
+  who accepted yours; picking one writes their handle into the draft, and the
+  posted handle renders as a link to their profile. An "@handle" belonging to
+  somebody you have not connected to stays exactly what it looks like — text.
+- **The list is keyboard-first.** Arrow keys move, Enter or Tab picks, Escape
+  dismisses without clearing the half-typed handle, and Ctrl/Cmd+Enter still
+  posts even mid-mention. It sits in the composer's flow rather than floating
+  over it: an absolutely positioned popover would have to be measured against a
+  textarea that grows as you type and a toolbar that appears on focus, and the
+  composer is an expanding surface anyway.
+- **An empty query is a real result.** The moment just after "@" is typed shows
+  who you could name at all, which is the useful answer then — not nothing.
+
+### The rule, and where it is enforced
+
+- **Decided once, on the server, at write time.** `createPostAction` scans the
+  body it was handed, resolves the handles against the profiles sharing a thread
+  with the author, and writes a `PostMention` row per survivor in the same
+  transaction as the post. The renderer links those rows and nothing else.
+- **Because deciding at render time would make the rule retroactive.** A body
+  re-scanned on every read is a body whose meaning changes underneath its
+  author: an "@alice" typed at a stranger would quietly become a live mention
+  months later, the moment the two of them connected, on the reader's machine.
+  Writing the decision down is what stops a mention from being something the
+  post acquires after the fact.
+- **The suggestion list is a convenience, not a gate.** Nothing describing a
+  mention crosses the wire inbound — the client posts the same body it always
+  did. A caller who never opens the list and types a handle by hand gets exactly
+  the same answer, and one who tampers with what it returns gets nothing extra.
+- **A block in either direction disqualifies**, and a handle that resolves to
+  nobody, to a stranger, or to either side of a block is left out silently. The
+  alternative is an error message that confirms whether a given handle exists
+  and whether that person has blocked you.
+- **Ten per post.** Not a performance bound — resolution is one indexed lookup
+  whatever the count — but the ceiling that keeps a post from being a broadcast.
+
+### Data model
+
+- **`PostMention` is the authorization record, not an index.** It is what the
+  renderer is permitted to link, which is why it is a table and not something
+  derived from the body on read.
+- **It stores the handle as written alongside the profile id**, because the two
+  answer different questions and drift apart. The body still reads "@alice"
+  after Alice renames herself, so matching the token needs the old string; the
+  link has to resolve today, so it is built from her current handle. Either
+  field alone silently unlinks every existing mention on the first rename.
+- **One row per person per post.** A body naming someone three times is one
+  relationship; all three tokens render from the same row.
+- **Cascading deletes on both sides, for different reasons.** By `postId`,
+  because the mention is part of the post. By `profileId`, because — unlike a
+  share card — a mention is not a snapshot of anything, it is a live pointer at
+  a person, and when that person deletes their account the body degrades to the
+  plain text it always was underneath.
+- **No backfill.** Every existing post predates the affordance, and an empty
+  table is exactly what "no post mentions anyone" looks like. Rescanning old
+  bodies would be the retroactive-rule failure above, applied wholesale.
+- **RLS is enabled on the new table.** Migrations `20260805130000` and
+  `20260805150000` revoked the default privileges that would hand a fresh table
+  to `anon`/`authenticated`, so there is nothing left to revoke — but RLS is
+  per-table state and a new table starts without it.
+
+### Structure
+
+- **`lib/mentions.ts` is pure string work** — token scanning, body-to-segments,
+  and the "@word" the caret is inside — so the composer and the feed cannot
+  disagree about what counts as a mention. If they could, a post might carry a
+  row nothing renders, or render a link the server never authorized.
+- **`lib/mention-core.ts` holds the database half**, outside any `"use server"`
+  module, on the same reasoning as `messages-core.ts` and `share-core.ts`: every
+  export of one of those is a callable endpoint, so a helper there taking a
+  profile id as an argument would let the client name whoever it liked as the
+  author.
+- The scanner checks the character before an "@" by index rather than with a
+  lookbehind. `foo@bar` must not read as a mention of @bar, and a lookbehind
+  that fails to parse takes the whole module with it — on a surface whose
+  fallback would be a blank feed.
+
+### Tests
+
+`e2e/15-post-mentions.spec.ts` posts one body naming a connection **and** a
+stranger, because that is the case where a "resolve them all" bug looks like a
+working feature until you read the second name. It checks the rendered result in
+two browser contexts — a link for one, plain text for the other, and the same
+for the person mentioned — and then checks the stored rows, since the UI
+assertion alone cannot tell "the server refused" from "the server stored it and
+the renderer declined to draw it". A second test holds the cascade, reading the
+database rather than the schema file: a hand-written migration is exactly where
+a correct `onDelete` in Prisma and a missing one in Postgres part company.
