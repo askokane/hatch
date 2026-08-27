@@ -9,32 +9,13 @@ import { useToast } from "@/components/ui/ToastProvider";
 import { ReportDialog } from "@/components/safety/ReportDialog";
 import { MediaGallery } from "./MediaGallery";
 import { PostBody } from "./PostBody";
+import { relativeTime } from "@/lib/relative-time";
 import type { PostFeedItem } from "@/lib/feed-types";
 
-// Shared by all three feed cards. It lives here because the post is the feed's
-// primary card and the other two match its author line — one implementation
-// means a "3h ago" cannot drift into a "3 hours ago" one card further down.
-export function relativeTime(iso: string): string {
-  const then = new Date(iso).getTime();
-  if (Number.isNaN(then)) return "";
-  // Clamped at zero: a clock a second ahead of the server should read "just
-  // now", not "-1m ago".
-  const seconds = Math.max(0, Math.round((Date.now() - then) / 1000));
-  if (seconds < 60) return "just now";
-  const minutes = Math.round(seconds / 60);
-  if (minutes < 60) return `${minutes}m ago`;
-  const hours = Math.round(minutes / 60);
-  if (hours < 24) return `${hours}h ago`;
-  const days = Math.round(hours / 24);
-  if (days < 7) return `${days}d ago`;
-  // Past a week "42d ago" stops meaning anything; show the date.
-  return new Date(then).toLocaleDateString("en-US", {
-    month: "short",
-    day: "numeric",
-    year: "numeric",
-  });
-}
-
+// Shared by all three feed cards, so the same age is worded the same way on
+// every one of them. The tiers themselves live in lib/relative-time, where they
+// can be tested against fixed clocks instead of only through a rendered feed.
+//
 // The timestamp is computed from the reader's clock, so the server's render and
 // the client's hydration can legitimately disagree by a tick. suppressHydration
 // Warning marks that as expected rather than letting a routine one-second skew
