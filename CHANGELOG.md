@@ -31,6 +31,9 @@ which is why the newest commit on `main` is briefly absent from the table.
 | [v0.18](#v018--share-cards-in-threads) | `a69dfff` | 2026-08-25 | Share a profile or project into a thread as a card, not a link |
 | [v0.19](#v019--changelog-through-v018) | `fe5c73d` | 2026-08-25 | Document v0.17 and v0.18 in the CHANGELOG; tag both |
 | [v0.20](#v020--mentions-on-posts) | `a934bfd` | 2026-08-26 | Mention people you are connected to in a post |
+| [v0.21](#v021--changelog-through-v020) | `91319f1` | 2026-08-26 | Document v0.19 and v0.20 in the CHANGELOG; tag both |
+| [v0.22](#v022--relative-post-timestamps) | `4d37842` | 2026-08-27 | Word a post's age in weeks and months before falling back to a date |
+| [v0.23](#v023--stale-deployment-recovery) | `959bb3f` | 2026-08-27 | Tell a reader their page is out of date instead of "something went wrong" |
 
 ---
 
@@ -832,3 +835,119 @@ assertion alone cannot tell "the server refused" from "the server stored it and
 the renderer declined to draw it". A second test holds the cascade, reading the
 database rather than the schema file: a hand-written migration is exactly where
 a correct `onDelete` in Prisma and a missing one in Postgres part company.
+
+---
+
+## v0.21 — Changelog through v0.20
+
+**Commit** `91319f1` · 2026-08-26 · 1 file, +110
+
+Documents v0.19 and v0.20 above, and tags both. No product change.
+
+---
+
+## v0.22 — Relative post timestamps
+
+**Commit** `4d37842` · 2026-08-27 · 3 files, +180 −24
+
+### Features
+
+- **A post's age is worded in weeks and months, not abandoned after one.**
+  The scale runs `just now` / `59m ago` / `23h ago` / `6d ago` / `4w ago` /
+  `11mo ago`, and only past a year does it print `Dec 26, 2024`. Previously
+  anything older than seven days rendered as a bare date — which covers most
+  of the feed, and hands the reader a subtraction problem in place of the one
+  fact they wanted.
+- **The ladder is Instagram's**, and the reason for its shape is that a unit
+  earns its place only while the reader can still hold it. "3w ago" lands;
+  "21d ago" has to be divided first; "63w ago" is arithmetic nobody performs,
+  and by then the date itself is the shorter read.
+- **Units floor where they used to round.** Rounding let a label overstate an
+  age — a post three and a half days old reported "4d ago", claiming to be
+  older than it was. Flooring makes every label a floor on the real age, so it
+  errs conservative in the only direction that is safe.
+- **The project changelog on `/p/[slug]` keeps absolute dates on purpose.** It
+  is described in-product as dated notes on what shipped; there the date is the
+  content rather than a stand-in for it.
+
+### Structure
+
+- **`lib/relative-time.ts` is pure and takes an injectable clock.** The old
+  implementation read `Date.now()` inside itself, which is precisely why nothing
+  covered the boundaries: proving "35 days becomes 1mo ago" needed either a real
+  thirty-five-day-old row or a faked global, so in practice it got neither.
+- **All three feed cards still render through `FeedTimestamp`**, so posts,
+  project updates and open roles cannot word the same age differently — a "3h
+  ago" cannot drift into a "3 hours ago" one card further down.
+- **Months divide by 30.4375 days** (365.25 / 12). Months are the one unit with
+  no fixed length, and approximating is what keeps "2mo ago" a constant-time
+  calculation. No reader can tell a 61-day month from a 60-day one.
+- **The `datetime` attribute and the hover tooltip still carry the exact
+  instant.** The relative wording is a presentation layer over the timestamp,
+  not a replacement for it.
+
+### Tests
+
+`e2e/16-post-timestamps.spec.ts` backdates nine rows to the middle of each tier
+and reads the rendered label out of a real browser — the half a pure test cannot
+reach, since the clock the tiers are measured against is the reader's own, on
+the far side of a server render and a hydration. The ages sit mid-tier
+deliberately: a row stamped exactly seven days old is a coin flip between "6d
+ago" and "1w ago" depending on how long the page took to load, and a test that
+flips on load time is worse than no test at all. It runs against a freshly
+signed-up account so the profile's post list is exactly the rows it wrote, and
+no seeded post can push the oldest one off the first page.
+
+---
+
+## v0.23 — Stale deployment recovery
+
+**Commit** `959bb3f` · 2026-08-27 · 2 files, +177 −1
+
+### Issue resolved
+
+- **A deploy landing while someone had a form open gave them
+  "Something went wrong".** Their tab is still running the previous build's
+  JavaScript, so the next submit calls a Server Action id the new server has
+  never heard of. Next answers that POST 404 with an `x-nextjs-action-not-found`
+  header, the router turns it into an `UnrecognizedActionError`, and it arrived
+  at the app's error boundary as an anonymous failure.
+- **The generic screen's button was actively wrong here.** "Try again" calls
+  `reset()`, which re-renders the segment using the JavaScript this tab already
+  downloaded — and the stale bundle is the entire problem, so the retry fails
+  identically. It was the one action guaranteed not to work, offered as the
+  primary one.
+
+### The fix
+
+- **The boundary recognises the case and names it**: the app was updated while
+  the page was open, nothing was saved, reload and try again. The button does a
+  real `window.location.reload()`, because only fetching the document again
+  replaces the code that is out of date.
+- **Detection uses Next's own `unstable_isUnrecognizedActionError`** from
+  `next/navigation`, backed by an `error.name` check. The predicate is still
+  `unstable_`, and this error crosses a bundle boundary to reach the boundary,
+  so an `instanceof` that quietly stopped matching would silently downgrade the
+  screen back to generic with nothing to notice it by. The fallback costs one
+  string comparison.
+- **"Nothing was saved" is a claim, not reassurance.** The action never reached
+  the server, so there is no write to be uncertain about — and the test holds it
+  by checking the tab is still logged out afterwards.
+- **The branch is deliberately narrow.** An action that fails for any other
+  reason is not a version skew, cannot be fixed by reloading, and still gets the
+  generic error.
+
+### Tests
+
+`e2e/17-stale-deployment.spec.ts` stages the skew with a route intercept rather
+than redeploying mid-run: status, header, content-type and body are copied from
+Next's own `handleUnrecognizedFetchAction`, and only POSTs carrying the
+`next-action` header are touched, so the page around the form stays real — the
+test models a *skewed* server, not a broken one. Three cases. The specific
+screen appears instead of the generic one. The reload button genuinely refetches
+— the intercept is armed for a single submit, so the login retry after reloading
+must succeed, which `reset()` could not deliver since it would send no request
+and the form would never come back. And a 500 from the same action still lands
+on "Something went wrong", which matters as much as the first case: telling a
+reader to reload when reloading cannot help is a wrong answer delivered
+confidently.
