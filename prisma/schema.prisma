@@ -74,6 +74,7 @@ enum SubjectType {
   MESSAGE
   THREAD
   POST
+  PROJECT_CHAT
 }
 
 enum MediaKind {
@@ -148,50 +149,51 @@ model LoginAttempt {
 }
 
 model Profile {
-  id               String         @id @default(cuid())
-  userId           String         @unique
-  handle           String         @unique
-  name             String
-  school           String
-  gradYear         Int
+  id                  String               @id @default(cuid())
+  userId              String               @unique
+  handle              String               @unique
+  name                String
+  school              String
+  gradYear            Int
   // Free text, "City, Country" by convention. Optional — a profile with no
   // location is complete, so nothing gates on it.
-  basedIn          String         @default("")
-  bio              String         @default("")
-  links            Json           @default("[]")
+  basedIn             String               @default("")
+  bio                 String               @default("")
+  links               Json                 @default("[]")
   // Fallback identity: the deterministic identicon every profile has from the
   // moment it is created (lib/avatar.ts). It is never cleared, so removing an
   // uploaded picture restores the same identicon the profile started with.
-  avatarSeed       String
+  avatarSeed          String
   // The uploaded profile picture, when there is one. Null means "render the
   // identicon". It is a scalar FK rather than a join because an avatar is drawn
   // on every people card, feed item, thread row and nav bar — the listing
   // queries have to be able to pick it up in the same `select` as the handle.
   // ON DELETE SET NULL: if the asset ever goes away the profile falls back to
   // its identicon rather than pointing at a missing row.
-  avatarAssetId    String?        @unique
-  avatarAsset      MediaAsset?    @relation("ProfileAvatar", fields: [avatarAssetId], references: [id], onDelete: SetNull)
-  isDiscoverable   Boolean        @default(true)
-  handleChangedAt  DateTime       @default(now())
-  onboardedAt      DateTime?
-  createdAt        DateTime       @default(now())
-  updatedAt        DateTime       @updatedAt
-  user             User           @relation(fields: [userId], references: [id], onDelete: Cascade)
-  tags             ProfileTag[]
-  intents          Intent[]
-  memberships      Membership[]
-  updates          Update[]
-  createdProjects  Project[]      @relation("ProjectCreator")
-  sentRequests     IntroRequest[] @relation("RequestSender")
-  receivedRequests IntroRequest[] @relation("RequestRecipient")
-  threadMembers    ThreadMember[]
-  messages         Message[]
-  blocksMade       Block[]        @relation("Blocker")
-  blocksReceived   Block[]        @relation("Blocked")
-  reportsFiled     Report[]
-  posts            Post[]
-  mentionedIn      PostMention[]  @relation("MentionedProfile")
-  mediaAssets      MediaAsset[]   @relation("MediaOwner")
+  avatarAssetId       String?              @unique
+  avatarAsset         MediaAsset?          @relation("ProfileAvatar", fields: [avatarAssetId], references: [id], onDelete: SetNull)
+  isDiscoverable      Boolean              @default(true)
+  handleChangedAt     DateTime             @default(now())
+  onboardedAt         DateTime?
+  createdAt           DateTime             @default(now())
+  updatedAt           DateTime             @updatedAt
+  user                User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tags                ProfileTag[]
+  intents             Intent[]
+  memberships         Membership[]
+  updates             Update[]
+  createdProjects     Project[]            @relation("ProjectCreator")
+  sentRequests        IntroRequest[]       @relation("RequestSender")
+  receivedRequests    IntroRequest[]       @relation("RequestRecipient")
+  threadMembers       ThreadMember[]
+  messages            Message[]
+  blocksMade          Block[]              @relation("Blocker")
+  blocksReceived      Block[]              @relation("Blocked")
+  reportsFiled        Report[]
+  posts               Post[]
+  mentionedIn         PostMention[]        @relation("MentionedProfile")
+  mediaAssets         MediaAsset[]         @relation("MediaOwner")
+  projectChatMessages ProjectChatMessage[]
 
   @@index([school])
   @@index([isDiscoverable])
@@ -292,6 +294,7 @@ model Project {
   memberships Membership[]
   updates     Update[]
   openRoles   OpenRole[]
+  chat        ProjectChat?
 
   @@index([stage])
   @@index([visibility])
@@ -309,15 +312,32 @@ model ProjectTag {
   @@index([tagId])
 }
 
+// A person on a project's team. This row is ALSO the group chat's membership
+// list — see ProjectChat for why the chat has no member table of its own — which
+// is why the two chat presence columns live here rather than beside the messages.
 model Membership {
-  id        String   @id @default(cuid())
-  projectId String
-  profileId String
-  role      String
-  isOwner   Boolean  @default(false)
-  joinedAt  DateTime @default(now())
-  project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  profile   Profile  @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  id              String    @id @default(cuid())
+  projectId       String
+  profileId       String
+  role            String
+  isOwner         Boolean   @default(false)
+  joinedAt        DateTime  @default(now())
+  // Read receipts for the project group chat: every chat message authored by
+  // someone else at or before this instant has been seen by this member. Named
+  // with a `chat` prefix because Membership is not a chat table and a bare
+  // `lastReadAt` here would read as "last looked at the project".
+  //
+  // Defaulted to now() rather than to the epoch on purpose: someone invited to a
+  // project with a year of chat behind it has not "missed" a year of unread
+  // messages, they simply were not there. The backfill in the migration sets
+  // existing rows to their own joinedAt for the same reason.
+  chatLastReadAt  DateTime  @default(now())
+  // Typing presence for the group chat, same expiry-not-boolean design as
+  // ThreadMember.typingUntil: a member who closes the tab mid-word self-heals
+  // when the claim lapses, so there is no stuck "typing…" to clean up.
+  chatTypingUntil DateTime?
+  project         Project   @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  profile         Profile   @relation(fields: [profileId], references: [id], onDelete: Cascade)
 
   @@unique([projectId, profileId])
   @@index([profileId])
@@ -445,6 +465,72 @@ model Message {
   // alone, with no heap lookup per counted row. Kept as one index rather than two
   // so sending a message still only maintains one.
   @@index([threadId, createdAt, authorProfileId])
+}
+
+// A project's group chat. One per project, and every member of the project is in
+// it — see the membership note below.
+//
+// WHY THIS IS NOT A Thread
+//
+// Thread is the two-person conversation that an accepted intro request opens. Its
+// identity IS that request (`introRequestId` is required and unique), and every
+// read built on it assumes exactly two participants: `otherMemberId()` asks for
+// "the member who is not me", presence is a single `otherTyping` /
+// `otherLastReadAt` pair, and a block closes the whole conversation because in a
+// room of two there is no conversation left. Widening that model to N people
+// would have made every one of those assumptions conditional on a discriminator,
+// in code paths (the 3s poll, the unread count) where a wrong branch is a
+// privacy bug rather than a rendering one. A project chat is a different object
+// with different rules, so it gets its own tables and its own read paths.
+//
+// WHY THERE IS NO MEMBER TABLE
+//
+// Chat membership is not a second list that happens to agree with the team
+// roster — it IS the roster. A member table would be a copy of Membership that
+// invite/remove/transfer would have to keep in step, and the failure mode of
+// that copy drifting is someone reading a chat they were removed from. So the
+// chat has no membership of its own: authorization is assertProjectMember(), and
+// the two pieces of per-person chat state (read watermark, typing claim) are
+// columns on Membership. Removing someone from the project removes them from the
+// chat in the same statement, with no second write to forget.
+//
+// WHY THE ROW IS CREATED LAZILY
+//
+// Nothing here distinguishes a project that has a chat from one that does not —
+// every project has one. The row exists to give the chat a stable id of its own
+// (for URLs, for reports, for anything later hung off a chat rather than a
+// project) and it is created on first open, which is why no backfill was needed
+// for the projects that already existed.
+model ProjectChat {
+  id        String               @id @default(cuid())
+  projectId String               @unique
+  createdAt DateTime             @default(now())
+  project   Project              @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  messages  ProjectChatMessage[]
+}
+
+// One message in a project group chat.
+//
+// Deliberately narrower than Message: no share attachment, so `body` is never
+// empty and needs none of the "empty is legal only with an attachment" handling
+// that Message and Post carry. Share cards write into Thread only (see
+// lib/share-core.ts) and widening them to group chats is a separate decision
+// with its own snapshot/authorization questions.
+model ProjectChatMessage {
+  id              String      @id @default(cuid())
+  chatId          String
+  authorProfileId String
+  body            String
+  createdAt       DateTime    @default(now())
+  chat            ProjectChat @relation(fields: [chatId], references: [id], onDelete: Cascade)
+  author          Profile     @relation(fields: [authorProfileId], references: [id], onDelete: Cascade)
+
+  // Same shape and the same reasoning as Message's index: the [chatId, createdAt]
+  // prefix serves transcript paging, and carrying authorProfileId lets both the
+  // unread count in /api/nav-counts and the per-viewer block filter be answered
+  // from the index without a heap lookup per row. One index rather than two, so
+  // sending a message maintains only one.
+  @@index([chatId, createdAt, authorProfileId])
 }
 
 // A profile post — the feed's first-party content type, alongside the project

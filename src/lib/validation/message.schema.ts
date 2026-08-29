@@ -11,9 +11,11 @@ export const messageSchema = z.object({
 
 // Mirrors the SubjectType enum in the schema. POST joined it with the feed:
 // user-authored media is the one surface here that carries content the platform
-// never generated, so a report path on it is a floor, not an extra.
+// never generated, so a report path on it is a floor, not an extra. PROJECT_CHAT
+// joined it with group chats, at the same granularity THREAD already had — a
+// report names the room, not one line in it.
 export const reportSchema = z.object({
-  subjectType: z.enum(["PROFILE", "PROJECT", "MESSAGE", "THREAD", "POST"]),
+  subjectType: z.enum(["PROFILE", "PROJECT", "MESSAGE", "THREAD", "POST", "PROJECT_CHAT"]),
   subjectId: z.string().min(1),
   reason: z.string().trim().min(1, "Choose a reason.").max(80),
   detail: z.string().trim().max(1000).optional().default(""),

@@ -195,6 +195,24 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
 
         {/* Team sidebar */}
         <aside>
+          {/* The way into the group chat, and deliberately the ONLY way to reach
+              one that has never been opened: the chat row is created on first
+              visit, so until someone comes through here the room does not exist
+              to be listed on /messages. Members only — the chat is the team's,
+              not the project page's. */}
+          {isMember && (
+            <Link
+              href={`/p/${project.slug}/chat`}
+              className="mono mb-6 flex items-center justify-between border border-hairline bg-white px-3 py-2 text-xs hover:border-ink"
+            >
+              <span>team chat</span>
+              <span className="text-2xs text-ink-muted">
+                {project.memberships.length}{" "}
+                {project.memberships.length === 1 ? "member" : "members"} →
+              </span>
+            </Link>
+          )}
+
           <p className="label-mono">[ team ]</p>
           <ul className="mt-3 flex flex-col gap-3">
             {project.memberships.map((m) => (

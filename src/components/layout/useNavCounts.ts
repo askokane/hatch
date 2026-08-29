@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { MIN_POLL_GAP_MS, NAV_POLL_INTERVAL_MS } from "@/lib/constants";
 
 export type NavCounts = {
+  /** Unread across two-person threads AND project group chats. */
   unreadMessages: number;
   pendingRequests: number;
 };
@@ -21,6 +22,11 @@ export type NavCounts = {
 // looking at, and the refetch lands before they can read the nav.
 export function useNavCounts(enabled: boolean): NavCounts {
   const [counts, setCounts] = useState<NavCounts>({ unreadMessages: 0, pendingRequests: 0 });
+  // The endpoint reports thread unread and project-chat unread separately, and
+  // they are summed here rather than kept apart because the nav has ONE messages
+  // badge and it has to be honest about where it leads. /messages lists both
+  // kinds of conversation, so a badge that counted only threads would leave team
+  // messages unannounced behind a destination that does show them.
 
   useEffect(() => {
     if (!enabled) return;
@@ -35,7 +41,7 @@ export function useNavCounts(enabled: boolean): NavCounts {
         const data = await res.json();
         if (!active) return;
         setCounts({
-          unreadMessages: data.unreadMessages ?? 0,
+          unreadMessages: (data.unreadMessages ?? 0) + (data.unreadProjectChats ?? 0),
           pendingRequests: data.pendingRequests ?? 0,
         });
       } catch {

@@ -782,6 +782,52 @@ const PROJECTS: ProjectSeed[] = [
   },
 ];
 
+// Project group chats. Every project has one, but a room is only *created* when
+// someone opens it, so seeding a few is what makes the difference between a demo
+// where the feature exists and one where you can see it working. The rooms below
+// belong to teams that already have updates and roles seeded, so the chat reads
+// as the back-channel to work that visibly happened.
+//
+// `hoursAgo` is relative to `daysAgo`, so a day's conversation stays in order
+// without every line needing its own absolute offset.
+type ChatSeed = {
+  projectSlug: string;
+  messages: { authorHandle: string; body: string; daysAgo: number; hoursAgo?: number }[];
+};
+
+const PROJECT_CHATS: ChatSeed[] = [
+  {
+    projectSlug: "notemesh",
+    messages: [
+      { authorHandle: "alex_demo", body: "Signups crossed 300 overnight. Mostly from the intro CS Discord again — one message, no other channel touched.", daysAgo: 6, hoursAgo: 9 },
+      { authorHandle: "ethan_park", body: "Transcription queue held. Longest job was a 94-minute lecture and it came back in 3m20s.", daysAgo: 6, hoursAgo: 8 },
+      { authorHandle: "grace_liu", body: "Watched four people use it in the library yesterday. Three of them scrolled past the search bar entirely — they scrubbed the audio instead.", daysAgo: 6, hoursAgo: 6 },
+      { authorHandle: "alex_demo", body: "That's the second time we've heard that. Should search be the thing you land on rather than a box at the top?", daysAgo: 6, hoursAgo: 5 },
+      { authorHandle: "grace_liu", body: "I think so. Let me mock both and we can put them in front of the same four people Thursday.", daysAgo: 5, hoursAgo: 11 },
+      { authorHandle: "ethan_park", body: "Heads up, I'm rate-limited on the transcription API until the plan resets Monday. Anything long will queue rather than fail.", daysAgo: 2, hoursAgo: 7 },
+      { authorHandle: "alex_demo", body: "Fine by me. Let's use the week to land the search change instead of adding load.", daysAgo: 2, hoursAgo: 6 },
+    ],
+  },
+  {
+    projectSlug: "shiftswap",
+    messages: [
+      { authorHandle: "priya_shah", body: "Two more restaurants signed on this week. That's nine, and the newest one has 40 staff — biggest by a wide margin.", daysAgo: 4, hoursAgo: 10 },
+      { authorHandle: "marcus_webb", body: "40 is past where the current swap-matching runs in-request. I'll move it to a background job before they onboard.", daysAgo: 4, hoursAgo: 9 },
+      { authorHandle: "amara_okonkwo", body: "Worth asking them what they use today before we build for it — the last two both turned out to be on a group chat and a whiteboard.", daysAgo: 4, hoursAgo: 7 },
+      { authorHandle: "priya_shah", body: "Good call. I'm there Friday, I'll ask.", daysAgo: 3, hoursAgo: 12 },
+    ],
+  },
+  {
+    projectSlug: "curbside",
+    messages: [
+      { authorHandle: "deepak_nair", body: "Pilot city confirmed the route data feed for next month. It's a nightly CSV, not an API, which is less fun but at least it's real.", daysAgo: 8, hoursAgo: 5 },
+      { authorHandle: "kevin_osborne", body: "Nightly is fine for now. The app can hold the last good import and show when it was.", daysAgo: 8, hoursAgo: 4 },
+      { authorHandle: "hana_kim", body: "Then the freshness stamp needs to be visible, not buried in settings. If yesterday's data is wrong, people should be able to see why before they blame us.", daysAgo: 7, hoursAgo: 9 },
+      { authorHandle: "deepak_nair", body: "Agreed. Put it under the route title where the ETA is.", daysAgo: 7, hoursAgo: 8 },
+    ],
+  },
+];
+
 // ---------------------------------------------------------------------------
 // 4. INTRO REQUESTS + THREADS + MESSAGES
 // ---------------------------------------------------------------------------
@@ -1044,6 +1090,11 @@ async function wipe() {
   await prisma.roleTag.deleteMany();
   await prisma.openRole.deleteMany();
   await prisma.projectTag.deleteMany();
+  // Chat messages before the chat before the project. The FKs cascade, so this
+  // ordering is not load-bearing — it is written out for the same reason the rest
+  // of this list is, so the wipe reads as an inventory of what exists.
+  await prisma.projectChatMessage.deleteMany();
+  await prisma.projectChat.deleteMany();
   await prisma.membership.deleteMany();
   await prisma.intent.deleteMany();
   await prisma.profileTag.deleteMany();
@@ -1278,6 +1329,42 @@ async function main() {
     }
   }
   console.log(`[HATCH seed] created ${PROJECTS.length} projects, ${roleCount} open roles, ${updateCount} updates`);
+
+  // --- Project group chats ---
+  //
+  // Each member's read watermark is set just past the newest message, so a
+  // seeded room opens caught-up rather than greeting the demo account with a
+  // badge for a conversation it is supposed to have been part of. This mirrors
+  // what the seeded threads do with ThreadMember.lastReadAt.
+  let chatMessageCount = 0;
+  for (const c of PROJECT_CHATS) {
+    const pid = projectId.get(c.projectSlug);
+    if (!pid) continue;
+    const chat = await prisma.projectChat.create({
+      data: { projectId: pid, createdAt: ago(30) },
+    });
+    let newest = ago(30);
+    for (const m of c.messages) {
+      const createdAt = ago(m.daysAgo, m.hoursAgo ?? 0);
+      await prisma.projectChatMessage.create({
+        data: {
+          chatId: chat.id,
+          authorProfileId: profileId.get(m.authorHandle)!,
+          body: m.body,
+          createdAt,
+        },
+      });
+      if (createdAt > newest) newest = createdAt;
+      chatMessageCount++;
+    }
+    await prisma.membership.updateMany({
+      where: { projectId: pid },
+      data: { chatLastReadAt: new Date(newest.getTime() + 60_000) },
+    });
+  }
+  console.log(
+    `[HATCH seed] created ${PROJECT_CHATS.length} project chats, ${chatMessageCount} chat messages`
+  );
 
   // --- Profile posts (text only — see the note on POSTS) ---
   for (const p of POSTS) {
