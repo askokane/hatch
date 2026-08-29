@@ -34,6 +34,8 @@ which is why the newest commit on `main` is briefly absent from the table.
 | [v0.21](#v021--changelog-through-v020) | `91319f1` | 2026-08-26 | Document v0.19 and v0.20 in the CHANGELOG; tag both |
 | [v0.22](#v022--relative-post-timestamps) | `4d37842` | 2026-08-27 | Word a post's age in weeks and months before falling back to a date |
 | [v0.23](#v023--stale-deployment-recovery) | `959bb3f` | 2026-08-27 | Tell a reader their page is out of date instead of "something went wrong" |
+| [v0.24](#v024--changelog-through-v023) | `a50b342` | 2026-08-27 | Document v0.21 through v0.23 in the CHANGELOG; tag all three |
+| [v0.25](#v025--project-group-chats) | `b808274` | 2026-08-28 | Give every project a group chat for its team |
 
 ---
 
@@ -951,3 +953,132 @@ and the form would never come back. And a 500 from the same action still lands
 on "Something went wrong", which matters as much as the first case: telling a
 reader to reload when reloading cannot help is a wrong answer delivered
 confidently.
+
+---
+
+## v0.24 — Changelog through v0.23
+
+**Commit** `a50b342` · 2026-08-27 · 1 file, +119 −0
+
+### Documentation
+
+- Documents v0.21 through v0.23 and tags all three. Housekeeping, and the
+  reason the entry exists at all: the file numbers commits in chronological
+  order, so a commit that updates it cannot number itself. Every changelog
+  update is therefore documented one update later, which is why the newest
+  commit on `main` is always briefly absent from the table above.
+
+---
+
+## v0.25 — Project group chats
+
+**Commit** `b808274` · 2026-08-28 · 18 files, +2,101 −106
+
+### Features
+
+- **Every project has a group chat, and its members are the project's team.**
+  There is nothing to join and nobody to invite: the roster *is* the member
+  list. Reachable from the project sidebar, and from `/messages`, which now
+  merges two-person threads and team rooms into one activity-sorted list.
+- **The transcript attributes every line** — avatar, name and handle — with
+  consecutive messages from one person collapsed into a single block. A thread
+  has one face pinned at the top and can infer the speaker; a room of six
+  cannot, and repeating a name and a face on every line of a five-message burst
+  buries the messages under their own labels.
+- **Presence is plural.** "Maya and Ali are typing…", and a read receipt that
+  counts against team size: `✓✓ seen by 2 of 4`.
+
+### Why this is not a wider `Thread`
+
+`Thread` already stores a conversation with members and messages, so the cheap
+move was to make `introRequestId` nullable, add a discriminator, and let a
+project chat be a `Thread` with more than two members. That version is cheap in
+the schema and expensive everywhere else, because the two-person assumption is
+not written down in one place — it is spread across every read. `otherMemberId()`
+asks the database for "the member who is not me" and takes the first row.
+Presence is a single `otherTyping` / `otherLastReadAt` pair. A block closes the
+whole conversation, which is the right rule when the conversation *is* the two of
+you and the wrong one when it is a team of six.
+
+Making each of those branch on a discriminator puts a conditional in the 3s poll
+and in the unread count, where taking the wrong branch shows someone a
+conversation they are not in. So the group chat got its own tables and its own
+read paths, and `Thread` was left exactly as it was.
+
+### Why there is no chat member table
+
+The chat's membership is the project's membership. Not "kept in agreement with"
+— the same thing. A member table would be a copy that `inviteMemberAction`,
+`removeMemberAction` and `transferOwnershipAction` each have to write to as well,
+and the failure mode of that copy drifting is a person reading a room they were
+removed from, which is exactly the kind of bug that does not announce itself.
+
+So the two pieces of per-person chat state went on `Membership` instead
+(`chatLastReadAt`, `chatTypingUntil`, both named with a prefix because a bare
+`lastReadAt` there would read as "last looked at the project"), and
+authorization for the chat is the `assertProjectMember` check the project pages
+already use. Removing someone from a project removes them from its chat in the
+same `DELETE`, with no second write to forget.
+
+### Blocks hide a person; they do not close the room
+
+In a thread of two, blocking ends the conversation because there is nothing left
+of it. In a team room it would let one person silence five. So the blocker stops
+being sent the blocked member's messages and typing — in both directions, since
+someone who blocked you has decided they want nothing to do with you and a shared
+room should not quietly be the exception. Neither side is told anything: the
+messages are simply not in the page, which is indistinguishable from that person
+not having written any.
+
+The filter is applied **inside** the transcript query (`blockedFrom` → `notIn`),
+never over its result. Filtering an already-limited page is a correctness bug and
+not merely a slower one: it yields short pages and a "load earlier" control that
+walks backwards in uneven steps. `/api/nav-counts` carries the same exclusion as
+a `NOT EXISTS`, so the badge never counts a message the transcript will not show.
+
+### Data model
+
+- `ProjectChat` — one per project, **created on first open**. The row exists to
+  give the chat a stable id of its own; creating it lazily is why no existing
+  project needed a backfill. The create is written as read-then-create-then-
+  reread rather than an upsert, because Prisma only compiles upsert to a native
+  `INSERT … ON CONFLICT` under conditions it does not promise to keep, and the
+  fallback it drops to is the check-then-act being guarded against. Two teammates
+  clicking "team chat" in the same second is an ordinary thing to happen.
+- `ProjectChatMessage` — deliberately narrower than `Message`: no share
+  attachment, so `body` is never empty and needs none of the "empty is legal only
+  with an attachment" handling `Message` and `Post` carry.
+- `Membership.chatLastReadAt` backfills to `joinedAt`, not to the epoch. The
+  messages sent before someone joined are not unread mail they have been
+  ignoring; they are a conversation that happened without them. Defaulting to the
+  epoch would have opened the feature by telling every existing member they had a
+  backlog.
+- `SubjectType` gains `PROJECT_CHAT`, so a room can be reported at the same
+  granularity a thread already could — a report names the room, not one line in
+  it.
+
+### Structure
+
+`src/lib/project-chat-core.ts` holds the authorization, block filtering, presence
+and send logic, and lives outside `actions/` for the same reason
+`messages-core.ts` does: every exported async function in a `"use server"` module
+is a callable endpoint, so a helper there taking `profileId` as a parameter lets
+the client choose whose identity to write under. The server action and
+`/api/project-chats/[chatId]/messages` share it, so there is one authorization
+source. The poll keeps the thread stack's cadence and its self-scheduling loop —
+a fixed clock lets a slow endpoint accumulate in-flight requests that each hold a
+database connection.
+
+### Tests
+
+`e2e/18-project-group-chat.spec.ts`, three scenarios, each aimed at one of the
+three places this differs from a two-person thread. The team talks and an
+outsider is refused — redirected off the page **and** given 403 by both `GET` and
+`POST`, since a redirect alone would only prove the UI is shy. A block hides one
+teammate from one viewer without closing the room, which needs three people in
+the chat to mean anything: with two, "the blocker sees nothing from them" and
+"the room is dead" are the same observation. The blocked member keeps an open
+composer, is told nothing, and their message reaches the third member, while the
+blocker's poll response is asserted at the JSON level — the server must withhold
+it, not the renderer. And removing a `Membership` row directly, the only write
+there is, revokes both page and endpoint access.
