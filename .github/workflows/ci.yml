@@ -6,6 +6,9 @@ on:
 jobs:
   verify:
     runs-on: ubuntu-latest
+    env:
+      DATABASE_URL: postgresql://ci:ci@localhost:5432/hatch_ci
+      DIRECT_URL: postgresql://ci:ci@localhost:5432/hatch_ci
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
