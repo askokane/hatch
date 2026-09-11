@@ -3,6 +3,7 @@ import { unstable_cache } from "next/cache";
 import { Prisma } from "@prisma/client";
 import { db } from "./db";
 import { rankOpenRoles, type RankableRole, type RoleScoreBreakdown } from "./ranking";
+import { INTENT_KINDS } from "./constants";
 
 // How many rows each candidate pass may pull, and how many ranked cards the feed
 // returns. Both are bounded so one busy campus cannot turn the default landing
@@ -95,6 +96,7 @@ export async function getRankedRoleFeed(viewer: {
     status: "OPEN",
     project: {
       visibility: "PUBLIC",
+      closedAt: null,
       // owner must be discoverable and not blocked
       memberships: {
         some: {
@@ -116,7 +118,7 @@ export async function getRankedRoleFeed(viewer: {
         name: true,
         stage: true,
         memberships: {
-          where: { isOwner: true },
+          where: { isOwner: true, profile: { isDiscoverable: true, id: { notIn: [...blocked, viewer.profileId] } } },
           include: {
             profile: {
               select: {
@@ -311,8 +313,7 @@ export async function getPeople(
   const blocked = await blockedProfileIds(viewer.profileId);
   const q = filters.q?.trim() ?? "";
 
-  const rows = await db.profile.findMany({
-    where: {
+  const baseWhere: Prisma.ProfileWhereInput = {
       isDiscoverable: true,
       id: { notIn: [...blocked, viewer.profileId] },
       ...(filters.school ? { school: { contains: filters.school, mode: "insensitive" as const } } : {}),
@@ -321,23 +322,41 @@ export async function getPeople(
       ...(filters.skillTagId
         ? { tags: { some: { tagId: filters.skillTagId, relation: "HAS" } } }
         : {}),
-      ...(filters.intent ? { intents: { some: { kind: filters.intent as never } } } : {}),
-    },
-    include: {
+      ...(filters.intent && (INTENT_KINDS as readonly string[]).includes(filters.intent)
+        ? { intents: { some: { kind: filters.intent as never, archivedAt: null } } }
+        : {}),
+  };
+  const include = {
       tags: { include: { tag: { select: { id: true, label: true } } } },
-      intents: { select: { kind: true } },
-    },
+      intents: { where: { archivedAt: null }, select: { kind: true } },
+  } satisfies Prisma.ProfileInclude;
+  const [rows, priorityRows] = await Promise.all([db.profile.findMany({
+    where: baseWhere,
+    include,
     orderBy: { updatedAt: "desc" },
     // A plain browse needs no ranking, so it pulls exactly one page. A text
     // search pulls a wider candidate set and lets relevance pick the page.
     take: q ? PEOPLE_CANDIDATE_LIMIT : PEOPLE_RESULT_MAX,
-  });
+  }), q ? db.profile.findMany({
+    where: {
+      ...baseWhere,
+      OR: [
+        { name: { startsWith: q, mode: "insensitive" } },
+        { handle: { startsWith: q, mode: "insensitive" } },
+        { tags: { some: { tag: { label: { startsWith: q, mode: "insensitive" } } } } },
+      ],
+    },
+    include,
+    take: PEOPLE_RESULT_MAX,
+    orderBy: { updatedAt: "desc" },
+  }) : Promise.resolve([])]);
 
   if (!q) return rows;
 
   // Sort by relevance, falling back to the database's recency order so the
   // result is stable rather than reshuffling between identical searches.
-  return rows
+  const mergedRows = [...priorityRows, ...rows.filter((row) => !priorityRows.some((priority) => priority.id === row.id))];
+  return mergedRows
     .map((p, i) => ({ p, i, score: relevance(p, q) }))
     .sort((a, b) => b.score - a.score || a.i - b.i)
     .slice(0, PEOPLE_RESULT_MAX)
@@ -352,6 +371,7 @@ export async function getProjects(
 ) {
   const blocked = await blockedProfileIds(viewer.profileId);
 
+  const validStage = filters.stage && ["IDEA", "BUILDING", "LAUNCHED"].includes(filters.stage) ? filters.stage : undefined;
   return db.project.findMany({
     where: {
       visibility: "PUBLIC",
@@ -360,7 +380,7 @@ export async function getProjects(
       memberships: {
         some: { isOwner: true, profile: { id: { notIn: [...blocked] } } },
       },
-      ...(filters.stage ? { stage: filters.stage as never } : {}),
+      ...(validStage ? { stage: validStage as never } : {}),
       ...(filters.tagId ? { tags: { some: { tagId: filters.tagId } } } : {}),
     },
     include: {

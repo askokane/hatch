@@ -1,5 +1,6 @@
 import { db } from "@/lib/db";
 import { catalogSlug } from "@/lib/catalog-slug";
+import type { Prisma } from "@prisma/client";
 
 // Records a school in the shared catalog and returns the name that should be
 // stored on the profile.
@@ -15,21 +16,21 @@ import { catalogSlug } from "@/lib/catalog-slug";
 // Callers must have validated length first (the zod schema does). A name with
 // nothing sluggable in it ("???") is returned untouched and NOT catalogued —
 // it would be an entry no one could ever match against.
-export async function ensureSchool(rawName: string): Promise<string> {
+export async function ensureSchool(rawName: string, client: Prisma.TransactionClient = db): Promise<string> {
   const name = rawName.trim().replace(/\s+/g, " ");
   const slug = catalogSlug(name);
   if (!slug) return name;
 
-  const existing = await db.school.findUnique({ where: { slug } });
+  const existing = await client.school.findUnique({ where: { slug } });
   if (existing) return existing.name;
 
   try {
-    const created = await db.school.create({ data: { slug, name } });
+    const created = await client.school.create({ data: { slug, name } });
     return created.name;
   } catch {
     // Two people onboarding from the same new school at once: the slug unique
     // constraint rejects the loser, who then adopts the winner's spelling.
-    const winner = await db.school.findUnique({ where: { slug } });
+    const winner = await client.school.findUnique({ where: { slug } });
     return winner?.name ?? name;
   }
 }

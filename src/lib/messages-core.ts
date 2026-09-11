@@ -4,6 +4,7 @@ import { messageSchema } from "./validation/message.schema";
 import { parseShareSnapshot, type ShareSnapshot } from "./validation/share.schema";
 import { TYPING_TTL_MS } from "./constants";
 import { ok, fail, type ActionResult } from "./action-result";
+import { consumeRateLimit } from "./rate-limit";
 
 // Messaging logic shared by the server action and the POST route handler, so
 // there is exactly one source of truth for the authorization + block checks.
@@ -69,6 +70,7 @@ export type ThreadPresence = {
   otherTyping: boolean;
   /** ISO timestamp; every message of ours at or before it has been seen. */
   otherLastReadAt: string | null;
+  otherLastReadMessageId: string | null;
 };
 
 // Threads are always exactly two people, but this reads the membership rows
@@ -126,20 +128,35 @@ export async function clearTypingAfterSend(threadId: string, profileId: string):
 export async function sendMessageCore(
   threadId: string,
   profileId: string,
-  body: string
+  body: string,
+  clientId: string
 ): Promise<ActionResult<MessageDTO>> {
   const refusal = await threadPostingRefusal(threadId, profileId);
   if (refusal) return fail(refusal);
+  if (!(await consumeRateLimit("direct-message", profileId, 180, 60 * 60 * 1000))) return fail("Message limit reached. Try again later.");
 
   const parsed = messageSchema.safeParse({ body });
   if (!parsed.success) return fail(parsed.error.issues[0]?.message ?? "Write a message.");
 
-  const message = await db.message.create({
-    data: { threadId, authorProfileId: profileId, body: parsed.data.body },
+  const validClientId = /^[0-9a-f-]{36}$/i.test(clientId) ? clientId : null;
+  if (!validClientId) return fail("Invalid message identifier.");
+  let message = await db.message.findUnique({
+    where: { threadId_authorProfileId_clientId: { threadId, authorProfileId: profileId, clientId: validClientId } },
     select: MESSAGE_DTO_SELECT,
   });
+  if (!message) {
+    try {
+      message = await db.message.create({ data: { threadId, authorProfileId: profileId, body: parsed.data.body, clientId: validClientId }, select: MESSAGE_DTO_SELECT });
+    } catch {
+      message = await db.message.findUnique({
+        where: { threadId_authorProfileId_clientId: { threadId, authorProfileId: profileId, clientId: validClientId } },
+        select: MESSAGE_DTO_SELECT,
+      });
+      if (!message) throw new Error("Message could not be stored");
+    }
+  }
 
-  await clearTypingAfterSend(threadId, profileId);
+  await clearTypingAfterSend(threadId, profileId).catch(() => {});
 
   return ok(toMessageDTO(message));
 }
@@ -170,11 +187,12 @@ export async function getThreadPresence(
 ): Promise<ThreadPresence> {
   const other = await db.threadMember.findFirst({
     where: { threadId, profileId: { not: profileId } },
-    select: { lastReadAt: true, typingUntil: true },
+    select: { lastReadAt: true, lastReadMessageId: true, typingUntil: true },
   });
-  if (!other) return { otherTyping: false, otherLastReadAt: null };
+  if (!other) return { otherTyping: false, otherLastReadAt: null, otherLastReadMessageId: null };
   return {
     otherTyping: !!other.typingUntil && other.typingUntil.getTime() > Date.now(),
     otherLastReadAt: other.lastReadAt.toISOString(),
+    otherLastReadMessageId: other.lastReadMessageId,
   };
 }

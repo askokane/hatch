@@ -6,21 +6,37 @@ import { db } from "./db";
 // source of truth, so this adds no new infrastructure.
 
 const WINDOW_MS = 15 * 60 * 1000; // 15 minutes
-const MAX_FAILED_PER_EMAIL = 5;
-const MAX_FAILED_PER_IP = 20;
+const MAX_ATTEMPTS_PER_EMAIL_SOURCE = 10;
+const MAX_ATTEMPTS_PER_IP = 50;
+
+export async function consumeRateLimit(
+  bucket: string,
+  subject: string,
+  limit: number,
+  windowMs: number
+): Promise<boolean> {
+  const normalized = subject.slice(0, 240);
+  return db.$transaction(async (tx) => {
+    await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${`${bucket}:${normalized}`}))`;
+    const since = new Date(Date.now() - windowMs);
+    const count = await tx.actionAttempt.count({
+      where: { bucket, subject: normalized, createdAt: { gte: since } },
+    });
+    if (count >= limit) return false;
+    await tx.actionAttempt.create({ data: { bucket, subject: normalized } });
+    return true;
+  });
+}
 
 export async function checkLoginRateLimit(
   email: string,
   ip: string
 ): Promise<{ allowed: boolean }> {
-  const since = new Date(Date.now() - WINDOW_MS);
-  const [failedByEmail, failedByIp] = await Promise.all([
-    db.loginAttempt.count({ where: { email, succeeded: false, createdAt: { gte: since } } }),
-    db.loginAttempt.count({ where: { ip, succeeded: false, createdAt: { gte: since } } }),
+  const [emailAllowed, ipAllowed] = await Promise.all([
+    consumeRateLimit("login-email-source", `${email}|${ip}`, MAX_ATTEMPTS_PER_EMAIL_SOURCE, WINDOW_MS),
+    consumeRateLimit("login-ip", ip, MAX_ATTEMPTS_PER_IP, WINDOW_MS),
   ]);
-  return {
-    allowed: failedByEmail < MAX_FAILED_PER_EMAIL && failedByIp < MAX_FAILED_PER_IP,
-  };
+  return { allowed: emailAllowed && ipAllowed };
 }
 
 export async function recordLoginAttempt(params: {

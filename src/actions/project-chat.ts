@@ -21,23 +21,24 @@ export type { ProjectChatMessageDTO, ProjectChatPresence } from "@/lib/project-c
 
 export async function sendProjectChatMessageAction(
   chatId: string,
-  body: string
+  body: string,
+  clientId: string
 ): Promise<ActionResult<ProjectChatMessageDTO>> {
   const session = await requireSession();
   const profileId = await requireProfile(session);
   const ctx = await requireChatMember(chatId, profileId);
-  const res = await sendProjectChatMessageCore(ctx, profileId, body);
+  const res = await sendProjectChatMessageCore(ctx, profileId, body, clientId);
   if (res.ok) revalidatePath(`/p/${ctx.projectSlug}/chat`);
   return res;
 }
 
 // Mark the chat read up to now (own membership row only). This is what clears the
 // unread badge on the project and in the nav.
-export async function markProjectChatReadAction(chatId: string): Promise<ActionResult> {
+export async function markProjectChatReadAction(chatId: string, messageId: string): Promise<ActionResult> {
   const session = await requireSession();
   const profileId = await requireProfile(session);
   const ctx = await requireChatMember(chatId, profileId);
-  await markChatReadCore(ctx, profileId);
+  await markChatReadCore(ctx, profileId, messageId);
   return ok(undefined);
 }
 

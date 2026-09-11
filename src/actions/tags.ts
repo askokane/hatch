@@ -10,6 +10,7 @@ import {
   TAG_LABEL_MIN,
 } from "@/lib/constants";
 import { ok, fail, type ActionResult } from "@/lib/action-result";
+import { consumeRateLimit } from "@/lib/rate-limit";
 
 export type TagDTO = { id: string; slug: string; label: string; kind: string };
 
@@ -80,6 +81,7 @@ export async function createTagAction(
   kind?: "SKILL" | "INTEREST" | "DOMAIN"
 ): Promise<ActionResult<TagDTO>> {
   const session = await requireSession();
+  if (!(await consumeRateLimit("tag-create", session.profileId ?? session.userId, 20, 24 * 60 * 60 * 1000))) return fail("Tag creation limit reached. Try again later.");
 
   const label = rawText.trim().replace(/\s+/g, " ");
   if (label.length < TAG_LABEL_MIN) return fail(`Tags need at least ${TAG_LABEL_MIN} characters.`);
@@ -94,10 +96,10 @@ export async function createTagAction(
     return ok(toDTO(existing));
   }
 
-  let created;
-  try {
-    created = await db.tag.create({
-      data: {
+  const created = await db.$transaction(async (tx) => {
+    const tag = await tx.tag.upsert({
+      where: { slug },
+      create: {
         slug,
         label,
         // Untyped free text has to land somewhere, and SKILL is the only kind the
@@ -108,25 +110,16 @@ export async function createTagAction(
         // empty is also what keeps the alias scan in searchTagsAction bounded to
         // the curated set — see the comment there before changing this.
         aliases: [],
-      },
+      }, update: {},
     });
-  } catch {
-    // Lost a race to another user creating the same tag; adopt theirs.
-    const winner = await db.tag.findUnique({ where: { slug } });
-    if (!winner) return fail("Could not add that tag. Try again.");
-    return ok(toDTO(winner));
-  }
-
-  // Provenance, not a to-do: records the raw text before normalization and the
-  // row it produced, so a junk tag can be traced back to who introduced it.
-  await db.tagSuggestion.create({
-    data: {
+    await tx.tagSuggestion.create({ data: {
       rawText,
-      kind: created.kind,
+      kind: tag.kind,
       suggestedBy: session.profileId ?? null,
       resolved: true,
-      resolvedTagId: created.id,
-    },
+      resolvedTagId: tag.id,
+    } });
+    return tag;
   });
 
   return ok(toDTO(created));

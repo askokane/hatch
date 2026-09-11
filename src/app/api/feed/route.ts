@@ -1,6 +1,6 @@
 import { getSession } from "@/lib/session";
 import { db } from "@/lib/db";
-import { getFeedPage } from "@/lib/feed-queries";
+import { getFeedPage, parseFeedCursor } from "@/lib/feed-queries";
 import { isFeedFilter } from "@/lib/feed-types";
 
 // GET /api/feed?filter=all|posts|updates|roles&before=<ISO>&author=<handle>
@@ -16,9 +16,7 @@ import { isFeedFilter } from "@/lib/feed-types";
 // and widening the query to the newest page, forever. This is the same guard, and
 // for the same reason, as parseCursor() in the thread messages route.
 function validCursor(raw: string | null): string | null {
-  if (!raw) return null;
-  const d = new Date(raw);
-  return Number.isNaN(d.getTime()) ? null : d.toISOString();
+  return parseFeedCursor(raw) ? raw : null;
 }
 
 export async function GET(req: Request) {

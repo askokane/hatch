@@ -8,14 +8,18 @@ import {
   toMessageDTO,
 } from "@/lib/messages-core";
 import { MESSAGE_PAGE_SIZE, MESSAGE_TAIL_MAX } from "@/lib/constants";
+import { isTrustedMutationRequest } from "@/lib/request-security";
 
 // Rejects garbage cursors instead of letting `new Date("...")` produce an Invalid
 // Date, which Prisma would send to Postgres as a null and silently widen the query
 // to the whole thread.
-function parseCursor(raw: string | null): Date | null {
+function parseCursor(raw: string | null): { date: Date; id: string } | null {
   if (!raw) return null;
-  const d = new Date(raw);
-  return Number.isNaN(d.getTime()) ? null : d;
+  const split = raw.lastIndexOf("~");
+  if (split < 0) return null;
+  const d = new Date(raw.slice(0, split));
+  const id = raw.slice(split + 1);
+  return Number.isNaN(d.getTime()) || !id ? null : { date: d, id };
 }
 
 // GET /api/threads/:threadId/messages?after=<ISO>   — live tail (newest first poll)
@@ -50,8 +54,8 @@ export async function GET(req: Request, { params }: { params: Promise<{ threadId
   if (before) {
     // One extra row is the hasMore probe; it is dropped before serializing.
     const rows = await db.message.findMany({
-      where: { threadId, createdAt: { lt: before } },
-      orderBy: { createdAt: "desc" },
+      where: { threadId, OR: [{ createdAt: { lt: before.date } }, { createdAt: before.date, id: { lt: before.id } }] },
+      orderBy: [{ createdAt: "desc" }, { id: "desc" }],
       take: MESSAGE_PAGE_SIZE + 1,
       select: MESSAGE_DTO_SELECT,
     });
@@ -66,12 +70,12 @@ export async function GET(req: Request, { params }: { params: Promise<{ threadId
     after
       ? db.message
           .findMany({
-            where: { threadId, createdAt: { gt: after } },
-            orderBy: { createdAt: "asc" },
-            take: MESSAGE_TAIL_MAX,
+            where: { threadId, OR: [{ createdAt: { gt: after.date } }, { createdAt: after.date, id: { gt: after.id } }] },
+            orderBy: [{ createdAt: "asc" }, { id: "asc" }],
+            take: MESSAGE_TAIL_MAX + 1,
             select: MESSAGE_DTO_SELECT,
           })
-          .then((rows) => ({ rows, hasMore: false }))
+          .then((rows) => ({ rows: rows.slice(0, MESSAGE_TAIL_MAX), hasMore: rows.length > MESSAGE_TAIL_MAX }))
       : // No cursor — the caller holds nothing yet, so this is a cold read, not a
         // delta. Hand back the most recent page rather than the whole thread, and
         // report whether anything precedes it: a client that started from an empty
@@ -81,7 +85,7 @@ export async function GET(req: Request, { params }: { params: Promise<{ threadId
         db.message
           .findMany({
             where: { threadId },
-            orderBy: { createdAt: "desc" },
+            orderBy: [{ createdAt: "desc" }, { id: "desc" }],
             take: MESSAGE_PAGE_SIZE + 1,
             select: MESSAGE_DTO_SELECT,
           })
@@ -103,20 +107,23 @@ export async function GET(req: Request, { params }: { params: Promise<{ threadId
 // POST /api/threads/:threadId/messages  { body }
 // Shares sendMessageCore with the server action — one authorization source.
 export async function POST(req: Request, { params }: { params: Promise<{ threadId: string }> }) {
+  if (!isTrustedMutationRequest(req, "application/json")) return Response.json({ error: "Untrusted request." }, { status: 403 });
   const session = await getSession();
   if (!session?.profileId) return Response.json({ error: "Unauthorized" }, { status: 401 });
   const { threadId } = await params;
 
   let body = "";
+  let clientId = "";
   try {
     const json = await req.json();
     body = typeof json?.body === "string" ? json.body : "";
+    clientId = typeof json?.clientId === "string" ? json.clientId : "";
   } catch {
     return Response.json({ error: "Invalid body" }, { status: 400 });
   }
 
   try {
-    const result = await sendMessageCore(threadId, session.profileId, body);
+    const result = await sendMessageCore(threadId, session.profileId, body, clientId);
     if (!result.ok) return Response.json({ error: result.error }, { status: 400 });
     return Response.json({ message: result.data });
   } catch (e) {

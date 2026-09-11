@@ -2,7 +2,7 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { requireSession } from "@/lib/session";
 import { db } from "@/lib/db";
-import { getRelationship, noRelationship } from "@/lib/relationship";
+import { getRelationship, noRelationship, toClientRelationship } from "@/lib/relationship";
 import { STAGE_LABELS } from "@/lib/constants";
 import { Avatar } from "@/components/ui/Avatar";
 import { TagBadge } from "@/components/ui/TagBadge";
@@ -12,6 +12,7 @@ import { RoleComposer } from "@/components/project/RoleComposer";
 import { MemberManager } from "@/components/project/MemberManager";
 import { ProjectRoleCard } from "@/components/project/ProjectRoleCard";
 import { ShareButton } from "@/components/share/ShareButton";
+import { LeaveProjectButton } from "@/components/project/LeaveProjectButton";
 
 function formatDate(d: Date): string {
   return d.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
@@ -28,6 +29,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
     include: {
       tags: { include: { tag: { select: { id: true, label: true } } } },
       memberships: {
+        take: 100,
         include: {
           profile: {
             select: { id: true, handle: true, name: true, avatarSeed: true, avatarAssetId: true },
@@ -36,12 +38,14 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
         orderBy: { isOwner: "desc" },
       },
       updates: {
+        take: 100,
         include: {
           author: { select: { handle: true, name: true, avatarSeed: true, avatarAssetId: true } },
         },
         orderBy: { createdAt: "desc" },
       },
       openRoles: {
+        take: 100,
         include: { tags: { include: { tag: { select: { id: true, label: true } } } } },
         orderBy: { createdAt: "desc" },
       },
@@ -95,6 +99,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
               Edit project
             </Link>
           )}
+          {isMember && <div className="mt-3"><LeaveProjectButton projectId={project.id} /></div>}
         </div>
       </div>
 
@@ -182,7 +187,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
                       ownerProfileId={owner?.id ?? ""}
                       ownerName={owner?.name ?? "the owner"}
                       viewerMatchedTagIds={r.tags.filter((t) => viewerSkillSet.has(t.tag.id)).map((t) => t.tag.id)}
-                      relationship={ownerRelationship ?? noRelationship()}
+                      relationship={toClientRelationship(ownerRelationship ?? noRelationship())}
                       projectOpen={!project.closedAt}
                       isMember={isMember}
                       canManage={isOwner}

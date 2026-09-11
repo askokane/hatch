@@ -98,9 +98,14 @@ export async function getFeedPage(args: {
   // A malformed cursor must not silently become `undefined` and widen the query to
   // the newest page forever — the caller (the route) validates the string, and this
   // second check keeps a direct server-side caller honest too.
-  const beforeDate = args.before ? new Date(args.before) : null;
-  const cursor = beforeDate && !Number.isNaN(beforeDate.getTime()) ? beforeDate : null;
-  const olderThan = cursor ? { createdAt: { lt: cursor } } : {};
+  const cursor = parseFeedCursor(args.before ?? null);
+  const olderThan = (kind: FeedItem["kind"]) => cursor ? {
+    OR: [
+      { createdAt: { lt: cursor.date } },
+      ...(kind < cursor.kind ? [{ createdAt: cursor.date }] : []),
+      ...(kind === cursor.kind ? [{ createdAt: cursor.date, id: { lt: cursor.id } }] : []),
+    ],
+  } : {};
 
   const scopedToAuthor = !!authorProfileId;
   const want = sourcesFor(filter, scopedToAuthor);
@@ -112,7 +117,7 @@ export async function getFeedPage(args: {
     want.posts
       ? db.post.findMany({
           where: {
-            ...olderThan,
+            ...olderThan("POST"),
             // The block exclusion applies to the author-scoped read too: a
             // profile page stays reachable by handle after a block, so without
             // this the blocked pair could still read each other's posts there.
@@ -136,7 +141,7 @@ export async function getFeedPage(args: {
     want.updates
       ? db.update.findMany({
           where: {
-            ...olderThan,
+            ...olderThan("PROJECT_UPDATE"),
             author: notBlocked,
             project: { visibility: "PUBLIC" },
           },
@@ -155,7 +160,7 @@ export async function getFeedPage(args: {
     want.roles
       ? db.openRole.findMany({
           where: {
-            ...olderThan,
+            ...olderThan("ROLE"),
             status: "OPEN",
             project: {
               visibility: "PUBLIC",
@@ -186,7 +191,7 @@ export async function getFeedPage(args: {
                 name: true,
                 stage: true,
                 memberships: {
-                  where: { isOwner: true },
+                  where: { isOwner: true, profile: { ...notBlocked, OR: [{ isDiscoverable: true }, { id: viewerProfileId }] } },
                   select: { profile: AUTHOR_SELECT },
                   take: 1,
                 },
@@ -259,7 +264,7 @@ export async function getFeedPage(args: {
     merged.push(item);
   }
 
-  merged.sort((a, b) => (a.createdAt < b.createdAt ? 1 : a.createdAt > b.createdAt ? -1 : 0));
+  merged.sort((a, b) => b.createdAt.localeCompare(a.createdAt) || b.kind.localeCompare(a.kind) || b.id.localeCompare(a.id));
 
   // --- Paging ---
   //
@@ -276,11 +281,7 @@ export async function getFeedPage(args: {
   // forever. Rather than switch to `<=` and dedupe (which cannot terminate if a
   // whole page shares one timestamp), the page is extended to the end of the tie,
   // so the cut always lands on a timestamp boundary and `<` is exact.
-  let end = Math.min(FEED_PAGE_SIZE, merged.length);
-  if (end < merged.length) {
-    const boundary = merged[end - 1]!.createdAt;
-    while (end < merged.length && merged[end]!.createdAt === boundary) end++;
-  }
+  const end = Math.min(FEED_PAGE_SIZE, merged.length);
   const items = merged.slice(0, end);
 
   // Only when every queried source came back short is `merged` known to hold all
@@ -295,6 +296,18 @@ export async function getFeedPage(args: {
 
   return {
     items,
-    nextCursor: exhausted || items.length === 0 ? null : items[items.length - 1]!.createdAt,
+    nextCursor: exhausted || items.length === 0 ? null : feedCursor(items[items.length - 1]!),
   };
+}
+
+function feedCursor(item: Pick<FeedItem, "createdAt" | "kind" | "id">): string {
+  return `${item.createdAt}~${item.kind}~${item.id}`;
+}
+
+export function parseFeedCursor(raw: string | null): { date: Date; kind: FeedItem["kind"]; id: string } | null {
+  if (!raw) return null;
+  const parts = raw.split("~");
+  if (parts.length !== 3 || !["POST", "PROJECT_UPDATE", "ROLE"].includes(parts[1]!)) return null;
+  const date = new Date(parts[0]!);
+  return Number.isNaN(date.getTime()) || !parts[2] ? null : { date, kind: parts[1] as FeedItem["kind"], id: parts[2]! };
 }

@@ -41,10 +41,12 @@ export function ThreadView({
   composer: ComposerState;
 }) {
   const { notify } = useToast();
-  const { messages, presence, append, reportTyping, loadOlder, hasOlder, loadingOlder } =
+  const { messages, presence, append, reportTyping, loadOlder, hasOlder, loadingOlder, connectionState } =
     useThreadPolling(threadId, initialMessages, initialPresence, initialHasOlder);
   const [body, setBody] = useState("");
   const [busy, setBusy] = useState(false);
+  const busyRef = useRef(false);
+  const pendingClientId = useRef<string | null>(null);
   const listRef = useRef<HTMLDivElement>(null);
 
   // Both effects below key off the NEWEST message id rather than the array length,
@@ -57,7 +59,7 @@ export function ThreadView({
   // mean opening a thread full of unread messages never cleared the nav badge —
   // and never turned the sender's "delivered" into "seen".
   useEffect(() => {
-    markThreadReadAction(threadId).catch(() => {});
+    if (newestId) markThreadReadAction(threadId, newestId).catch(() => {});
   }, [threadId, newestId]);
 
   // Pin the transcript to its newest message.
@@ -91,7 +93,8 @@ export function ThreadView({
   const seen =
     !!lastOwn &&
     !!presence.otherLastReadAt &&
-    new Date(presence.otherLastReadAt).getTime() >= new Date(lastOwn.createdAt).getTime();
+    (new Date(presence.otherLastReadAt).getTime() > new Date(lastOwn.createdAt).getTime() ||
+      (presence.otherLastReadAt === lastOwn.createdAt && presence.otherLastReadMessageId === lastOwn.id));
 
   function onBodyChange(value: string) {
     setBody(value);
@@ -101,21 +104,22 @@ export function ThreadView({
   async function send(e: React.FormEvent) {
     e.preventDefault();
     const text = body.trim();
-    if (!text) return;
+    if (!text || busyRef.current) return;
+    busyRef.current = true;
     setBusy(true);
-    const res = await sendMessageAction(threadId, text);
-    setBusy(false);
-    if (res.ok) {
-      append(res.data);
-      setBody("");
-      reportTyping(false);
-    } else {
-      notify(res.error, "error");
-    }
+    pendingClientId.current ??= crypto.randomUUID();
+    try {
+      const res = await sendMessageAction(threadId, text, pendingClientId.current);
+      if (res.ok) {
+        append(res.data); setBody(""); reportTyping(false); pendingClientId.current = null;
+      } else notify(res.error, "error");
+    } catch { notify("Message could not be confirmed. Retry to check the same send.", "error"); }
+    finally { busyRef.current = false; setBusy(false); }
   }
 
   return (
     <div className="flex h-[60vh] flex-col border border-hairline bg-white">
+      {connectionState !== "online" && <p role="status" className="mono border-b border-hairline bg-brick-soft px-3 py-1 text-2xs text-brick">{connectionState === "revoked" ? "Conversation access changed. Refresh this page." : "Connection interrupted. Retrying…"}</p>}
       {/* Message list with aria-live so new arrivals are announced. */}
       <div
         ref={listRef}

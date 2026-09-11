@@ -13,6 +13,7 @@ export const createPostSchema = z
       .array(z.string())
       .max(POST_MEDIA_MAX, `Up to ${POST_MEDIA_MAX} photos or videos per post.`)
       .default([]),
+    draftId: z.string().regex(/^[a-zA-Z0-9_-]{8,80}$/).optional(),
   })
   .refine((v) => v.body.length > 0 || v.mediaIds.length > 0, {
     message: "Write something or add a photo or video.",

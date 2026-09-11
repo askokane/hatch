@@ -3,7 +3,7 @@ import { Avatar } from "@/components/ui/Avatar";
 import { TagBadge } from "@/components/ui/TagBadge";
 import { ConnectionStatus } from "@/components/ui/ConnectionStatus";
 import { INTENT_LABELS } from "@/lib/constants";
-import type { Relationship } from "@/lib/relationship";
+import type { ClientRelationship } from "@/lib/relationship";
 
 export function PeopleCard({
   person,
@@ -21,7 +21,7 @@ export function PeopleCard({
     tags: { relation: string; tag: { id: string; label: string } }[];
     intents: { kind: string }[];
   };
-  relationship: Relationship;
+  relationship: ClientRelationship;
 }) {
   const skills = person.tags.filter((t) => t.relation === "HAS").slice(0, 6);
   return (

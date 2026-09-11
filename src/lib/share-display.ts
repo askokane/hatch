@@ -7,7 +7,7 @@ import type { ShareSnapshot } from "./validation/share.schema";
 
 /** Where a card points. The only link a share card ever renders. */
 export function shareHref(share: ShareSnapshot): string {
-  return share.kind === "PROFILE" ? `/u/${share.handle}` : `/p/${share.slug}`;
+  return share.kind === "PROFILE" ? `/go/profile/${share.targetId}` : `/go/project/${share.targetId}`;
 }
 
 /**

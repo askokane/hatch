@@ -3,6 +3,7 @@ import { assertProjectMember, ForbiddenError } from "./authz";
 import { messageSchema } from "./validation/message.schema";
 import { TYPING_TTL_MS } from "./constants";
 import { ok, fail, type ActionResult } from "./action-result";
+import { consumeRateLimit } from "./rate-limit";
 
 // Project group chat logic, shared by the server actions and the route handler
 // so there is exactly one source of truth for the authorization and block rules.
@@ -232,25 +233,35 @@ export function chatPostingRefusal(ctx: ChatContext): string | null {
 export async function sendProjectChatMessageCore(
   ctx: ChatContext,
   profileId: string,
-  body: string
+  body: string,
+  clientId: string
 ): Promise<ActionResult<ProjectChatMessageDTO>> {
   const refusal = chatPostingRefusal(ctx);
   if (refusal) return fail(refusal);
+  if (!(await consumeRateLimit("project-message", profileId, 180, 60 * 60 * 1000))) return fail("Message limit reached. Try again later.");
 
   const parsed = messageSchema.safeParse({ body });
   if (!parsed.success) return fail(parsed.error.issues[0]?.message ?? "Write a message.");
 
-  const message = await db.projectChatMessage.create({
-    data: { chatId: ctx.chatId, authorProfileId: profileId, body: parsed.data.body },
-    select: PROJECT_CHAT_MESSAGE_SELECT,
+  if (!/^[0-9a-f-]{36}$/i.test(clientId)) return fail("Invalid message identifier.");
+  let message = await db.projectChatMessage.findUnique({
+    where: { chatId_authorProfileId_clientId: { chatId: ctx.chatId, authorProfileId: profileId, clientId } }, select: PROJECT_CHAT_MESSAGE_SELECT,
   });
+  if (!message) {
+    try {
+      message = await db.projectChatMessage.create({ data: { chatId: ctx.chatId, authorProfileId: profileId, body: parsed.data.body, clientId }, select: PROJECT_CHAT_MESSAGE_SELECT });
+    } catch {
+      message = await db.projectChatMessage.findUnique({ where: { chatId_authorProfileId_clientId: { chatId: ctx.chatId, authorProfileId: profileId, clientId } }, select: PROJECT_CHAT_MESSAGE_SELECT });
+      if (!message) throw new Error("Message could not be stored");
+    }
+  }
 
   // Sending ends the typing state, or the indicator would linger for the rest of
   // the TTL right beside the message that just arrived.
   await db.membership.update({
     where: { projectId_profileId: { projectId: ctx.projectId, profileId } },
     data: { chatTypingUntil: null },
-  });
+  }).catch(() => {});
 
   return ok(toProjectChatMessageDTO(message));
 }
@@ -270,10 +281,14 @@ export async function setChatTypingCore(
 }
 
 // Marks the chat read up to now for one member.
-export async function markChatReadCore(ctx: ChatContext, profileId: string): Promise<void> {
-  await db.membership.update({
-    where: { projectId_profileId: { projectId: ctx.projectId, profileId } },
-    data: { chatLastReadAt: new Date() },
+export async function markChatReadCore(ctx: ChatContext, profileId: string, messageId: string): Promise<void> {
+  const message = await db.projectChatMessage.findFirst({ where: { id: messageId, chatId: ctx.chatId }, select: { id: true, createdAt: true } });
+  if (!message) return;
+  await db.$transaction(async (tx) => {
+    await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${`chat-read:${ctx.chatId}:${profileId}`}))`;
+    const member = await tx.membership.findUnique({ where: { projectId_profileId: { projectId: ctx.projectId, profileId } }, select: { chatLastReadAt: true, chatLastReadMessageId: true } });
+    if (!member || member.chatLastReadAt > message.createdAt || (member.chatLastReadAt.getTime() === message.createdAt.getTime() && member.chatLastReadMessageId && member.chatLastReadMessageId >= message.id)) return;
+    await tx.membership.update({ where: { projectId_profileId: { projectId: ctx.projectId, profileId } }, data: { chatLastReadAt: message.createdAt, chatLastReadMessageId: message.id } });
   });
 }
 
@@ -300,14 +315,15 @@ export async function getProjectChatPresence(
       select: {
         profileId: true,
         chatLastReadAt: true,
+        chatLastReadMessageId: true,
         chatTypingUntil: true,
         profile: { select: { name: true } },
       },
     }),
     db.projectChatMessage.findFirst({
       where: { chatId: ctx.chatId, authorProfileId: profileId },
-      orderBy: { createdAt: "desc" },
-      select: { createdAt: true },
+      orderBy: [{ createdAt: "desc" }, { id: "desc" }],
+      select: { id: true, createdAt: true },
     }),
   ]);
 
@@ -325,9 +341,11 @@ export async function getProjectChatPresence(
   // With no message of our own there is nothing for anyone to have seen, and
   // reporting the number who happen to be caught up would read as a receipt for
   // a message that does not exist.
+  const eligibleOthers = others.filter((m) => !blockedSet.has(m.profileId));
   const seenByCount = newestOwn
-    ? others.filter((m) => m.chatLastReadAt.getTime() >= newestOwn.createdAt.getTime()).length
+    ? eligibleOthers.filter((m) => m.chatLastReadAt.getTime() > newestOwn.createdAt.getTime() ||
+        (m.chatLastReadAt.getTime() === newestOwn.createdAt.getTime() && m.chatLastReadMessageId === newestOwn.id)).length
     : 0;
 
-  return { typingNames, seenByCount, otherMemberCount: others.length };
+  return { typingNames, seenByCount, otherMemberCount: eligibleOthers.length };
 }

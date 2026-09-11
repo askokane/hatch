@@ -49,7 +49,7 @@ export default async function ThreadPage({ params }: { params: Promise<{ threadI
     }),
     db.message.findMany({
       where: { threadId },
-      orderBy: { createdAt: "desc" },
+      orderBy: [{ createdAt: "desc" }, { id: "desc" }],
       take: MESSAGE_PAGE_SIZE + 1,
       select: MESSAGE_DTO_SELECT,
     }),

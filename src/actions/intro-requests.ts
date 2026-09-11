@@ -8,6 +8,7 @@ import { getProfileCompleteness } from "@/lib/profile-complete";
 import { introRequestSchema } from "@/lib/validation/intro-request.schema";
 import { MAX_PENDING_OUTBOUND } from "@/lib/constants";
 import { ok, fail, type ActionResult } from "@/lib/action-result";
+import { consumeRateLimit } from "@/lib/rate-limit";
 
 // Verifies that the given context (ROLE | PROJECT | INTENT) exists AND belongs to
 // the recipient. This is what prevents messaging a stranger with no context.
@@ -17,12 +18,12 @@ async function contextBelongsToRecipient(
   recipientProfileId: string
 ): Promise<boolean> {
   if (contextType === "INTENT") {
-    const intent = await db.intent.findUnique({ where: { id: contextId }, select: { profileId: true } });
-    return intent?.profileId === recipientProfileId;
+    const intent = await db.intent.findUnique({ where: { id: contextId }, select: { profileId: true, archivedAt: true } });
+    return intent?.profileId === recipientProfileId && !intent.archivedAt;
   }
   if (contextType === "PROJECT") {
     const membership = await db.membership.findFirst({
-      where: { projectId: contextId, profileId: recipientProfileId, isOwner: true },
+      where: { projectId: contextId, profileId: recipientProfileId, isOwner: true, project: { closedAt: null } },
       select: { id: true },
     });
     return !!membership;
@@ -30,10 +31,12 @@ async function contextBelongsToRecipient(
   // ROLE: the role's project must be owned by the recipient.
   const role = await db.openRole.findUnique({
     where: { id: contextId },
-    select: { project: { select: { memberships: { where: { isOwner: true }, select: { profileId: true } } } } },
+    select: { status: true, project: { select: { closedAt: true, memberships: { where: { isOwner: true }, select: { profileId: true } } } } },
   });
-  return !!role?.project.memberships.some((m) => m.profileId === recipientProfileId);
+  return role?.status === "OPEN" && !role.project.closedAt && role.project.memberships.some((m) => m.profileId === recipientProfileId);
 }
+
+function pairKey(a: string, b: string): string { return [a, b].sort().join(":"); }
 
 export async function createIntroRequestAction(input: {
   toProfileId: string;
@@ -43,6 +46,7 @@ export async function createIntroRequestAction(input: {
 }): Promise<ActionResult> {
   const session = await requireSession();
   const fromProfileId = await requireProfile(session);
+  if (!(await consumeRateLimit("intro-request", fromProfileId, 30, 24 * 60 * 60 * 1000))) return fail("Request limit reached. Try again later.");
 
   const parsed = introRequestSchema.safeParse(input);
   if (!parsed.success) return fail(parsed.error.issues[0]?.message ?? "Invalid request.");
@@ -74,32 +78,22 @@ export async function createIntroRequestAction(input: {
     return fail("You can't send a request to this person.");
   }
 
-  // (5) at most one PENDING request between the pair in either direction
-  const existingPending = await db.introRequest.findFirst({
-    where: {
-      status: "PENDING",
-      OR: [
-        { fromProfileId, toProfileId },
-        { fromProfileId: toProfileId, toProfileId: fromProfileId },
-      ],
-    },
-    select: { id: true },
+  const key = pairKey(fromProfileId, toProfileId);
+  const result = await db.$transaction(async (tx) => {
+    await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${`intro-sender:${fromProfileId}`}))`;
+    await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${`intro-pair:${key}`}))`;
+    const existing = await tx.introRequest.findFirst({
+      where: { pairKey: key, status: { in: ["PENDING", "ACCEPTED"] } }, select: { status: true },
+    });
+    if (existing) return existing.status === "ACCEPTED" ? "connected" : "pending";
+    const outboundPending = await tx.introRequest.count({ where: { fromProfileId, status: "PENDING" } });
+    if (outboundPending >= MAX_PENDING_OUTBOUND) return "quota";
+    await tx.introRequest.create({ data: { fromProfileId, toProfileId, pairKey: key, contextType, contextId, note } });
+    return "created";
   });
-  if (existingPending) {
-    return fail("There's already a pending request between you two.");
-  }
-
-  // (6) at most 5 pending outbound requests
-  const outboundPending = await db.introRequest.count({
-    where: { fromProfileId, status: "PENDING" },
-  });
-  if (outboundPending >= MAX_PENDING_OUTBOUND) {
-    return fail(`You can have at most ${MAX_PENDING_OUTBOUND} pending outbound requests.`);
-  }
-
-  await db.introRequest.create({
-    data: { fromProfileId, toProfileId, contextType, contextId, note },
-  });
+  if (result === "connected") return fail("You're already connected to this person.");
+  if (result === "pending") return fail("There's already a pending request between you two.");
+  if (result === "quota") return fail(`You can have at most ${MAX_PENDING_OUTBOUND} pending outbound requests.`);
   revalidatePath("/requests");
   return ok(undefined);
 }
@@ -120,6 +114,9 @@ export async function acceptIntroRequestAction(requestId: string): Promise<Actio
   // Blocking makes acceptance impossible.
   if (await isBlockedEitherWay(request.fromProfileId, request.toProfileId)) {
     return fail("You can't accept a request from someone you've blocked.");
+  }
+  if (!(await contextBelongsToRecipient(request.contextType, request.contextId, request.toProfileId))) {
+    return fail("That request context is no longer open.");
   }
 
   const threadId = await db.$transaction(async (tx) => {

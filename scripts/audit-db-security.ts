@@ -170,6 +170,13 @@ async function main() {
 async function verdict() {
   console.log("\n=== VERDICT");
   const problems: string[] = [];
+  const identities = await db.$queryRawUnsafe<{ current_user: string; rolbypassrls: boolean; owns_tables: boolean }[]>(
+    `select current_user, r.rolbypassrls,
+      exists(select 1 from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname=current_schema() and c.relowner=r.oid) as owns_tables
+     from pg_roles r where r.rolname=current_user`
+  );
+  const identity = identities[0];
+  if (identity?.rolbypassrls || identity?.owns_tables) problems.push("runtime identity bypasses RLS or owns application tables; use a dedicated DML-only role");
 
   const unprotected = await db.$queryRawUnsafe<{ table: string }[]>(
     `select c.relname as table

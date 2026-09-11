@@ -1,6 +1,6 @@
-import { type Page, expect } from "@playwright/test";
+import { type Page } from "@playwright/test";
 
-export const DEMO_PASSWORD = "HatchDemo!2026";
+export const DEMO_PASSWORD = process.env.E2E_SEED_PASSWORD ?? "";
 export const DEMO_EMAIL = "demo@stateu.edu";
 
 // Log in as a seeded user via the real login form.

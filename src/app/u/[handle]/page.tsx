@@ -1,7 +1,7 @@
 import { notFound, redirect } from "next/navigation";
 import { requireSession } from "@/lib/session";
 import { loadProfileByHandle } from "@/lib/profile-queries";
-import { getRelationship } from "@/lib/relationship";
+import { getRelationship, toClientRelationship } from "@/lib/relationship";
 import { getFeedPage } from "@/lib/feed-queries";
 import { db } from "@/lib/db";
 import { ProfileView } from "@/components/profile/ProfileView";
@@ -36,14 +36,16 @@ export default async function PublicProfilePage({
   // plus the first page of their posts, batched into the same round trip.
   const [roles, projects, intents, postsPage] = await Promise.all([
     db.openRole.findMany({
-      where: { status: "OPEN", project: { memberships: { some: { profileId: target.id, isOwner: true } } } },
+      where: { status: "OPEN", project: { closedAt: null, visibility: "PUBLIC", memberships: { some: { profileId: target.id, isOwner: true } } } },
       select: { id: true, title: true, project: { select: { name: true } } },
+      take: 50,
     }),
     db.project.findMany({
-      where: { visibility: "PUBLIC", memberships: { some: { profileId: target.id, isOwner: true } } },
+      where: { visibility: "PUBLIC", closedAt: null, memberships: { some: { profileId: target.id, isOwner: true } } },
       select: { id: true, name: true },
+      take: 50,
     }),
-    db.intent.findMany({ where: { profileId: target.id }, select: { id: true, kind: true } }),
+    db.intent.findMany({ where: { profileId: target.id, archivedAt: null }, select: { id: true, kind: true }, take: 5 }),
     getFeedPage({
       viewerProfileId: session.profileId,
       filter: "posts",
@@ -70,7 +72,7 @@ export default async function PublicProfilePage({
             targetProfileId={target.id}
             targetName={data.name}
             targetHandle={data.handle}
-            relationship={relationship}
+            relationship={toClientRelationship(relationship)}
             contexts={{
               roles: roles.map((r) => ({ id: r.id, label: `Role: ${r.title} (${r.project.name})` })),
               projects: projects.map((p) => ({ id: p.id, label: `Project: ${p.name}` })),

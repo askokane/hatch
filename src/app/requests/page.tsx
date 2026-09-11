@@ -26,6 +26,7 @@ export default async function RequestsPage({
         thread: { select: { id: true } },
       },
       orderBy: { createdAt: "desc" },
+      take: 100,
     }),
     db.introRequest.findMany({
       where: { fromProfileId: profileId },
@@ -34,6 +35,7 @@ export default async function RequestsPage({
         thread: { select: { id: true } },
       },
       orderBy: { createdAt: "desc" },
+      take: 100,
     }),
     db.introRequest.count({ where: { toProfileId: profileId, status: "PENDING" } }),
   ]);

@@ -131,6 +131,15 @@ if (shouldMigrate && !process.env.DIRECT_URL) {
   process.env.DIRECT_URL = pooled;
 }
 
+if (shouldMigrate) {
+  const runtime = new URL(process.env.DATABASE_URL);
+  const migration = new URL(process.env.DIRECT_URL);
+  if (!runtime.username || runtime.username === migration.username || ["postgres", "supabase_admin"].includes(runtime.username)) {
+    console.error("[build] DATABASE_URL must use a dedicated, non-owner runtime role distinct from DIRECT_URL.");
+    process.exit(1);
+  }
+}
+
 // Announced only once the connection string has survived the checks above, so
 // the log never says "will apply migrations to X" immediately before refusing to.
 if (shouldMigrate) {
@@ -157,6 +166,12 @@ if (migrateStatus !== 0) {
   // schema the new code expects could not be established.
   console.error("[build] migrations failed; deploy aborted, previous release still live.");
   process.exit(migrateStatus);
+}
+
+const credentialStatus = run("tsx", ["scripts/assert-no-demo-credentials.ts"]);
+if (credentialStatus !== 0) {
+  console.error("[build] production credential safety check failed; deploy aborted.");
+  process.exit(credentialStatus);
 }
 
 // Deliberately not "migrations applied": this line also prints when there were

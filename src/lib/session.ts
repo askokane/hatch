@@ -28,11 +28,17 @@ function hashToken(token: string): string {
 
 // Creates a Session row and sets the cookie. Only callable from a Server Action
 // or Route Handler (cookie mutation is not allowed during plain render).
-export async function createSession(userId: string): Promise<void> {
+export async function createSession(userId: string, expectedCredentialVersion?: number): Promise<void> {
   const token = crypto.randomBytes(32).toString("base64url");
   const tokenHash = hashToken(token);
   const expiresAt = new Date(Date.now() + SESSION_TTL_MS);
-  await db.session.create({ data: { userId, tokenHash, expiresAt } });
+  const user = await db.user.findUnique({ where: { id: userId }, select: { credentialVersion: true } });
+  if (!user || (expectedCredentialVersion !== undefined && user.credentialVersion !== expectedCredentialVersion)) {
+    return;
+  }
+  await db.session.create({
+    data: { userId, tokenHash, expiresAt, credentialVersion: user.credentialVersion },
+  });
   await setSessionCookie(token, expiresAt);
 }
 
@@ -58,7 +64,12 @@ async function loadSession(): Promise<SessionUser | null> {
     // session query was already joining.
     include: {
       user: {
-        include: {
+        select: {
+          id: true,
+          email: true,
+          isAdmin: true,
+          emailVerifiedAt: true,
+          credentialVersion: true,
           profile: {
             select: { id: true, name: true, handle: true, avatarSeed: true, avatarAssetId: true },
           },
@@ -67,19 +78,24 @@ async function loadSession(): Promise<SessionUser | null> {
     },
   });
 
-  if (!session || session.expiresAt < new Date()) return null;
+  if (
+    !session ||
+    session.expiresAt < new Date() ||
+    session.credentialVersion !== session.user.credentialVersion
+  ) return null;
 
-  // Sliding renewal. The DB expiry is always bumped when under threshold; the
-  // cookie refresh is best-effort because it only works from an action/route
-  // context (Next throws on cookie mutation during a plain component render).
+  // Cookie and database expiry stay aligned. Server-component renders cannot
+  // mutate cookies, so they do not renew either side; the next action/route can.
   if (session.expiresAt.getTime() - Date.now() < RENEWAL_THRESHOLD_MS) {
     const newExpiry = new Date(Date.now() + SESSION_TTL_MS);
-    await db.session.update({ where: { id: session.id }, data: { expiresAt: newExpiry } });
     try {
       await setSessionCookie(token, newExpiry);
+      await db.session.updateMany({
+        where: { id: session.id, credentialVersion: session.user.credentialVersion },
+        data: { expiresAt: newExpiry },
+      });
     } catch {
-      // Not in a mutable (action/route) context this request; DB expiry bump is
-      // enough — the cookie will catch up on the next action the user performs.
+      // A read-only render leaves both expiries unchanged.
     }
   }
 
@@ -103,8 +119,8 @@ export const getSession = cache(loadSession);
 export async function requireSession(nextPath?: string): Promise<SessionUser> {
   const session = await getSession();
   if (!session) {
-    const safeNext =
-      nextPath && nextPath.startsWith("/") && !nextPath.startsWith("//") ? nextPath : "/discover";
+    const { safeLocalPath } = await import("./safe-path");
+    const safeNext = safeLocalPath(nextPath);
     redirect(`/login?next=${encodeURIComponent(safeNext)}`);
   }
   return session;

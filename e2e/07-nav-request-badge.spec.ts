@@ -46,6 +46,7 @@ test("the requests nav badge counts pending requests and caps at 9+", async ({ p
         data: {
           fromProfileId: sender.id,
           toProfileId: myProfileId,
+          pairKey: [sender.id, myProfileId].sort().join(":"),
           contextType: "INTENT",
           contextId: myIntent!.id,
           note: "Seeded pending request used to exercise the nav badge count.",

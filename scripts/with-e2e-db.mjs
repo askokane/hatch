@@ -17,6 +17,9 @@ import { spawn } from "node:child_process";
 import { existsSync, readFileSync } from "node:fs";
 
 const SCHEMA = process.env.E2E_SCHEMA ?? "hatch_e2e";
+if (!/^hatch_e2e(?:_[a-z0-9_]+)?$/.test(SCHEMA) || SCHEMA === "public") {
+  throw new Error("E2E_SCHEMA must be hatch_e2e or a hatch_e2e_* namespace; public/system schemas are forbidden.");
+}
 
 function parseEnvFile(path) {
   if (!existsSync(path)) return {};
@@ -52,7 +55,6 @@ function withSchema(url) {
   // suite would delete live user data on a run. The application itself is free
   // to use :6543 — it only ever uses the default schema, so it has nothing to
   // leak — but anything that relies on `schema=` must stay on the session port.
-  u.port = "5432";
   u.searchParams.delete("pgbouncer");
 
   // Session mode caps the whole project at 15 client connections, and the suite
@@ -80,15 +82,25 @@ function withSchema(url) {
 const fileEnv = parseEnvFile(".env");
 const base = { ...fileEnv, ...process.env };
 
-if (!base.DATABASE_URL) {
-  console.error("with-e2e-db: DATABASE_URL is not set (checked .env and the environment).");
+if (!base.DATABASE_URL || !base.DIRECT_URL) {
+  console.error("with-e2e-db: both DATABASE_URL and DIRECT_URL must be set.");
   process.exit(1);
+}
+
+const appTarget = new URL(base.DATABASE_URL);
+const directTarget = new URL(base.DIRECT_URL);
+if (appTarget.hostname !== directTarget.hostname || appTarget.pathname !== directTarget.pathname) {
+  throw new Error("DATABASE_URL and DIRECT_URL must point to the same database host and database name.");
+}
+if (directTarget.port === "6543" || directTarget.searchParams.get("pgbouncer") === "true") {
+  throw new Error("DIRECT_URL must use a session/direct connection; transaction poolers cannot isolate schemas.");
 }
 
 const env = {
   ...base,
-  DATABASE_URL: withSchema(base.DATABASE_URL),
-  DIRECT_URL: withSchema(base.DIRECT_URL ?? base.DATABASE_URL),
+  DATABASE_URL: withSchema(base.DIRECT_URL),
+  DIRECT_URL: withSchema(base.DIRECT_URL),
+  ALLOW_DESTRUCTIVE_SEED: "e2e",
 };
 
 const [cmd, ...args] = process.argv.slice(2);

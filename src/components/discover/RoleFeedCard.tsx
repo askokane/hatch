@@ -4,7 +4,7 @@ import { TagBadge } from "@/components/ui/TagBadge";
 import { ConnectionStatus } from "@/components/ui/ConnectionStatus";
 import { COMMITMENT_LABELS, STAGE_LABELS } from "@/lib/constants";
 import type { RoleFeedItem } from "@/lib/discover-queries";
-import type { Relationship } from "@/lib/relationship";
+import type { ClientRelationship } from "@/lib/relationship";
 
 // The signature element: a role card whose tag-match visualization makes the
 // ranking transparent. Matched tags render in the accent; a match meter shows the
@@ -15,7 +15,7 @@ export function RoleFeedCard({
 }: {
   item: RoleFeedItem;
   /** Standing with the role's owner, so the feed agrees with the profile page. */
-  relationship: Relationship;
+  relationship: ClientRelationship;
 }) {
   const { role, project, owner, score } = item;
   const matched = new Set(score.matchedTagIds);

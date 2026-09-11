@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { db } from "@/lib/db";
 import { requireSession, requireProfile } from "@/lib/session";
-import { assertProjectMember, assertProjectOwner, ForbiddenError } from "@/lib/authz";
+import { ForbiddenError } from "@/lib/authz";
 import {
   createProjectSchema,
   updateProjectSchema,
@@ -13,6 +13,17 @@ import {
   inviteMemberSchema,
 } from "@/lib/validation/project.schema";
 import { ok, fail, type ActionResult } from "@/lib/action-result";
+import type { Prisma } from "@prisma/client";
+import { consumeRateLimit } from "@/lib/rate-limit";
+
+async function lockProject(tx: Prisma.TransactionClient, projectId: string) {
+  await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${`project:${projectId}`}))`;
+}
+
+async function ownerInTransaction(tx: Prisma.TransactionClient, projectId: string, profileId: string) {
+  await lockProject(tx, projectId);
+  return tx.membership.findFirst({ where: { projectId, profileId, isOwner: true }, select: { id: true } });
+}
 
 function slugify(name: string): string {
   return name
@@ -49,6 +60,7 @@ export async function createProjectAction(input: {
 }): Promise<ActionResult<{ slug: string }>> {
   const session = await requireSession();
   const profileId = await requireProfile(session);
+  if (!(await consumeRateLimit("project-create", profileId, 10, 24 * 60 * 60 * 1000))) return fail("Project creation limit reached. Try again later.");
 
   const parsed = createProjectSchema.safeParse(input);
   if (!parsed.success) return fail(parsed.error.issues[0]?.message ?? "Please complete the form.");
@@ -91,18 +103,16 @@ export async function updateProjectAction(
 ): Promise<ActionResult> {
   const session = await requireSession();
   const profileId = await requireProfile(session);
-  await assertProjectOwner(projectId, profileId);
-
   const parsed = updateProjectSchema.safeParse(input);
   if (!parsed.success) return fail(parsed.error.issues[0]?.message ?? "Please complete the form.");
   const data = parsed.data;
   const tagIds = await validTagIds(data.tagIds);
   if (tagIds.length < 1) return fail("Add at least one recognized tag.");
 
-  const project = await db.project.findUnique({ where: { id: projectId }, select: { slug: true } });
-
-  await db.$transaction([
-    db.project.update({
+  const project = await db.$transaction(async (tx) => {
+    if (!(await ownerInTransaction(tx, projectId, profileId))) throw new ForbiddenError();
+    const project = await tx.project.findUnique({ where: { id: projectId }, select: { slug: true } });
+    await tx.project.update({
       where: { id: projectId },
       data: {
         name: data.name,
@@ -111,10 +121,11 @@ export async function updateProjectAction(
         visibility: data.visibility,
         links: data.links,
       },
-    }),
-    db.projectTag.deleteMany({ where: { projectId } }),
-    db.projectTag.createMany({ data: tagIds.map((tagId) => ({ projectId, tagId })) }),
-  ]);
+    });
+    await tx.projectTag.deleteMany({ where: { projectId } });
+    await tx.projectTag.createMany({ data: tagIds.map((tagId) => ({ projectId, tagId })) });
+    return project;
+  });
 
   revalidatePath(`/p/${project?.slug}`);
   return ok(undefined);
@@ -124,11 +135,11 @@ export async function updateProjectAction(
 export async function closeProjectAction(projectId: string): Promise<ActionResult> {
   const session = await requireSession();
   const profileId = await requireProfile(session);
-  await assertProjectOwner(projectId, profileId);
-  const project = await db.project.update({
-    where: { id: projectId },
-    data: { closedAt: new Date() },
-    select: { slug: true },
+  const project = await db.$transaction(async (tx) => {
+    if (!(await ownerInTransaction(tx, projectId, profileId))) throw new ForbiddenError();
+    const project = await tx.project.update({ where: { id: projectId }, data: { closedAt: new Date() }, select: { slug: true } });
+    await tx.openRole.updateMany({ where: { projectId, status: "OPEN" }, data: { status: "CLOSED" } });
+    return project;
   });
   revalidatePath(`/p/${project.slug}`);
   return ok(undefined);
@@ -139,15 +150,19 @@ export async function closeProjectAction(projectId: string): Promise<ActionResul
 export async function postUpdateAction(projectId: string, body: string): Promise<ActionResult> {
   const session = await requireSession();
   const profileId = await requireProfile(session);
-  await assertProjectMember(projectId, profileId);
-
   const parsed = postUpdateSchema.safeParse({ body });
   if (!parsed.success) return fail(parsed.error.issues[0]?.message ?? "Write an update.");
 
-  const project = await db.project.findUnique({ where: { id: projectId }, select: { slug: true } });
-  await db.update.create({
-    data: { projectId, authorProfileId: profileId, body: parsed.data.body },
+  const project = await db.$transaction(async (tx) => {
+    await lockProject(tx, projectId);
+    const membership = await tx.membership.findUnique({ where: { projectId_profileId: { projectId, profileId } }, select: { id: true } });
+    const project = await tx.project.findUnique({ where: { id: projectId }, select: { slug: true, closedAt: true } });
+    if (!membership) throw new ForbiddenError();
+    if (!project || project.closedAt) return null;
+    await tx.update.create({ data: { projectId, authorProfileId: profileId, body: parsed.data.body } });
+    return project;
   });
+  if (!project) return fail("This project is closed.");
   revalidatePath(`/p/${project?.slug}`);
   return ok(undefined);
 }
@@ -159,23 +174,25 @@ export async function createOpenRoleAction(
 ): Promise<ActionResult> {
   const session = await requireSession();
   const profileId = await requireProfile(session);
-  await assertProjectOwner(projectId, profileId);
-
   const parsed = openRoleSchema.safeParse(input);
   if (!parsed.success) return fail(parsed.error.issues[0]?.message ?? "Please complete the role.");
   const tagIds = await validTagIds(parsed.data.tagIds);
   if (tagIds.length < 1) return fail("A role needs at least one recognized required tag.");
 
-  const project = await db.project.findUnique({ where: { id: projectId }, select: { slug: true } });
-  await db.openRole.create({
-    data: {
+  const project = await db.$transaction(async (tx) => {
+    if (!(await ownerInTransaction(tx, projectId, profileId))) throw new ForbiddenError();
+    const project = await tx.project.findUnique({ where: { id: projectId }, select: { slug: true, closedAt: true } });
+    if (!project || project.closedAt) return null;
+    await tx.openRole.create({ data: {
       projectId,
       title: parsed.data.title,
       description: parsed.data.description,
       commitment: parsed.data.commitment,
       tags: { create: tagIds.map((tagId) => ({ tagId })) },
-    },
+    } });
+    return project;
   });
+  if (!project) return fail("This project is closed.");
   revalidatePath(`/p/${project?.slug}`);
   return ok(undefined);
 }
@@ -188,8 +205,10 @@ export async function closeRoleAction(roleId: string): Promise<ActionResult> {
     select: { projectId: true, project: { select: { slug: true } } },
   });
   if (!role) return fail("Role not found.");
-  await assertProjectOwner(role.projectId, profileId);
-  await db.openRole.update({ where: { id: roleId }, data: { status: "CLOSED" } });
+  await db.$transaction(async (tx) => {
+    if (!(await ownerInTransaction(tx, role.projectId, profileId))) throw new ForbiddenError();
+    await tx.openRole.update({ where: { id: roleId }, data: { status: "CLOSED" } });
+  });
   revalidatePath(`/p/${role.project.slug}`);
   return ok(undefined);
 }
@@ -201,8 +220,6 @@ export async function inviteMemberAction(
 ): Promise<ActionResult> {
   const session = await requireSession();
   const profileId = await requireProfile(session);
-  await assertProjectOwner(projectId, profileId);
-
   const parsed = inviteMemberSchema.safeParse(input);
   if (!parsed.success) return fail(parsed.error.issues[0]?.message ?? "Invalid invite.");
 
@@ -212,16 +229,24 @@ export async function inviteMemberAction(
   });
   if (!invitee) return fail("No profile with that handle.");
 
-  const existing = await db.membership.findUnique({
-    where: { projectId_profileId: { projectId, profileId: invitee.id } },
+  const result = await db.$transaction(async (tx) => {
+    if (!(await ownerInTransaction(tx, projectId, profileId))) throw new ForbiddenError();
+    const project = await tx.project.findUnique({ where: { id: projectId }, select: { slug: true, closedAt: true } });
+    if (!project || project.closedAt) return { error: "This project is closed." } as const;
+    const blocked = await tx.block.findFirst({ where: { OR: [
+      { blockerProfileId: profileId, blockedProfileId: invitee.id },
+      { blockerProfileId: invitee.id, blockedProfileId: profileId },
+    ] }, select: { id: true } });
+    if (blocked) return { error: "That person isn't available to invite." } as const;
+    const connection = await tx.introRequest.findFirst({ where: { pairKey: [profileId, invitee.id].sort().join(":"), status: "ACCEPTED" }, select: { id: true } });
+    if (!connection) return { error: "Connect with this person before inviting them." } as const;
+    const existing = await tx.membership.findUnique({ where: { projectId_profileId: { projectId, profileId: invitee.id } } });
+    if (existing) return { error: "They're already a member." } as const;
+    await tx.membership.create({ data: { projectId, profileId: invitee.id, role: parsed.data.role, isOwner: false } });
+    return { slug: project.slug } as const;
   });
-  if (existing) return fail("They're already a member.");
-
-  const project = await db.project.findUnique({ where: { id: projectId }, select: { slug: true } });
-  await db.membership.create({
-    data: { projectId, profileId: invitee.id, role: parsed.data.role, isOwner: false },
-  });
-  revalidatePath(`/p/${project?.slug}`);
+  if ("error" in result && result.error) return fail(result.error);
+  revalidatePath(`/p/${result.slug}`);
   return ok(undefined);
 }
 
@@ -229,21 +254,19 @@ export async function inviteMemberAction(
 export async function removeMemberAction(projectId: string, memberProfileId: string): Promise<ActionResult> {
   const session = await requireSession();
   const profileId = await requireProfile(session);
-  await assertProjectOwner(projectId, profileId);
-
-  const target = await db.membership.findUnique({
-    where: { projectId_profileId: { projectId, profileId: memberProfileId } },
+  const result = await db.$transaction(async (tx) => {
+    if (!(await ownerInTransaction(tx, projectId, profileId))) throw new ForbiddenError();
+    const target = await tx.membership.findUnique({ where: { projectId_profileId: { projectId, profileId: memberProfileId } } });
+    if (!target) return { error: "They're not a member." } as const;
+    if (target.isOwner && await tx.membership.count({ where: { projectId, isOwner: true } }) <= 1) {
+      return { error: "Transfer ownership before removing the last owner." } as const;
+    }
+    const project = await tx.project.findUnique({ where: { id: projectId }, select: { slug: true } });
+    await tx.membership.delete({ where: { projectId_profileId: { projectId, profileId: memberProfileId } } });
+    return { slug: project?.slug } as const;
   });
-  if (!target) return fail("They're not a member.");
-  if (target.isOwner) {
-    const ownerCount = await db.membership.count({ where: { projectId, isOwner: true } });
-    if (ownerCount <= 1) return fail("Transfer ownership before removing the last owner.");
-  }
-  const project = await db.project.findUnique({ where: { id: projectId }, select: { slug: true } });
-  await db.membership.delete({
-    where: { projectId_profileId: { projectId, profileId: memberProfileId } },
-  });
-  revalidatePath(`/p/${project?.slug}`);
+  if ("error" in result && result.error) return fail(result.error);
+  revalidatePath(`/p/${result.slug ?? ""}`);
   return ok(undefined);
 }
 
@@ -254,29 +277,33 @@ export async function transferOwnershipAction(
 ): Promise<ActionResult> {
   const session = await requireSession();
   const profileId = await requireProfile(session);
-  await assertProjectOwner(projectId, profileId);
-
-  const target = await db.membership.findUnique({
-    where: { projectId_profileId: { projectId, profileId: newOwnerProfileId } },
+  const result = await db.$transaction(async (tx) => {
+    if (!(await ownerInTransaction(tx, projectId, profileId))) throw new ForbiddenError();
+    const target = await tx.membership.findUnique({ where: { projectId_profileId: { projectId, profileId: newOwnerProfileId } } });
+    if (!target) return null;
+    const project = await tx.project.findUnique({ where: { id: projectId }, select: { slug: true } });
+    await tx.membership.update({ where: { projectId_profileId: { projectId, profileId: newOwnerProfileId } }, data: { isOwner: true } });
+    return project;
   });
-  if (!target) return fail("That person isn't a member of this project.");
+  if (!result) return fail("That person isn't a member of this project.");
+  revalidatePath(`/p/${result.slug}`);
+  return ok(undefined);
+}
 
-  const project = await db.project.findUnique({ where: { id: projectId }, select: { slug: true } });
-  await db.membership.update({
-    where: { projectId_profileId: { projectId, profileId: newOwnerProfileId } },
-    data: { isOwner: true },
+export async function leaveProjectAction(projectId: string): Promise<ActionResult> {
+  const profileId = await requireProfile(await requireSession());
+  const result = await db.$transaction(async (tx) => {
+    await lockProject(tx, projectId);
+    const membership = await tx.membership.findUnique({ where: { projectId_profileId: { projectId, profileId } } });
+    if (!membership) return "missing" as const;
+    if (membership.isOwner && await tx.membership.count({ where: { projectId, isOwner: true } }) <= 1) return "last-owner" as const;
+    await tx.membership.delete({ where: { projectId_profileId: { projectId, profileId } } });
+    return "left" as const;
   });
-  revalidatePath(`/p/${project?.slug}`);
+  if (result === "missing") return fail("You're not a member of this project.");
+  if (result === "last-owner") return fail("Transfer ownership before leaving this project.");
+  revalidatePath("/messages"); revalidatePath("/discover");
   return ok(undefined);
 }
 
 // Helper to surface ForbiddenError as a redirect at the page level if needed.
-export async function guardMembershipOrRedirect(projectId: string, profileId: string) {
-  try {
-    await assertProjectMember(projectId, profileId);
-    return true;
-  } catch (e) {
-    if (e instanceof ForbiddenError) return false;
-    throw e;
-  }
-}

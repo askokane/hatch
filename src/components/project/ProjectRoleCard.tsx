@@ -9,7 +9,7 @@ import { IntroRequestDialog } from "@/components/requests/IntroRequestDialog";
 import { closeRoleAction } from "@/actions/projects";
 import { useToast } from "@/components/ui/ToastProvider";
 import { COMMITMENT_LABELS, ROLE_STATUS_LABELS } from "@/lib/constants";
-import type { Relationship } from "@/lib/relationship";
+import type { ClientRelationship } from "@/lib/relationship";
 
 export function ProjectRoleCard({
   role,
@@ -26,7 +26,7 @@ export function ProjectRoleCard({
   ownerName: string;
   viewerMatchedTagIds: string[];
   /** The viewer's standing with the project owner — the single source of truth. */
-  relationship: Relationship;
+  relationship: ClientRelationship;
   projectOpen: boolean;
   isMember: boolean;
   canManage: boolean;

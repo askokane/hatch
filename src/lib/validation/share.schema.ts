@@ -19,6 +19,7 @@ export type ShareKind = z.infer<typeof shareKindSchema>;
 // snapshot alone, and nothing has to keep a column and a JSON blob agreeing.
 const profileSnapshotSchema = z.object({
   kind: z.literal("PROFILE"),
+  targetId: z.string().min(1),
   handle: z.string().min(1),
   name: z.string().min(1),
   /** "Stanford · '27" — the identity line under the name. */
@@ -31,6 +32,7 @@ const profileSnapshotSchema = z.object({
 
 const projectSnapshotSchema = z.object({
   kind: z.literal("PROJECT"),
+  targetId: z.string().min(1),
   slug: z.string().min(1),
   name: z.string().min(1),
   /** "Building · by Maya Chen" */

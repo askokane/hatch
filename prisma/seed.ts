@@ -18,7 +18,25 @@ import { CATALOG_TAGS } from "./data/catalog-tags";
 
 const prisma = new PrismaClient();
 
-const PASSWORD = "HatchDemo!2026";
+function assertSafeSeedTarget() {
+  const raw = process.env.DATABASE_URL;
+  if (!raw) throw new Error("DATABASE_URL is required.");
+  const schema = new URL(raw).searchParams.get("schema") ?? "public";
+  const e2e = /^hatch_e2e(?:_[a-z0-9_]+)?$/.test(schema) && process.env.ALLOW_DESTRUCTIVE_SEED === "e2e";
+  const explicitDemo = process.env.ALLOW_DESTRUCTIVE_SEED === "demo" && process.env.NODE_ENV !== "production" && schema !== "public";
+  if (!e2e && !explicitDemo) {
+    throw new Error("Refusing destructive seed. Use an isolated hatch_e2e schema, or set ALLOW_DESTRUCTIVE_SEED=demo on a non-public non-production demo schema.");
+  }
+}
+
+assertSafeSeedTarget();
+
+function requiredSeedPassword(): string {
+  const password = process.env.E2E_SEED_PASSWORD;
+  if (!password) throw new Error("E2E_SEED_PASSWORD is required for an isolated seed run.");
+  return password;
+}
+const PASSWORD = requiredSeedPassword();
 const BCRYPT_COST = 12;
 
 // Helper: a Date `days` (and optional `hours`) in the past.
@@ -1078,7 +1096,8 @@ const POSTS: PostSeed[] = [
 async function wipe() {
   // FK-safe order: children before parents.
   await prisma.message.deleteMany();
-  await prisma.threadMember.deleteMany();
+  // Thread/Project deletes cascade their memberships in one statement; deleting
+  // membership rows first would correctly trip the deferred owner/member guards.
   await prisma.thread.deleteMany();
   await prisma.introRequest.deleteMany();
   await prisma.report.deleteMany();
@@ -1095,7 +1114,6 @@ async function wipe() {
   // of this list is, so the wipe reads as an inventory of what exists.
   await prisma.projectChatMessage.deleteMany();
   await prisma.projectChat.deleteMany();
-  await prisma.membership.deleteMany();
   await prisma.intent.deleteMany();
   await prisma.profileTag.deleteMany();
   await prisma.project.deleteMany();
@@ -1404,6 +1422,7 @@ async function main() {
       data: {
         fromProfileId: fromId,
         toProfileId: toId,
+        pairKey: [fromId, toId].sort().join(":"),
         contextType: ctx.type,
         contextId: ctx.id,
         note: a.note,
@@ -1451,6 +1470,7 @@ async function main() {
       data: {
         fromProfileId: profileId.get(p.fromHandle)!,
         toProfileId: profileId.get(ctx.toHandle)!,
+        pairKey: [profileId.get(p.fromHandle)!, profileId.get(ctx.toHandle)!].sort().join(":"),
         contextType: ctx.type,
         contextId: ctx.id,
         note: p.note,
@@ -1461,13 +1481,7 @@ async function main() {
   }
   console.log(`[HATCH seed] created ${PENDING_TO_DEMO.length} pending inbound requests for the demo account`);
 
-  console.log(`
---------------------------------------------------------------------
-[HATCH seed] Demo account:   demo@stateu.edu / ${PASSWORD}
-[HATCH seed] Admin account:  admin@hatchdemo.edu / ${PASSWORD}
-[HATCH seed] All seeded users share password: ${PASSWORD}
---------------------------------------------------------------------
-`);
+  console.log("[HATCH seed] completed isolated fixture data.");
 }
 
 main()

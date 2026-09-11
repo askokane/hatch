@@ -6,7 +6,7 @@ import { requireSession } from "@/lib/session";
 import { newAvatarSeed } from "@/lib/avatar";
 import { ensureSchool } from "@/lib/school-catalog";
 import { onboardingSchema } from "@/lib/validation/profile.schema";
-import { ok, fail, type ActionResult } from "@/lib/action-result";
+import { fail, type ActionResult } from "@/lib/action-result";
 
 type OnboardingInput = {
   name: string;
@@ -59,10 +59,10 @@ export async function completeOnboardingAction(
 
   // Add the school to the shared catalog (or adopt the catalog's spelling of it
   // if someone got here first) so the next person can pick it from the dropdown.
-  const school = await ensureSchool(data.school);
-
   try {
-    await db.profile.create({
+    await db.$transaction(async (tx) => {
+      const school = await ensureSchool(data.school, tx);
+      await tx.profile.create({
       data: {
         userId: session.userId,
         handle: data.handle,
@@ -83,6 +83,7 @@ export async function completeOnboardingAction(
           create: data.intents.map((i) => ({ kind: i.kind as never, note: i.note ?? "" })),
         },
       },
+      });
     });
   } catch {
     return fail("Could not create your profile. The handle may have just been taken.");

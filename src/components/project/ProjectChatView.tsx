@@ -53,10 +53,12 @@ export function ProjectChatView({
   composer: ChatComposerState;
 }) {
   const { notify } = useToast();
-  const { messages, presence, append, reportTyping, loadOlder, hasOlder, loadingOlder } =
+  const { messages, presence, append, reportTyping, loadOlder, hasOlder, loadingOlder, connectionState } =
     useProjectChatPolling(chatId, initialMessages, initialPresence, initialHasOlder);
   const [body, setBody] = useState("");
   const [busy, setBusy] = useState(false);
+  const busyRef = useRef(false);
+  const pendingClientId = useRef<string | null>(null);
   const listRef = useRef<HTMLDivElement>(null);
 
   // Both effects below key off the NEWEST message id rather than the array length,
@@ -68,7 +70,7 @@ export function ProjectChatView({
   // Mark read on open and on every arrival, so the unread badge on the project
   // and in the nav clears while you are actually looking at the room.
   useEffect(() => {
-    markProjectChatReadAction(chatId).catch(() => {});
+    if (newestId) markProjectChatReadAction(chatId, newestId).catch(() => {});
   }, [chatId, newestId]);
 
   // Pin the transcript to its newest message by assigning scrollTop rather than
@@ -97,21 +99,21 @@ export function ProjectChatView({
   async function send(e: React.FormEvent) {
     e.preventDefault();
     const text = body.trim();
-    if (!text) return;
+    if (!text || busyRef.current) return;
+    busyRef.current = true;
     setBusy(true);
-    const res = await sendProjectChatMessageAction(chatId, text);
-    setBusy(false);
-    if (res.ok) {
-      append(res.data);
-      setBody("");
-      reportTyping(false);
-    } else {
-      notify(res.error, "error");
-    }
+    pendingClientId.current ??= crypto.randomUUID();
+    try {
+      const res = await sendProjectChatMessageAction(chatId, text, pendingClientId.current);
+      if (res.ok) { append(res.data); setBody(""); reportTyping(false); pendingClientId.current = null; }
+      else notify(res.error, "error");
+    } catch { notify("Message could not be confirmed. Retry to check the same send.", "error"); }
+    finally { busyRef.current = false; setBusy(false); }
   }
 
   return (
     <div className="flex h-[65vh] flex-col border border-hairline bg-white">
+      {connectionState !== "online" && <p role="status" className="mono border-b border-hairline bg-brick-soft px-3 py-1 text-2xs text-brick">{connectionState === "revoked" ? "Team access changed. Refresh this page." : "Connection interrupted. Retrying…"}</p>}
       {/* Message list with aria-live so new arrivals are announced. */}
       <div
         ref={listRef}

@@ -89,11 +89,13 @@ function classify(file: File): { kind: "IMAGE" | "VIDEO" } | { error: string } {
 // question for a user to be asking mid-post.
 function uploadFile(
   file: File,
+  draftId: string,
   onProgress: (percent: number) => void
 ): Promise<{ ok: true; id: string } | { ok: false; error: string }> {
   return new Promise((resolve) => {
     const form = new FormData();
     form.append("file", file);
+    form.append("draftId", draftId);
 
     const xhr = new XMLHttpRequest();
     xhr.open("POST", "/api/media");
@@ -145,6 +147,7 @@ export function PostComposer({
   const hintId = `${fileInputId}-hint`;
   const fileInputRef = useRef<HTMLInputElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const draftIdRef = useRef(crypto.randomUUID());
 
   const [body, setBody] = useState("");
   const [staged, setStaged] = useState<Staged[]>([]);
@@ -224,7 +227,7 @@ export function PostComposer({
         { localId, name: file.name, kind: verdict.kind, previewUrl, status: "uploading", progress: 0 },
       ]);
 
-      void uploadFile(file, (percent) => patch(localId, { progress: percent })).then((res) => {
+      void uploadFile(file, draftIdRef.current, (percent) => patch(localId, { progress: percent })).then((res) => {
         if (res.ok) patch(localId, { status: "ready", progress: 100, assetId: res.id });
         else patch(localId, { status: "error", error: res.error });
       });
@@ -234,14 +237,20 @@ export function PostComposer({
   function remove(localId: string) {
     setStaged((prev) => {
       const target = prev.find((s) => s.localId === localId);
-      if (target) URL.revokeObjectURL(target.previewUrl);
+      if (target) {
+        URL.revokeObjectURL(target.previewUrl);
+        if (target.assetId) void fetch(`/api/media/${target.assetId}`, { method: "DELETE" });
+      }
       return prev.filter((s) => s.localId !== localId);
     });
     setError(null);
   }
 
   function reset() {
-    for (const s of stagedRef.current) URL.revokeObjectURL(s.previewUrl);
+    for (const s of stagedRef.current) {
+      URL.revokeObjectURL(s.previewUrl);
+      if (s.assetId) void fetch(`/api/media/${s.assetId}`, { method: "DELETE" });
+    }
     setStaged([]);
     setBody("");
     mention.reset();
@@ -264,10 +273,11 @@ export function PostComposer({
     if (!canPost) return;
     setError(null);
     setBusy(true);
-    const res = await createPostAction({ body: trimmed, mediaIds: readyIds });
+    const res = await createPostAction({ body: trimmed, mediaIds: readyIds, draftId: draftIdRef.current });
     setBusy(false);
 
     if (res.ok) {
+      draftIdRef.current = crypto.randomUUID();
       reset();
       notify("Posted.", "success");
       // The feed's first page is server-rendered; refresh pulls it back down

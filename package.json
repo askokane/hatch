@@ -7,18 +7,23 @@
     "dev": "next dev",
     "build": "node scripts/migrate-then-build.mjs",
     "start": "next start",
-    "lint": "next lint",
-    "seed": "tsx prisma/seed.ts",
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit --incremental false",
+    "security:audit": "npm audit --audit-level=high",
+    "verify": "npm run typecheck && npm run lint && npm run test:unit && npm run catalog:verify && prisma validate",
+    "seed": "node --require ./scripts/tsx-windows-shim.cjs --import tsx prisma/seed.ts",
     "db:migrate": "prisma migrate dev",
     "db:reset": "prisma migrate reset --force",
     "db:studio": "prisma studio",
-    "audit:db": "tsx scripts/audit-db-security.ts",
-    "catalog:verify": "tsx scripts/verify-catalog.ts",
+    "audit:db": "node --require ./scripts/tsx-windows-shim.cjs --import tsx scripts/audit-db-security.ts",
+    "security:demo-credentials": "node --require ./scripts/tsx-windows-shim.cjs --import tsx scripts/assert-no-demo-credentials.ts",
+    "security:revoke-demo-credentials": "node --require ./scripts/tsx-windows-shim.cjs --import tsx scripts/revoke-demo-credentials.ts",
+    "catalog:verify": "node --require ./scripts/tsx-windows-shim.cjs --import tsx scripts/verify-catalog.ts",
     "catalog:fetch": "node scripts/fetch-universities.mjs",
-    "catalog:import": "tsx scripts/import-catalog.ts",
-    "test:e2e": "node scripts/with-e2e-db.mjs playwright test",
-    "test:e2e:install": "playwright install chromium",
-    "pretest:e2e": "node scripts/with-e2e-db.mjs prisma migrate deploy && node scripts/with-e2e-db.mjs tsx prisma/seed.ts && cross-env NODE_ENV=production next build"
+    "catalog:import": "node --require ./scripts/tsx-windows-shim.cjs --import tsx scripts/import-catalog.ts",
+    "test:e2e": "node scripts/run-e2e.mjs",
+    "test:unit": "node --require ./scripts/tsx-windows-shim.cjs --import tsx --test tests/*.test.ts",
+    "test:e2e:install": "playwright install chromium"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"
@@ -26,9 +31,11 @@
   "dependencies": {
     "@prisma/client": "^6.2.1",
     "bcryptjs": "^2.4.3",
-    "next": "^15.5.22",
+    "nanoid": "3.3.18",
+    "next": "16.3.4",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
+    "sharp": "0.35.4",
     "zod": "^3.24.1"
   },
   "devDependencies": {
@@ -39,10 +46,18 @@
     "@types/react-dom": "^19.0.2",
     "autoprefixer": "^10.4.20",
     "cross-env": "^7.0.3",
-    "postcss": "^8.4.49",
+    "eslint": "^9.35.0",
+    "eslint-config-next": "^16.3.4",
+    "postcss": "8.5.23",
     "prisma": "^6.2.1",
     "tailwindcss": "^3.4.17",
     "tsx": "^4.19.2",
     "typescript": "^5.7.3"
+  },
+  "overrides": {
+    "deepmerge-ts": "8.0.2"
+  },
+  "engines": {
+    "node": ">=22.18 <26"
   }
 }

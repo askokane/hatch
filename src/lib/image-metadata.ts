@@ -22,13 +22,9 @@
 // removes the segments and chunks that carry provenance, which is the disclosure
 // problem actually at hand.
 //
-// Every parser below is bounds-checked and forward-only: a malformed file makes
-// it bail and return the input unchanged rather than loop, over-read, or emit a
-// corrupt image. Failing open on parse is deliberate — a file we cannot parse is
-// a file whose metadata we also cannot locate, and refusing all such uploads
-// would reject legitimate images to no benefit. The formats that actually carry
-// GPS (JPEG, PNG, WebP) all parse trivially; if one of them does not parse, it is
-// near-certainly not a real photo from a camera.
+// Every parser below is bounds-checked and forward-only. The legacy helper
+// preserves its input on a parse failure; upload routes use the strict wrapper
+// below and reject inputs that cannot be safely rewritten.
 
 const JPEG_APP1 = 0xe1; // EXIF and XMP both live here
 const JPEG_APP13 = 0xed; // Photoshop IRB, which carries IPTC
@@ -147,12 +143,12 @@ function stripWebp(buf: Buffer): Buffer | null {
 }
 
 /**
- * Returns `bytes` with provenance metadata removed, or the original buffer when
- * the format is not one that carries it or the file does not parse.
+ * Legacy best-effort metadata removal for already-stored content and isolated
+ * parser tests. Upload routes use `stripImageMetadataStrict` instead.
  *
- * GIF is intentionally passed through: it has no EXIF container, and cameras do
- * not produce GIFs — the comment/application extensions it does have are written
- * by encoders, not by a device that knows where it is.
+ * GIF is intentionally passed through here for backwards compatibility. New GIF
+ * uploads are refused by the strict path because their comment and application
+ * extensions are not safely rewritten by this parser.
  */
 // The `Buffer<ArrayBuffer>` annotations are load-bearing, not decoration: Prisma's
 // `Bytes` field wants exactly that, while `Buffer.concat` is typed as the looser
@@ -178,4 +174,20 @@ export function stripImageMetadata(
   if (!stripped || stripped.length === 0 || stripped.length > bytes.length) return bytes;
   // Copies once, and only on the path that already rebuilt the file anyway.
   return Buffer.from(stripped);
+}
+
+export function stripImageMetadataStrict(
+  bytes: Buffer<ArrayBuffer>,
+  mimeType: string
+): Buffer<ArrayBuffer> | null {
+  // GIF comment/application blocks are not safely rewritten by this parser.
+  // Refuse new GIF uploads instead of making a metadata-free promise we cannot keep.
+  if (mimeType === "image/gif") return null;
+  try {
+    const stripped = mimeType === "image/jpeg" ? stripJpeg(bytes)
+      : mimeType === "image/png" ? stripPng(bytes)
+      : mimeType === "image/webp" ? stripWebp(bytes)
+      : null;
+    return stripped && stripped.length > 0 && stripped.length <= bytes.length ? Buffer.from(stripped) : null;
+  } catch { return null; }
 }

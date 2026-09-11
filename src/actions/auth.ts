@@ -6,7 +6,6 @@ import { hashPassword, verifyPassword } from "@/lib/password";
 import {
   createSession,
   destroySession,
-  destroyAllSessionsForUser,
   requireSession,
 } from "@/lib/session";
 import { isAllowedRegistrationEmail, isEduOnlyMode } from "@/lib/edu-allowlist";
@@ -15,8 +14,10 @@ import { getClientIp } from "@/lib/request-meta";
 import {
   createPasswordResetToken,
   sendPasswordResetEmail,
-  consumePasswordResetToken,
+  revokePasswordResetToken,
 } from "@/lib/email-verify";
+import { safeLocalPath } from "@/lib/safe-path";
+import { consumeRateLimit } from "@/lib/rate-limit";
 import {
   signupSchema,
   loginSchema,
@@ -28,6 +29,7 @@ import {
 import { ok, fail, type ActionResult } from "@/lib/action-result";
 
 const GENERIC_LOGIN_ERROR = "Invalid email or password.";
+const DUMMY_PASSWORD_HASH = "$2a$12$bJ9W0bxYtLr3IMjzcrF7me6q9juS8qBgdiKj2iM2zVHOv7qkcRjDe";
 
 function firstError(parsed: { error: { issues: { message: string }[] } }): string {
   return parsed.error.issues[0]?.message ?? "Invalid input.";
@@ -45,6 +47,10 @@ export async function signupAction(
   if (!parsed.success) return fail(firstError(parsed));
 
   const { email, password } = parsed.data;
+  const ip = await getClientIp();
+  if (!(await consumeRateLimit("signup-ip", ip, 5, 60 * 60 * 1000))) {
+    return fail("Too many signup attempts. Please try again later.");
+  }
 
   if (!isAllowedRegistrationEmail(email)) {
     return fail(
@@ -60,14 +66,13 @@ export async function signupAction(
     return fail("An account with this email already exists.");
   }
 
-  // Accounts are live immediately — there is no verification step to complete.
-  // `emailVerifiedAt` is stamped now so the column stays meaningful as an audit
-  // trail and as the hook a real mail provider would later gate on.
+  // Accounts are live immediately. A null verification timestamp is honest:
+  // no mailbox challenge has occurred and this field must never imply otherwise.
   const user = await db.user.create({
     data: {
       email,
       passwordHash: await hashPassword(password),
-      emailVerifiedAt: new Date(),
+      emailVerifiedAt: null,
     },
   });
 
@@ -97,7 +102,7 @@ export async function loginAction(
   const user = await db.user.findUnique({ where: { email } });
   // Always compare against something to reduce timing signal; never reveal which
   // half failed.
-  const passwordOk = user ? await verifyPassword(password, user.passwordHash) : false;
+  const passwordOk = await verifyPassword(password, user?.passwordHash ?? DUMMY_PASSWORD_HASH);
 
   if (!user || !passwordOk) {
     await recordLoginAttempt({ email, ip, succeeded: false, userId: user?.id });
@@ -105,11 +110,10 @@ export async function loginAction(
   }
 
   await recordLoginAttempt({ email, ip, succeeded: true, userId: user.id });
-  await createSession(user.id);
+  await createSession(user.id, user.credentialVersion);
 
   const next = formData.get("next");
-  const safeNext =
-    typeof next === "string" && next.startsWith("/") && !next.startsWith("//") ? next : "/discover";
+  const safeNext = safeLocalPath(next);
   redirect(safeNext);
 }
 
@@ -129,10 +133,15 @@ export async function requestPasswordResetAction(
   if (!parsed.success) return fail(firstError(parsed));
 
   const { email } = parsed.data;
+  const ip = await getClientIp();
+  if (!(await consumeRateLimit("password-reset-ip", ip, 8, 60 * 60 * 1000))) return ok(undefined);
   const user = await db.user.findUnique({ where: { email } });
   if (user) {
     const token = await createPasswordResetToken(user.id);
-    sendPasswordResetEmail(email, token);
+    const delivered = await sendPasswordResetEmail(email, token).catch(() => false);
+    if (!delivered) {
+      await revokePasswordResetToken(token);
+    }
   }
   // Same response whether or not the account exists.
   return ok(undefined);
@@ -149,15 +158,22 @@ export async function resetPasswordAction(
   });
   if (!parsed.success) return fail(firstError(parsed));
 
-  const result = await consumePasswordResetToken(parsed.data.token);
-  if (!result) return fail("This reset link is invalid or has expired.");
-
-  await db.user.update({
-    where: { id: result.userId },
-    data: { passwordHash: await hashPassword(parsed.data.password) },
+  const passwordHash = await hashPassword(parsed.data.password);
+  const tokenHash = (await import("node:crypto")).createHash("sha256").update(parsed.data.token).digest("hex");
+  const changed = await db.$transaction(async (tx) => {
+    const row = await tx.passwordResetToken.findUnique({ where: { tokenHash }, select: { id: true, userId: true } });
+    if (!row) return false;
+    const claimed = await tx.passwordResetToken.updateMany({
+      where: { id: row.id, usedAt: null, expiresAt: { gt: new Date() } },
+      data: { usedAt: new Date() },
+    });
+    if (claimed.count !== 1) return false;
+    await tx.user.update({ where: { id: row.userId }, data: { passwordHash, credentialVersion: { increment: 1 } } });
+    await tx.session.deleteMany({ where: { userId: row.userId } });
+    await tx.passwordResetToken.deleteMany({ where: { userId: row.userId } });
+    return true;
   });
-  // Defense in depth: invalidate all existing sessions.
-  await destroyAllSessionsForUser(result.userId);
+  if (!changed) return fail("This reset link is invalid or has expired.");
   return ok(undefined);
 }
 
@@ -178,10 +194,13 @@ export async function changePasswordAction(
     return fail("Your current password is incorrect.");
   }
 
-  await db.user.update({
-    where: { id: session.userId },
-    data: { passwordHash: await hashPassword(parsed.data.newPassword) },
-  });
+  const passwordHash = await hashPassword(parsed.data.newPassword);
+  await db.$transaction([
+    db.user.update({ where: { id: session.userId }, data: { passwordHash, credentialVersion: { increment: 1 } } }),
+    db.session.deleteMany({ where: { userId: session.userId } }),
+    db.passwordResetToken.deleteMany({ where: { userId: session.userId } }),
+  ]);
+  await createSession(session.userId);
   return ok(undefined);
 }
 
@@ -201,7 +220,19 @@ export async function deleteAccountAction(
     return fail("Password is incorrect.");
   }
 
+  await db.$transaction(async (tx) => {
+    const profile = await tx.profile.findUnique({
+      where: { userId: session.userId },
+      select: { id: true, memberships: { where: { isOwner: true }, select: { projectId: true } } },
+    });
+    if (profile) {
+      for (const membership of profile.memberships) {
+        const owners = await tx.membership.count({ where: { projectId: membership.projectId, isOwner: true } });
+        if (owners === 1) await tx.project.delete({ where: { id: membership.projectId } });
+      }
+    }
+    await tx.user.delete({ where: { id: session.userId } });
+  });
   await destroySession();
-  await db.user.delete({ where: { id: session.userId } });
   redirect("/");
 }

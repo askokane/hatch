@@ -11,6 +11,7 @@ export default async function AdminReportsPage() {
   if (!session.isAdmin) redirect("/discover");
 
   const reports = await db.report.findMany({
+    take: 200,
     include: { reporter: { select: { handle: true, name: true } } },
     orderBy: { createdAt: "desc" },
   });

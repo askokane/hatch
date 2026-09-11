@@ -3,7 +3,10 @@ import { db } from "@/lib/db";
 import { AVATAR_BYTES_MAX } from "@/lib/constants";
 import { revalidateAvatarSurfaces } from "@/lib/avatar-surfaces";
 import { humanMB, mimeKind, safeFileName } from "@/lib/upload";
-import { stripImageMetadata } from "@/lib/image-metadata";
+import { stripImageMetadataStrict } from "@/lib/image-metadata";
+import { validateFileBytes } from "@/lib/file-signature";
+import { consumeRateLimit } from "@/lib/rate-limit";
+import { isTrustedMutationRequest } from "@/lib/request-security";
 
 // POST /api/avatar   (multipart/form-data, field: `file`)
 //
@@ -22,9 +25,13 @@ import { stripImageMetadata } from "@/lib/image-metadata";
 // Images only. Video is a valid post attachment and not a valid face.
 
 export async function POST(req: Request) {
+  if (!isTrustedMutationRequest(req, "multipart/form-data")) return Response.json({ error: "Untrusted request." }, { status: 403 });
   const session = await getSession();
   if (!session?.profileId) return Response.json({ error: "Unauthorized" }, { status: 401 });
   const profileId = session.profileId;
+  const declaredLength = Number(req.headers.get("content-length") ?? "0");
+  if (declaredLength > AVATAR_BYTES_MAX + 500_000) return Response.json({ error: "Upload body is too large." }, { status: 413 });
+  if (!(await consumeRateLimit("avatar-upload", profileId, 10, 60 * 60 * 1000))) return Response.json({ error: "Upload limit reached." }, { status: 429 });
 
   let form: FormData;
   try {
@@ -40,7 +47,7 @@ export async function POST(req: Request) {
 
   if (mimeKind(file.type) !== "IMAGE") {
     return Response.json(
-      { error: "A profile picture has to be an image — JPEG, PNG, GIF or WebP." },
+      { error: "A profile picture has to be an image — JPEG, PNG or WebP." },
       { status: 400 }
     );
   }
@@ -68,9 +75,12 @@ export async function POST(req: Request) {
   // phone photo carries the GPS coordinates of wherever it was taken. The client
   // already re-encodes through a canvas, which drops metadata as a side effect —
   // this is the half that cannot be skipped by posting here directly.
-  const bytes = stripImageMetadata(raw, file.type);
+  if (!validateFileBytes(raw, file.type)) return Response.json({ error: "The file contents are not a valid supported image." }, { status: 400 });
+  const bytes = stripImageMetadataStrict(raw, file.type);
+  if (!bytes) return Response.json({ error: "That image could not be safely processed." }, { status: 400 });
 
   const result = await db.$transaction(async (tx) => {
+    await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${`avatar:${profileId}`}))`;
     const profile = await tx.profile.findUnique({
       where: { id: profileId },
       select: { handle: true, avatarAssetId: true },

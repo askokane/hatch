@@ -15,24 +15,29 @@ export type { MessageDTO, ThreadPresence } from "@/lib/messages-core";
 
 export async function sendMessageAction(
   threadId: string,
-  body: string
+  body: string,
+  clientId: string
 ): Promise<ActionResult<MessageDTO>> {
   const session = await requireSession();
   const profileId = await requireProfile(session);
-  const res = await sendMessageCore(threadId, profileId, body);
+  const res = await sendMessageCore(threadId, profileId, body, clientId);
   if (res.ok) revalidatePath(`/messages/${threadId}`);
   return res;
 }
 
 // Mark a thread read up to now (own membership only). This is what turns the
 // other side's "delivered" into "seen".
-export async function markThreadReadAction(threadId: string): Promise<ActionResult> {
+export async function markThreadReadAction(threadId: string, messageId: string): Promise<ActionResult> {
   const session = await requireSession();
   const profileId = await requireProfile(session);
   await assertThreadMember(threadId, profileId);
-  await db.threadMember.update({
-    where: { threadId_profileId: { threadId, profileId } },
-    data: { lastReadAt: new Date() },
+  const message = await db.message.findFirst({ where: { id: messageId, threadId }, select: { id: true, createdAt: true } });
+  if (!message) return ok(undefined);
+  await db.$transaction(async (tx) => {
+    await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${`thread-read:${threadId}:${profileId}`}))`;
+    const member = await tx.threadMember.findUnique({ where: { threadId_profileId: { threadId, profileId } }, select: { lastReadAt: true, lastReadMessageId: true } });
+    if (!member || member.lastReadAt > message.createdAt || (member.lastReadAt.getTime() === message.createdAt.getTime() && member.lastReadMessageId && member.lastReadMessageId >= message.id)) return;
+    await tx.threadMember.update({ where: { threadId_profileId: { threadId, profileId } }, data: { lastReadAt: message.createdAt, lastReadMessageId: message.id } });
   });
   return ok(undefined);
 }

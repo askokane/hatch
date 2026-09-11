@@ -6,6 +6,7 @@ import { setTypingAction, type MessageDTO, type ThreadPresence } from "@/actions
 
 type Poll = { messages: MessageDTO[]; hasMore?: boolean } & Partial<ThreadPresence>;
 type HistoryPage = { messages: MessageDTO[]; hasMore: boolean };
+const cursorOf = (message: MessageDTO | undefined) => message ? `${message.createdAt}~${message.id}` : null;
 
 // Polls a thread every 3s for new messages AND the other participant's presence
 // (typing + read watermark). Pauses while the tab is hidden and catches up
@@ -26,9 +27,11 @@ export function useThreadPolling(
   const [presence, setPresence] = useState<ThreadPresence>(initialPresence);
   const [hasOlder, setHasOlder] = useState(initialHasOlder);
   const [loadingOlder, setLoadingOlder] = useState(false);
-  const cursorRef = useRef<string | null>(initial.at(-1)?.createdAt ?? null);
-  const oldestRef = useRef<string | null>(initial.at(0)?.createdAt ?? null);
+  const [connectionState, setConnectionState] = useState<"online" | "degraded" | "revoked">("online");
+  const cursorRef = useRef<string | null>(cursorOf(initial.at(-1)));
+  const oldestRef = useRef<string | null>(cursorOf(initial.at(0)));
   const visibleRef = useRef(true);
+  const failuresRef = useRef(0);
 
   // Typing presence (outbound). Every keystroke would mean a write per
   // character; instead a keystroke re-claims a multi-second window at most once
@@ -43,9 +46,8 @@ export function useThreadPolling(
       if (prev.some((m) => m.id === msg.id)) return prev;
       return [...prev, msg];
     });
-    if (!cursorRef.current || msg.createdAt > cursorRef.current) cursorRef.current = msg.createdAt;
     // First message in a previously empty thread also becomes the oldest one.
-    if (!oldestRef.current) oldestRef.current = msg.createdAt;
+    if (!oldestRef.current) oldestRef.current = cursorOf(msg);
     // Our own send clears our typing state server-side; mirror that locally so
     // the composer's throttle does not suppress the next genuine keystroke.
     lastTypingPingRef.current = 0;
@@ -60,9 +62,10 @@ export function useThreadPolling(
     try {
       const res = await fetch(
         `/api/threads/${threadId}/messages?before=${encodeURIComponent(cursor)}`,
-        { cache: "no-store" }
+        { cache: "no-store", signal: AbortSignal.timeout(10_000) }
       );
-      if (!res.ok) return;
+      if (!res.ok) { setConnectionState(res.status === 401 || res.status === 403 ? "revoked" : "degraded"); return; }
+      setConnectionState("online");
       const data = (await res.json()) as HistoryPage;
       if (data.messages.length > 0) {
         setMessages((prev) => {
@@ -70,10 +73,11 @@ export function useThreadPolling(
           const older = data.messages.filter((m) => !seen.has(m.id));
           return older.length ? [...older, ...prev] : prev;
         });
-        oldestRef.current = data.messages[0].createdAt;
+        oldestRef.current = cursorOf(data.messages[0]);
       }
       setHasOlder(data.hasMore);
     } catch {
+      setConnectionState("degraded");
       // leave the control in place; the reader can retry
     } finally {
       setLoadingOlder(false);
@@ -117,10 +121,8 @@ export function useThreadPolling(
       } finally {
         running = false;
         const elapsed = Date.now() - started;
-        const delay = Math.min(
-          POLL_INTERVAL_MS,
-          Math.max(MIN_POLL_GAP_MS, POLL_INTERVAL_MS - elapsed)
-        );
+        const target = Math.min(60_000, POLL_INTERVAL_MS * 2 ** Math.min(failuresRef.current, 4));
+        const delay = Math.max(MIN_POLL_GAP_MS, target - elapsed);
         if (!stopped && visibleRef.current) {
           clearTimer();
           timer = setTimeout(() => {
@@ -150,8 +152,10 @@ export function useThreadPolling(
       try {
         const cold = !cursorRef.current;
         const qs = cold ? "" : `?after=${encodeURIComponent(cursorRef.current!)}`;
-        const res = await fetch(`/api/threads/${threadId}/messages${qs}`, { cache: "no-store" });
-        if (!res.ok) return;
+        const res = await fetch(`/api/threads/${threadId}/messages${qs}`, { cache: "no-store", signal: AbortSignal.timeout(10_000) });
+        if (!res.ok) { failuresRef.current++; setConnectionState(res.status === 401 || res.status === 403 ? "revoked" : "degraded"); if (res.status === 401 || res.status === 403) stopped = true; return; }
+        failuresRef.current = 0;
+        setConnectionState("online");
         const data = (await res.json()) as Poll;
         if (data.messages.length > 0) {
           setMessages((prev) => {
@@ -159,20 +163,22 @@ export function useThreadPolling(
             const fresh = data.messages.filter((m) => !seen.has(m.id));
             return fresh.length ? [...prev, ...fresh] : prev;
           });
-          cursorRef.current = data.messages.at(-1)!.createdAt;
+          cursorRef.current = cursorOf(data.messages.at(-1));
           // A cold read returns a page, not a delta, so it also establishes the
           // backwards cursor and whether anything sits behind it.
           if (cold) {
-            oldestRef.current = data.messages[0].createdAt;
+            oldestRef.current = cursorOf(data.messages[0]);
             setHasOlder(!!data.hasMore);
           }
         }
         setPresence({
           otherTyping: data.otherTyping ?? false,
           otherLastReadAt: data.otherLastReadAt ?? null,
+          otherLastReadMessageId: data.otherLastReadMessageId ?? null,
         });
       } catch {
-        // transient error; try again next tick
+        failuresRef.current++;
+        setConnectionState("degraded");
       }
     }
 
@@ -215,5 +221,5 @@ export function useThreadPolling(
     };
   }, [threadId]);
 
-  return { messages, presence, append, reportTyping, loadOlder, hasOlder, loadingOlder };
+  return { messages, presence, append, reportTyping, loadOlder, hasOlder, loadingOlder, connectionState };
 }

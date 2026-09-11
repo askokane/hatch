@@ -6,7 +6,8 @@ export const commitmentSchema = z.enum(["LIGHT", "STEADY", "HEAVY"]);
 
 const linkSchema = z.object({
   label: z.string().trim().min(1).max(40),
-  url: z.string().trim().url("Enter a valid URL (including https://)."),
+  url: z.string().trim().max(2048).url("Enter a valid URL (including https://).")
+    .refine((value) => /^https?:\/\//i.test(value), "Links must use http:// or https://."),
 });
 
 export const createProjectSchema = z.object({
@@ -15,7 +16,8 @@ export const createProjectSchema = z.object({
   stage: projectStageSchema,
   visibility: projectVisibilitySchema.optional().default("PUBLIC"),
   links: z.array(linkSchema).max(6).optional().default([]),
-  tagIds: z.array(z.string()).min(1, "Add at least one tag.").max(10),
+  tagIds: z.array(z.string()).min(1, "Add at least one tag.").max(10)
+    .refine((values) => new Set(values).size === values.length, "Choose each tag once."),
 });
 
 export const updateProjectSchema = createProjectSchema;
@@ -28,7 +30,8 @@ export const openRoleSchema = z.object({
   title: z.string().trim().min(2, "Enter a role title.").max(80),
   description: z.string().trim().min(10, "Describe the role (10+ characters).").max(1000),
   commitment: commitmentSchema,
-  tagIds: z.array(z.string()).min(1, "Add at least one required tag.").max(8),
+  tagIds: z.array(z.string()).min(1, "Add at least one required tag.").max(8)
+    .refine((values) => new Set(values).size === values.length, "Choose each tag once."),
 });
 
 export const inviteMemberSchema = z.object({

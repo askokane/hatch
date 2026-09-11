@@ -24,24 +24,35 @@ function appUrl(): string {
 
 export async function createPasswordResetToken(userId: string): Promise<string> {
   const token = crypto.randomBytes(32).toString("base64url");
-  await db.passwordResetToken.create({
-    data: { userId, tokenHash: hashToken(token), expiresAt: new Date(Date.now() + RESET_TTL_MS) },
-  });
+  await db.$transaction([
+    db.passwordResetToken.deleteMany({ where: { userId, usedAt: null } }),
+    db.passwordResetToken.create({ data: { userId, tokenHash: hashToken(token), expiresAt: new Date(Date.now() + RESET_TTL_MS) } }),
+  ]);
   return token;
 }
 
-export async function consumePasswordResetToken(
-  rawToken: string
-): Promise<{ userId: string } | null> {
-  const row = await db.passwordResetToken.findUnique({
-    where: { tokenHash: hashToken(rawToken) },
-  });
-  if (!row || row.usedAt || row.expiresAt < new Date()) return null;
-  await db.passwordResetToken.update({ where: { id: row.id }, data: { usedAt: new Date() } });
-  return { userId: row.userId };
+export async function revokePasswordResetToken(rawToken: string): Promise<void> {
+  await db.passwordResetToken.deleteMany({ where: { tokenHash: hashToken(rawToken) } });
 }
 
-export function sendPasswordResetEmail(email: string, rawToken: string): void {
+export async function sendPasswordResetEmail(email: string, rawToken: string): Promise<boolean> {
   const link = `${appUrl()}/reset-password/${rawToken}`;
-  console.log(`\n[HATCH:dev-mail] Reset password for ${email}:\n  ${link}\n`);
+  if (process.env.NODE_ENV !== "production") {
+    console.log(`\n[HATCH:dev-mail] Reset password for ${email}:\n  ${link}\n`);
+    return true;
+  }
+  const endpoint = process.env.PASSWORD_RESET_WEBHOOK_URL;
+  if (!endpoint) return false;
+  const response = await fetch(endpoint, {
+    method: "POST",
+    headers: {
+      "content-type": "application/json",
+      ...(process.env.PASSWORD_RESET_WEBHOOK_SECRET
+        ? { authorization: `Bearer ${process.env.PASSWORD_RESET_WEBHOOK_SECRET}` }
+        : {}),
+    },
+    body: JSON.stringify({ template: "password-reset", to: email, link }),
+    signal: AbortSignal.timeout(10_000),
+  });
+  return response.ok;
 }

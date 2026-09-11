@@ -12,6 +12,7 @@ import {
 } from "@/lib/mention-core";
 import { POST_MENTION_MAX } from "@/lib/constants";
 import { ok, fail, type ActionResult } from "@/lib/action-result";
+import { consumeRateLimit } from "@/lib/rate-limit";
 
 // Thrown inside the create transaction when an asset fails the ownership guard at
 // the moment of attachment, so the whole post rolls back rather than being written
@@ -38,13 +39,15 @@ function revalidateAuthorSurfaces(handle: string) {
 export async function createPostAction(input: {
   body: string;
   mediaIds: string[];
+  draftId?: string;
 }): Promise<ActionResult<{ postId: string }>> {
   const session = await requireSession();
   const profileId = await requireProfile(session);
+  if (!(await consumeRateLimit("post", profileId, 60, 60 * 60 * 1000))) return fail("Posting limit reached. Try again later.");
 
   const parsed = createPostSchema.safeParse(input);
   if (!parsed.success) return fail(parsed.error.issues[0]?.message ?? "Write something to post.");
-  const { body, mediaIds } = parsed.data;
+  const { body, mediaIds, draftId } = parsed.data;
 
   // A duplicated id would otherwise consume one asset and then fail the guard on
   // its second occurrence, reporting "no longer available" for something that was
@@ -96,7 +99,7 @@ export async function createPostAction(input: {
       // "an avatar is never a post attachment" total rather than half-held.
       for (const [position, id] of mediaIds.entries()) {
         const claimed = await tx.mediaAsset.updateMany({
-          where: { id, ownerProfileId: profileId, postId: null, isAvatar: false },
+          where: { id, ownerProfileId: profileId, postId: null, isAvatar: false, ...(draftId ? { draftId } : {}) },
           data: { postId: post.id, position },
         });
         if (claimed.count !== 1) throw new MediaUnavailableError();
@@ -124,9 +127,7 @@ export async function createPostAction(input: {
       // set in the INSERT that creates it, so this is not a race with an upload
       // in flight: the row is either an avatar from the moment it exists, or it
       // never becomes one.
-      await tx.mediaAsset.deleteMany({
-        where: { ownerProfileId: profileId, postId: null, isAvatar: false },
-      });
+      if (draftId) await tx.mediaAsset.deleteMany({ where: { ownerProfileId: profileId, draftId, postId: null, isAvatar: false } });
 
       return post.id;
     });

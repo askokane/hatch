@@ -32,7 +32,7 @@ export async function getProfileCompleteness(profileId: string): Promise<Complet
       bio: true,
       onboardedAt: true,
       tags: { select: { relation: true } },
-      _count: { select: { intents: true } },
+      intents: { where: { archivedAt: null }, select: { id: true } },
     },
   });
 
@@ -42,7 +42,7 @@ export async function getProfileCompleteness(profileId: string): Promise<Complet
     if (t.relation === "HAS") skillCount++;
     else if (t.relation === "LEARNING") learningCount++;
   }
-  const intentCount = profile?._count.intents ?? 0;
+  const intentCount = profile?.intents.length ?? 0;
 
   const checks = [
     !!profile?.name,

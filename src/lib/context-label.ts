@@ -22,7 +22,7 @@ export async function resolveContextLabel(
   }
   // INTENT
   const intent = await db.intent.findUnique({ where: { id: contextId }, select: { kind: true } });
-  return intent ? `Intent: ${intent.kind}` : "Intent";
+    return intent ? `Intent: ${intent.kind}` : "Intent unavailable";
 }
 
 export type ContextRef = { contextType: string; contextId: string };
@@ -83,7 +83,7 @@ export async function resolveContextLabels(
     if (!out.has(k)) {
       out.set(
         k,
-        r.contextType === "ROLE" ? "Role" : r.contextType === "PROJECT" ? "Project" : "Intent"
+        r.contextType === "ROLE" ? "Role unavailable" : r.contextType === "PROJECT" ? "Project unavailable" : "Intent unavailable"
       );
     }
   }

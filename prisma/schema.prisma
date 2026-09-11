@@ -91,9 +91,8 @@ enum ShareKind {
   PROJECT
 }
 
-// Accounts are usable the moment they are created. `emailVerifiedAt` is stamped
-// at signup and kept as an audit field / hook for a future real mail provider —
-// nothing gates on it, so there is no on-platform verification step.
+// Accounts are usable immediately, but emailVerifiedAt remains null until a real
+// mailbox challenge succeeds. Nothing currently gates on it.
 model User {
   id              String               @id @default(cuid())
   email           String               @unique
@@ -101,6 +100,7 @@ model User {
   emailVerifiedAt DateTime?
   isAdmin         Boolean              @default(false)
   createdAt       DateTime             @default(now())
+  credentialVersion Int                @default(0)
   sessions        Session[]
   profile         Profile?
   passwordResets  PasswordResetToken[]
@@ -115,6 +115,7 @@ model Session {
   tokenHash String   @unique
   expiresAt DateTime
   createdAt DateTime @default(now())
+  credentialVersion Int @default(0)
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
@@ -131,6 +132,17 @@ model PasswordResetToken {
   user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
+  @@index([expiresAt])
+}
+
+model ActionAttempt {
+  id        String   @id @default(cuid())
+  bucket    String
+  subject   String
+  createdAt DateTime @default(now())
+
+  @@index([bucket, subject, createdAt])
+  @@index([createdAt])
 }
 
 // DB-backed rate limiter store. Chosen over an in-memory Map so the limit
@@ -271,6 +283,7 @@ model Intent {
   kind      IntentKind
   note      String     @default("")
   createdAt DateTime   @default(now())
+  archivedAt DateTime?
   profile   Profile    @relation(fields: [profileId], references: [id], onDelete: Cascade)
 
   @@unique([profileId, kind])
@@ -285,11 +298,11 @@ model Project {
   stage       ProjectStage
   visibility  ProjectVisibility @default(PUBLIC)
   links       Json              @default("[]")
-  createdById String
+  createdById String?
   createdAt   DateTime          @default(now())
   updatedAt   DateTime          @updatedAt
   closedAt    DateTime?
-  createdBy   Profile           @relation("ProjectCreator", fields: [createdById], references: [id])
+  createdBy   Profile?          @relation("ProjectCreator", fields: [createdById], references: [id], onDelete: SetNull)
   tags        ProjectTag[]
   memberships Membership[]
   updates     Update[]
@@ -332,6 +345,7 @@ model Membership {
   // messages, they simply were not there. The backfill in the migration sets
   // existing rows to their own joinedAt for the same reason.
   chatLastReadAt  DateTime  @default(now())
+  chatLastReadMessageId String?
   // Typing presence for the group chat, same expiry-not-boolean design as
   // ThreadMember.typingUntil: a member who closes the tab mid-word self-heals
   // when the claim lapses, so there is no stuck "typing…" to clean up.
@@ -393,12 +407,14 @@ model IntroRequest {
   status        RequestStatus @default(PENDING)
   createdAt     DateTime      @default(now())
   respondedAt   DateTime?
+  pairKey       String
   fromProfile   Profile       @relation("RequestSender", fields: [fromProfileId], references: [id], onDelete: Cascade)
   toProfile     Profile       @relation("RequestRecipient", fields: [toProfileId], references: [id], onDelete: Cascade)
   thread        Thread?
 
   @@index([toProfileId, status])
   @@index([fromProfileId, status])
+  @@index([pairKey, status])
 }
 
 model Thread {
@@ -418,6 +434,7 @@ model ThreadMember {
   // Read receipts: every message in the thread authored by the OTHER member and
   // created at or before this instant has been seen by this member.
   lastReadAt  DateTime  @default(now())
+  lastReadMessageId String?
   // Typing presence. Set a few seconds into the future while this member types;
   // any reader treats `typingUntil > now()` as "currently typing". Storing an
   // expiry rather than a boolean means a disconnected client self-heals — there
@@ -440,6 +457,7 @@ model Message {
   // "empty is legal only with an attachment" rule.
   body            String
   createdAt       DateTime   @default(now())
+  clientId        String?
   // --- Share attachment (all three set together, or all three null) ---
   // A profile or project passed into this thread from its own page, rendered as
   // a card instead of a link. See lib/share-core.ts.
@@ -465,6 +483,7 @@ model Message {
   // alone, with no heap lookup per counted row. Kept as one index rather than two
   // so sending a message still only maintains one.
   @@index([threadId, createdAt, authorProfileId])
+  @@unique([threadId, authorProfileId, clientId])
 }
 
 // A project's group chat. One per project, and every member of the project is in
@@ -522,6 +541,7 @@ model ProjectChatMessage {
   authorProfileId String
   body            String
   createdAt       DateTime    @default(now())
+  clientId        String?
   chat            ProjectChat @relation(fields: [chatId], references: [id], onDelete: Cascade)
   author          Profile     @relation(fields: [authorProfileId], references: [id], onDelete: Cascade)
 
@@ -531,6 +551,8 @@ model ProjectChatMessage {
   // from the index without a heap lookup per row. One index rather than two, so
   // sending a message maintains only one.
   @@index([chatId, createdAt, authorProfileId])
+  @@index([chatId, authorProfileId, createdAt])
+  @@unique([chatId, authorProfileId, clientId])
 }
 
 // A profile post — the feed's first-party content type, alongside the project
@@ -600,6 +622,7 @@ model MediaAsset {
   id             String    @id @default(cuid())
   ownerProfileId String
   postId         String?
+  draftId        String?
   // Lifecycle discriminator, NOT a duplicate of Profile.avatarAssetId. A profile
   // picture is an asset that legitimately has no post and never will, which is
   // indistinguishable from composer litter by `postId: null` alone — it would be
@@ -626,6 +649,8 @@ model MediaAsset {
   @@index([postId])
   // Serves the pending-upload quota check (postId null for one owner).
   @@index([ownerProfileId, postId])
+  @@index([ownerProfileId, draftId, postId])
+  @@index([createdAt])
 }
 
 model Block {
@@ -651,4 +676,5 @@ model Report {
   reporter          Profile     @relation(fields: [reporterProfileId], references: [id], onDelete: Cascade)
 
   @@index([subjectType, subjectId])
+  @@index([reporterProfileId, createdAt])
 }

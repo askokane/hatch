@@ -193,7 +193,7 @@ export const AVATAR_BYTES_MAX = 1024 * 1024; // 1 MB
 // MIME allowlist. An allowlist rather than a blocklist, and the served
 // Content-Type is echoed from this list rather than from the upload, so a file
 // cannot be stored as one type and served as another (e.g. text/html).
-export const ALLOWED_IMAGE_MIME = ["image/jpeg", "image/png", "image/gif", "image/webp"] as const;
+export const ALLOWED_IMAGE_MIME = ["image/jpeg", "image/png", "image/webp"] as const;
 export const ALLOWED_VIDEO_MIME = ["video/mp4", "video/webm", "video/quicktime"] as const;
 
 // Uploads sit unattached between "file chosen" and "post created". This caps how

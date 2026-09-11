@@ -7,7 +7,7 @@ export async function loadProfileByHandle(handle: string): Promise<ProfileViewDa
     where: { handle },
     include: {
       tags: { include: { tag: { select: { id: true, label: true } } } },
-      intents: true,
+      intents: { where: { archivedAt: null } },
     },
   });
   if (!profile) return null;
@@ -19,7 +19,7 @@ export async function loadProfileById(profileId: string): Promise<ProfileViewDat
     where: { id: profileId },
     include: {
       tags: { include: { tag: { select: { id: true, label: true } } } },
-      intents: true,
+      intents: { where: { archivedAt: null } },
     },
   });
   if (!profile) return null;

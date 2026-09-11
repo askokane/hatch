@@ -26,11 +26,12 @@ export async function listShareTargetsAction(): Promise<ActionResult<ShareTarget
 export async function shareToThreadAction(
   threadId: string,
   kind: ShareKind,
-  targetId: string
+  targetId: string,
+  clientId: string
 ): Promise<ActionResult<MessageDTO>> {
   const session = await requireSession();
   const profileId = await requireProfile(session);
-  const res = await shareToThreadCore(threadId, profileId, { kind, targetId });
+  const res = await shareToThreadCore(threadId, profileId, { kind, targetId }, clientId);
   // The sender is usually not looking at the thread they just shared into — they
   // are on a profile or a project page. Revalidating anyway means the transcript
   // is already correct when they do open it, rather than one poll behind.

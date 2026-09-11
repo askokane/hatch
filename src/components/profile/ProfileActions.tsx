@@ -13,7 +13,7 @@ import { BlockButton } from "@/components/safety/BlockButton";
 import { UnblockButton } from "@/components/safety/UnblockButton";
 import { ReportDialog } from "@/components/safety/ReportDialog";
 import { ShareButton } from "@/components/share/ShareButton";
-import type { Relationship } from "@/lib/relationship";
+import type { ClientRelationship } from "@/lib/relationship";
 
 export type IntroContextOption = { id: string; label: string };
 
@@ -28,7 +28,7 @@ export function ProfileActions({
   targetName: string;
   targetHandle: string;
   contexts: { roles: IntroContextOption[]; projects: IntroContextOption[]; intents: IntroContextOption[] };
-  relationship: Relationship;
+  relationship: ClientRelationship;
 }) {
   const [introOpen, setIntroOpen] = useState(false);
   const hasContext =

@@ -34,6 +34,19 @@ export type Relationship = {
   canRequestIntro: boolean;
 };
 
+export type ClientRelationship = Omit<Relationship, "theyBlockedViewer">;
+
+export function toClientRelationship(value: Relationship): ClientRelationship {
+  return {
+    targetProfileId: value.targetProfileId,
+    self: value.self,
+    connection: value.connection,
+    threadId: value.threadId,
+    viewerBlockedThem: value.viewerBlockedThem,
+    canRequestIntro: value.canRequestIntro,
+  };
+}
+
 /**
  * A relationship with nobody in particular: no connection and — importantly —
  * no intro affordance. Used where the counterpart cannot be resolved at all
@@ -72,10 +85,11 @@ export async function getRelationships(
   const others = targets.filter((id) => id !== viewerProfileId);
   if (others.length === 0) return out;
 
-  const [myThreadMemberships, pendingRequests, blocks] = await Promise.all([
+  const [sharedMemberships, pendingRequests, blocks] = await Promise.all([
     db.threadMember.findMany({
-      where: { profileId: viewerProfileId },
-      select: { threadId: true },
+      where: { profileId: viewerProfileId, thread: { members: { some: { profileId: { in: others } } } } },
+      select: { thread: { select: { id: true, members: { where: { profileId: { in: others } }, select: { profileId: true } } } } },
+      take: others.length,
     }),
     db.introRequest.findMany({
       where: {
@@ -98,20 +112,13 @@ export async function getRelationships(
     }),
   ]);
 
-  // A thread connects the pair only if BOTH are members of it.
-  const myThreadIds = myThreadMemberships.map((m) => m.threadId);
-  const sharedThreads = myThreadIds.length
-    ? await db.threadMember.findMany({
-        where: { threadId: { in: myThreadIds }, profileId: { in: others } },
-        select: { threadId: true, profileId: true },
-      })
-    : [];
-
-  for (const t of sharedThreads) {
-    const rel = out.get(t.profileId);
-    if (!rel) continue;
-    rel.connection = "CONNECTED";
-    rel.threadId = t.threadId;
+  for (const membership of sharedMemberships) {
+    for (const member of membership.thread.members) {
+      const rel = out.get(member.profileId);
+      if (!rel) continue;
+      rel.connection = "CONNECTED";
+      rel.threadId = membership.thread.id;
+    }
   }
 
   for (const r of pendingRequests) {

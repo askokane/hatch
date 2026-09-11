@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { Modal } from "@/components/ui/Modal";
 import { Avatar } from "@/components/ui/Avatar";
@@ -34,6 +34,7 @@ export function ShareDialog({
   targetLabel: string;
   onClose: () => void;
 }) {
+  const clientIds = useRef<Record<string, string>>({});
   const { notify } = useToast();
   const [targets, setTargets] = useState<ShareTarget[] | null>(null);
   const [query, setQuery] = useState("");
@@ -66,7 +67,8 @@ export function ShareDialog({
   async function send(target: ShareTarget) {
     if (states[target.threadId]) return;
     setStates((s) => ({ ...s, [target.threadId]: "sending" }));
-    const res = await shareToThreadAction(target.threadId, kind, targetId);
+    clientIds.current[target.threadId] ??= crypto.randomUUID();
+    const res = await shareToThreadAction(target.threadId, kind, targetId, clientIds.current[target.threadId]);
     if (res.ok) {
       setStates((s) => ({ ...s, [target.threadId]: "sent" }));
     } else {

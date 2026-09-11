@@ -61,6 +61,7 @@ export default async function ProjectChatPage({
   const [team, newestFirst] = await Promise.all([
     db.membership.findMany({
       where: { projectId: project.id },
+      take: 100,
       orderBy: { isOwner: "desc" },
       select: {
         isOwner: true,
@@ -72,7 +73,7 @@ export default async function ProjectChatPage({
     }),
     db.projectChatMessage.findMany({
       where: { chatId: ctx.chatId, ...visible },
-      orderBy: { createdAt: "desc" },
+      orderBy: [{ createdAt: "desc" }, { id: "desc" }],
       take: MESSAGE_PAGE_SIZE + 1,
       select: PROJECT_CHAT_MESSAGE_SELECT,
     }),

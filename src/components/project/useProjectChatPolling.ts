@@ -10,6 +10,7 @@ import {
 
 type Poll = { messages: ProjectChatMessageDTO[]; hasMore?: boolean } & Partial<ProjectChatPresence>;
 type HistoryPage = { messages: ProjectChatMessageDTO[]; hasMore: boolean };
+const cursorOf = (message: ProjectChatMessageDTO | undefined) => message ? `${message.createdAt}~${message.id}` : null;
 
 // Polls a project group chat every 3s for new messages and team presence (who is
 // typing, how many people have read your newest message). Pauses while the tab is
@@ -34,9 +35,11 @@ export function useProjectChatPolling(
   const [presence, setPresence] = useState<ProjectChatPresence>(initialPresence);
   const [hasOlder, setHasOlder] = useState(initialHasOlder);
   const [loadingOlder, setLoadingOlder] = useState(false);
-  const cursorRef = useRef<string | null>(initial.at(-1)?.createdAt ?? null);
-  const oldestRef = useRef<string | null>(initial.at(0)?.createdAt ?? null);
+  const [connectionState, setConnectionState] = useState<"online" | "degraded" | "revoked">("online");
+  const cursorRef = useRef<string | null>(cursorOf(initial.at(-1)));
+  const oldestRef = useRef<string | null>(cursorOf(initial.at(0)));
   const visibleRef = useRef(true);
+  const failuresRef = useRef(0);
 
   const lastTypingPingRef = useRef(0);
   const typingActiveRef = useRef(false);
@@ -48,9 +51,8 @@ export function useProjectChatPolling(
       if (prev.some((m) => m.id === msg.id)) return prev;
       return [...prev, msg];
     });
-    if (!cursorRef.current || msg.createdAt > cursorRef.current) cursorRef.current = msg.createdAt;
     // First message in a previously empty chat also becomes the oldest one.
-    if (!oldestRef.current) oldestRef.current = msg.createdAt;
+    if (!oldestRef.current) oldestRef.current = cursorOf(msg);
     // Our own send clears our typing state server-side; mirror that locally so
     // the composer's throttle does not suppress the next genuine keystroke.
     lastTypingPingRef.current = 0;
@@ -65,9 +67,10 @@ export function useProjectChatPolling(
     try {
       const res = await fetch(
         `/api/project-chats/${chatId}/messages?before=${encodeURIComponent(cursor)}`,
-        { cache: "no-store" }
+        { cache: "no-store", signal: AbortSignal.timeout(10_000) }
       );
-      if (!res.ok) return;
+      if (!res.ok) { setConnectionState(res.status === 401 || res.status === 403 ? "revoked" : "degraded"); return; }
+      setConnectionState("online");
       const data = (await res.json()) as HistoryPage;
       if (data.messages.length > 0) {
         setMessages((prev) => {
@@ -75,10 +78,11 @@ export function useProjectChatPolling(
           const older = data.messages.filter((m) => !seen.has(m.id));
           return older.length ? [...older, ...prev] : prev;
         });
-        oldestRef.current = data.messages[0].createdAt;
+        oldestRef.current = cursorOf(data.messages[0]);
       }
       setHasOlder(data.hasMore);
     } catch {
+      setConnectionState("degraded");
       // leave the control in place; the reader can retry
     } finally {
       setLoadingOlder(false);
@@ -106,10 +110,8 @@ export function useProjectChatPolling(
       } finally {
         running = false;
         const elapsed = Date.now() - started;
-        const delay = Math.min(
-          POLL_INTERVAL_MS,
-          Math.max(MIN_POLL_GAP_MS, POLL_INTERVAL_MS - elapsed)
-        );
+        const target = Math.min(60_000, POLL_INTERVAL_MS * 2 ** Math.min(failuresRef.current, 4));
+        const delay = Math.max(MIN_POLL_GAP_MS, target - elapsed);
         if (!stopped && visibleRef.current) {
           clearTimer();
           timer = setTimeout(() => {
@@ -141,8 +143,11 @@ export function useProjectChatPolling(
         const qs = cold ? "" : `?after=${encodeURIComponent(cursorRef.current!)}`;
         const res = await fetch(`/api/project-chats/${chatId}/messages${qs}`, {
           cache: "no-store",
+          signal: AbortSignal.timeout(10_000),
         });
-        if (!res.ok) return;
+        if (!res.ok) { failuresRef.current++; setConnectionState(res.status === 401 || res.status === 403 ? "revoked" : "degraded"); if (res.status === 401 || res.status === 403) stopped = true; return; }
+        failuresRef.current = 0;
+        setConnectionState("online");
         const data = (await res.json()) as Poll;
         if (data.messages.length > 0) {
           setMessages((prev) => {
@@ -150,11 +155,11 @@ export function useProjectChatPolling(
             const fresh = data.messages.filter((m) => !seen.has(m.id));
             return fresh.length ? [...prev, ...fresh] : prev;
           });
-          cursorRef.current = data.messages.at(-1)!.createdAt;
+          cursorRef.current = cursorOf(data.messages.at(-1));
           // A cold read returns a page, not a delta, so it also establishes the
           // backwards cursor and whether anything sits behind it.
           if (cold) {
-            oldestRef.current = data.messages[0].createdAt;
+            oldestRef.current = cursorOf(data.messages[0]);
             setHasOlder(!!data.hasMore);
           }
         }
@@ -164,7 +169,8 @@ export function useProjectChatPolling(
           otherMemberCount: data.otherMemberCount ?? 0,
         });
       } catch {
-        // transient error; try again next tick
+        failuresRef.current++;
+        setConnectionState("degraded");
       }
     }
 
@@ -207,5 +213,5 @@ export function useProjectChatPolling(
     };
   }, [chatId]);
 
-  return { messages, presence, append, reportTyping, loadOlder, hasOlder, loadingOlder };
+  return { messages, presence, append, reportTyping, loadOlder, hasOlder, loadingOlder, connectionState };
 }

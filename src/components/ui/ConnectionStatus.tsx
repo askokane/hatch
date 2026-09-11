@@ -1,5 +1,5 @@
 import Link from "next/link";
-import type { Relationship } from "@/lib/relationship";
+import type { ClientRelationship } from "@/lib/relationship";
 
 // Compact, read-only rendering of where the viewer stands with someone, for use
 // on cards in feeds. Renders nothing when there is no relationship yet, so an
@@ -7,7 +7,7 @@ import type { Relationship } from "@/lib/relationship";
 //
 // It never renders `theyBlockedViewer` — that direction of a block is not
 // disclosable. See lib/relationship.ts.
-export function ConnectionStatus({ relationship }: { relationship: Relationship }) {
+export function ConnectionStatus({ relationship }: { relationship: ClientRelationship }) {
   if (relationship.self) return null;
 
   if (relationship.viewerBlockedThem) {

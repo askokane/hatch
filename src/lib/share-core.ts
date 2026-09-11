@@ -74,6 +74,7 @@ async function buildProfileSnapshot(
   const skills = profile.tags.map((t) => t.tag.label);
   return {
     kind: "PROFILE",
+    targetId: profile.id,
     handle: profile.handle,
     name: profile.name,
     // Grad year in the two-digit apostrophe form everyone on the platform already
@@ -97,6 +98,7 @@ async function buildProjectSnapshot(targetId: string): Promise<ShareSnapshot | n
   const project = await db.project.findUnique({
     where: { id: targetId },
     select: {
+      id: true,
       slug: true,
       name: true,
       description: true,
@@ -114,6 +116,7 @@ async function buildProjectSnapshot(targetId: string): Promise<ShareSnapshot | n
   const owner = project.memberships[0]?.profile.name;
   return {
     kind: "PROJECT",
+    targetId: project.id,
     slug: project.slug,
     name: project.name,
     subtitle: owner ? `${STAGE_LABELS[project.stage]} · by ${owner}` : STAGE_LABELS[project.stage],
@@ -131,7 +134,8 @@ async function buildProjectSnapshot(targetId: string): Promise<ShareSnapshot | n
 export async function shareToThreadCore(
   threadId: string,
   profileId: string,
-  input: { kind: string; targetId: string }
+  input: { kind: string; targetId: string },
+  clientId: string
 ): Promise<ActionResult<MessageDTO>> {
   const parsed = shareInputSchema.safeParse(input);
   if (!parsed.success) return fail("That can't be shared.");
@@ -155,19 +159,26 @@ export async function shareToThreadCore(
     );
   }
 
-  const message = await db.message.create({
-    data: {
+  if (!/^[0-9a-f-]{36}$/i.test(clientId)) return fail("Invalid message identifier.");
+  let message = await db.message.findUnique({ where: { threadId_authorProfileId_clientId: { threadId, authorProfileId: profileId, clientId } }, select: MESSAGE_DTO_SELECT });
+  if (!message) {
+    try { message = await db.message.create({ data: {
       threadId,
       authorProfileId: profileId,
+      clientId,
       body: "",
       shareKind: parsed.data.kind,
       shareTargetId: parsed.data.targetId,
       shareSnapshot: snapshot,
     },
-    select: MESSAGE_DTO_SELECT,
-  });
+    select: MESSAGE_DTO_SELECT }); }
+    catch {
+      message = await db.message.findUnique({ where: { threadId_authorProfileId_clientId: { threadId, authorProfileId: profileId, clientId } }, select: MESSAGE_DTO_SELECT });
+      if (!message) throw new Error("Share could not be stored");
+    }
+  }
 
-  await clearTypingAfterSend(threadId, profileId);
+  await clearTypingAfterSend(threadId, profileId).catch(() => {});
   return ok(toMessageDTO(message));
 }
 

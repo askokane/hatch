@@ -42,7 +42,7 @@ export async function updateProfileAction(
 
   // Handle immutability after 7 days.
   if (data.handle !== current.handle) {
-    const ageMs = Date.now() - current.handleChangedAt.getTime();
+    const ageMs = Date.now() - current.createdAt.getTime();
     if (ageMs > HANDLE_IMMUTABLE_DAYS * 24 * 60 * 60 * 1000) {
       return fail(
         `Handles can only be changed within ${HANDLE_IMMUTABLE_DAYS} days of creation.`,
@@ -67,10 +67,9 @@ export async function updateProfileAction(
 
   // Same catalog write as onboarding: editing your profile to a school nobody
   // has used yet is the other way a school enters the dropdown.
-  const school = await ensureSchool(data.school);
-
-  await db.$transaction([
-    db.profile.update({
+  await db.$transaction(async (tx) => {
+    const school = await ensureSchool(data.school, tx);
+    await tx.profile.update({
       where: { id: profileId },
       data: {
         name: data.name,
@@ -83,19 +82,24 @@ export async function updateProfileAction(
         isDiscoverable: data.isDiscoverable,
         ...(data.handle !== current.handle ? { handleChangedAt: new Date() } : {}),
       },
-    }),
-    db.profileTag.deleteMany({ where: { profileId } }),
-    db.profileTag.createMany({
+    });
+    await tx.profileTag.deleteMany({ where: { profileId } });
+    await tx.profileTag.createMany({
       data: [
         ...skillIds.map((tagId) => ({ profileId, tagId, relation: "HAS" as const })),
         ...learningIds.map((tagId) => ({ profileId, tagId, relation: "LEARNING" as const })),
       ],
-    }),
-    db.intent.deleteMany({ where: { profileId } }),
-    ...data.intents.map((i) =>
-      db.intent.create({ data: { profileId, kind: i.kind as never, note: i.note ?? "" } })
-    ),
-  ]);
+    });
+    await tx.intent.updateMany({
+      where: { profileId, kind: { notIn: data.intents.map((i) => i.kind as never) } },
+      data: { archivedAt: new Date() },
+    });
+    for (const i of data.intents) await tx.intent.upsert({
+        where: { profileId_kind: { profileId, kind: i.kind as never } },
+        create: { profileId, kind: i.kind as never, note: i.note ?? "" },
+        update: { note: i.note ?? "", archivedAt: null },
+      });
+  });
 
   revalidatePath("/profile");
   revalidatePath(`/u/${data.handle}`);
@@ -116,24 +120,24 @@ export async function removeAvatarAction(): Promise<ActionResult> {
   const session = await requireSession();
   const profileId = await requireProfile(session);
 
-  const profile = await db.profile.findUnique({
-    where: { id: profileId },
-    select: { handle: true, avatarAssetId: true },
-  });
+  const profile = await db.profile.findUnique({ where: { id: profileId }, select: { handle: true, avatarAssetId: true } });
   if (!profile) return fail("Profile not found.");
   // Already on the identicon. Reported as success: the caller asked for a state,
   // and the state holds.
   if (!profile.avatarAssetId) return ok(undefined);
 
   const assetId = profile.avatarAssetId;
-  await db.$transaction([
-    db.profile.update({ where: { id: profileId }, data: { avatarAssetId: null } }),
+  await db.$transaction(async (tx) => {
+    await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${`avatar:${profileId}`}))`;
+    const current = await tx.profile.findUnique({ where: { id: profileId }, select: { avatarAssetId: true } });
+    if (current?.avatarAssetId !== assetId) return;
+    await tx.profile.update({ where: { id: profileId }, data: { avatarAssetId: null } });
     // `deleteMany`, not `delete`: two removals racing each other (or a removal
     // racing a replacement) would otherwise have the loser throw P2025 on a row
     // the winner already took, turning "it is already gone" into a 500. The
     // no-op is the correct outcome — the requested state holds either way.
-    db.mediaAsset.deleteMany({ where: { id: assetId } }),
-  ]);
+    await tx.mediaAsset.deleteMany({ where: { id: assetId } });
+  });
 
   revalidateAvatarSurfaces(profile.handle);
   return ok(undefined);

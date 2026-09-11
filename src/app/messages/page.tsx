@@ -99,6 +99,7 @@ export default async function MessagesPage() {
   const [memberships, teamMemberships] = await Promise.all([
     db.threadMember.findMany({
       where: { profileId },
+      take: 100,
       include: {
         thread: {
           include: {
@@ -135,6 +136,7 @@ export default async function MessagesPage() {
     // that are actually happening. Until then the way in is the project page.
     db.membership.findMany({
       where: { profileId, project: { chat: { isNot: null } } },
+      take: 100,
       select: {
         project: {
           select: {

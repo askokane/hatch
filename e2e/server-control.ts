@@ -16,7 +16,10 @@ const isWin = process.platform === "win32";
 // scripts/with-e2e-db.mjs). Next does not override variables already present in
 // process.env, so .env cannot leak the production URL back in here.
 function envForServer() {
-  if (!process.env.DATABASE_URL?.includes("schema=")) {
+  const database = process.env.DATABASE_URL ? new URL(process.env.DATABASE_URL) : null;
+  const direct = process.env.DIRECT_URL ? new URL(process.env.DIRECT_URL) : null;
+  const schema = database?.searchParams.get("schema") ?? "";
+  if (!database || !direct || !/^hatch_e2e(?:_[a-z0-9_]+)?$/.test(schema) || direct.searchParams.get("schema") !== schema) {
     throw new Error(
       "Refusing to start the e2e server: DATABASE_URL has no explicit schema, so it " +
         "may be pointing at production. Run the suite via `npm run test:e2e`."
@@ -28,6 +31,7 @@ function envForServer() {
     DEV_EMAIL_ALLOWLIST: "@stateu.edu,@hatchdemo.edu,@e2e.edu",
     APP_URL: `http://localhost:${PORT}`,
     PORT: String(PORT),
+    ALLOW_DESTRUCTIVE_SEED: "e2e",
   };
 }
 
@@ -89,13 +93,13 @@ export async function startServer(): Promise<void> {
     }
   }
 
-  const nextBin = join(process.cwd(), "node_modules", ".bin", isWin ? "next.cmd" : "next");
-  const child = spawn(nextBin, ["start", "-p", String(PORT)], {
+  const nextBin = join(process.cwd(), "node_modules", "next", "dist", "bin", "next");
+  const child = spawn(process.execPath, [nextBin, "start", "-p", String(PORT)], {
     env: envForServer(),
     cwd: process.cwd(),
     detached: !isWin,
-    stdio: "ignore",
-    shell: isWin,
+    stdio: process.env.E2E_SERVER_LOG === "1" ? "inherit" : "ignore",
+    shell: false,
   });
   child.unref();
   if (child.pid) writeFileSync(PID_FILE, String(child.pid), "utf8");
