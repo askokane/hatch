@@ -13,7 +13,10 @@ jobs:
         with:
           node-version: 24
           cache: npm
-      - run: npm ci
+      # Optional native packages differ between Windows lockfile generation and
+      # the Linux runner. `npm install` resolves the declared graph for the
+      # runner's platform while retaining the lockfile's direct versions.
+      - run: npm install
       - run: npm run security:audit
       - run: npm run verify
       - run: npx next build
