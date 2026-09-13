@@ -9,6 +9,7 @@ jobs:
     env:
       DATABASE_URL: postgresql://ci:ci@localhost:5432/hatch_ci
       DIRECT_URL: postgresql://ci:ci@localhost:5432/hatch_ci
+      E2E_DIRECT_URL: ${{ secrets.DIRECT_URL }}
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
@@ -24,6 +25,6 @@ jobs:
       - run: npm run verify
       - run: npx next build
       - run: npm run test:e2e
-        if: ${{ secrets.DIRECT_URL != '' }}
+        if: env.E2E_DIRECT_URL != ''
         env:
-          DIRECT_URL: ${{ secrets.DIRECT_URL }}
+          DIRECT_URL: ${{ env.E2E_DIRECT_URL }}
