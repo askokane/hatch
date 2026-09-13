@@ -24,5 +24,6 @@ jobs:
       - run: npm run verify
       - run: npx next build
       - run: npm run test:e2e
+        if: ${{ secrets.DIRECT_URL != '' }}
         env:
           DIRECT_URL: ${{ secrets.DIRECT_URL }}
